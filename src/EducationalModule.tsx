@@ -59,10 +59,10 @@ export const EducationalModule: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in text-slate-800">
+    <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-12 py-8 sm:py-12 animate-fade-in text-slate-800">
       
       {/* Header */}
-      <div className="text-center max-w-3xl mx-auto mb-8">
+      <div className="text-center max-w-4xl mx-auto mb-10">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 border border-purple-300/80 text-purple-950 text-xs font-bold uppercase tracking-wider mb-3 shadow-2xs">
           <BookOpen className="w-3.5 h-3.5 text-purple-700" />
           Guia Educativo e Conscientização

@@ -21,19 +21,19 @@ export const HomeHero: React.FC = () => {
   const { setActiveTab, setIsLoadingScreen } = useApp();
 
   return (
-    <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 animate-fade-in text-slate-800">
+    <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-12 py-8 sm:py-14 animate-fade-in text-slate-800">
       
       {/* Hero Header */}
-      <div className="text-center max-w-3xl mx-auto mb-12">
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-100/90 border border-purple-300/80 text-purple-950 text-xs font-bold uppercase tracking-wider shadow-2xs">
+      <div className="text-center max-w-5xl mx-auto mb-14">
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-5">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-100/90 border border-purple-300/80 text-purple-950 text-xs font-bold uppercase tracking-wider shadow-2xs">
             <ShieldCheck className="w-4 h-4 text-purple-700" />
             <span>Plataforma Oficial de Acolhimento e Prevenção Escolar</span>
           </div>
 
           <button
             onClick={() => setIsLoadingScreen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-800 text-xs font-extrabold shadow-2xs transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-800 text-xs font-extrabold shadow-2xs transition-all active:scale-95 cursor-pointer"
             title="Assistir à animação ilustrada de acolhimento"
           >
             <Heart className="w-3.5 h-3.5 text-rose-600 fill-rose-500" />
@@ -41,22 +41,22 @@ export const HomeHero: React.FC = () => {
           </button>
         </div>
 
-        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4">
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.15] mb-5">
           Sua voz protegida. <br className="hidden sm:block" />
           <span className="bg-gradient-to-r from-purple-700 via-purple-800 to-indigo-700 bg-clip-text text-transparent">
             Um ambiente escolar seguro para todos.
           </span>
         </h1>
 
-        <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto mb-8">
+        <p className="text-slate-600 text-base sm:text-lg lg:text-xl leading-relaxed max-w-3xl lg:max-w-4xl mx-auto mb-10 font-normal">
           Identifique diferentes tipos de agressão, denuncie com <strong>sigilo absoluto e sem cadastro</strong>, receba acolhimento emocional em tempo real e acompanhe as respostas da coordenação escolar.
         </p>
 
         {/* Primary CTA Buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-3.5">
+        <div className="flex flex-wrap items-center justify-center gap-4">
           <button
             onClick={() => setActiveTab('report')}
-            className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-extrabold text-sm sm:text-base px-7 py-3.5 rounded-2xl flex items-center gap-2.5 shadow-md shadow-purple-500/20 transition-all active:scale-95"
+            className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-extrabold text-sm sm:text-base px-8 py-4 rounded-2xl flex items-center gap-3 shadow-md shadow-purple-500/25 transition-all active:scale-95"
           >
             <Send className="w-5 h-5" />
             <span>Fazer Denúncia Anônima</span>
@@ -64,7 +64,7 @@ export const HomeHero: React.FC = () => {
 
           <button
             onClick={() => setActiveTab('support')}
-            className="bg-white hover:bg-purple-50/80 text-slate-800 font-bold text-sm sm:text-base px-6 py-3.5 rounded-2xl flex items-center gap-2 border border-purple-200 shadow-xs transition-all"
+            className="bg-white hover:bg-purple-50 text-slate-800 font-bold text-sm sm:text-base px-7 py-4 rounded-2xl flex items-center gap-2.5 border border-purple-200 shadow-xs transition-all"
           >
             <HeartHandshake className="w-5 h-5 text-purple-600" />
             <span>Apoio Emocional & Chat</span>
@@ -73,7 +73,7 @@ export const HomeHero: React.FC = () => {
       </div>
 
       {/* Feature Pillar Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 w-full max-w-full">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-14 w-full max-w-full">
         
         {/* Card 1: Education */}
         <div 

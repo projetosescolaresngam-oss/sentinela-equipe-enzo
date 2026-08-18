@@ -10,8 +10,8 @@ export const EmergencyBanner: React.FC = () => {
 
   return (
     <>
-      <div className="bg-purple-100/80 text-purple-950 border-b border-purple-200/90 px-3 sm:px-4 py-2 text-xs shadow-2xs w-full max-w-full overflow-hidden">
-        <div className="max-w-7xl w-full mx-auto flex items-center justify-between gap-2 sm:gap-3">
+      <div className="bg-purple-100/80 text-purple-950 border-b border-purple-200/90 px-4 sm:px-8 lg:px-12 py-2 text-xs shadow-2xs w-full max-w-full overflow-hidden">
+        <div className="max-w-[1600px] w-full mx-auto flex items-center justify-between gap-2 sm:gap-4">
           <div className="flex items-center gap-2 overflow-hidden min-w-0">
             <span className="flex h-2 w-2 relative flex-shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
