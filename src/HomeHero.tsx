@@ -1,0 +1,184 @@
+import React from 'react';
+import { 
+  ShieldCheck, 
+  BookOpen, 
+  Send, 
+  Search, 
+  HeartHandshake, 
+  BarChart3, 
+  Wind, 
+  PhoneCall, 
+  CheckCircle, 
+  ArrowRight,
+  Lock,
+  Sparkles,
+  Heart,
+  MessageSquareWarning
+} from 'lucide-react';
+import { useApp } from './AppContext';
+
+export const HomeHero: React.FC = () => {
+  const { setActiveTab, setIsLoadingScreen } = useApp();
+
+  return (
+    <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 animate-fade-in text-slate-800">
+      
+      {/* Hero Header */}
+      <div className="text-center max-w-3xl mx-auto mb-12">
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-100/90 border border-purple-300/80 text-purple-950 text-xs font-bold uppercase tracking-wider shadow-2xs">
+            <ShieldCheck className="w-4 h-4 text-purple-700" />
+            <span>Plataforma Oficial de Acolhimento e Prevenção Escolar</span>
+          </div>
+
+          <button
+            onClick={() => setIsLoadingScreen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-800 text-xs font-extrabold shadow-2xs transition-all active:scale-95 cursor-pointer"
+            title="Assistir à animação ilustrada de acolhimento"
+          >
+            <Heart className="w-3.5 h-3.5 text-rose-600 fill-rose-500" />
+            <span>Ver Animação da Solidariedade</span>
+          </button>
+        </div>
+
+        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4">
+          Sua voz protegida. <br className="hidden sm:block" />
+          <span className="bg-gradient-to-r from-purple-700 via-purple-800 to-indigo-700 bg-clip-text text-transparent">
+            Um ambiente escolar seguro para todos.
+          </span>
+        </h1>
+
+        <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto mb-8">
+          Identifique diferentes tipos de agressão, denuncie com <strong>sigilo absoluto e sem cadastro</strong>, receba acolhimento emocional em tempo real e acompanhe as respostas da coordenação escolar.
+        </p>
+
+        {/* Primary CTA Buttons */}
+        <div className="flex flex-wrap items-center justify-center gap-3.5">
+          <button
+            onClick={() => setActiveTab('report')}
+            className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-extrabold text-sm sm:text-base px-7 py-3.5 rounded-2xl flex items-center gap-2.5 shadow-md shadow-purple-500/20 transition-all active:scale-95"
+          >
+            <Send className="w-5 h-5" />
+            <span>Fazer Denúncia Anônima</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('support')}
+            className="bg-white hover:bg-purple-50/80 text-slate-800 font-bold text-sm sm:text-base px-6 py-3.5 rounded-2xl flex items-center gap-2 border border-purple-200 shadow-xs transition-all"
+          >
+            <HeartHandshake className="w-5 h-5 text-purple-600" />
+            <span>Apoio Emocional & Chat</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Feature Pillar Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 w-full max-w-full">
+        
+        {/* Card 1: Education */}
+        <div 
+          onClick={() => setActiveTab('education')}
+          className="bg-white hover:bg-purple-50/40 border border-purple-200/90 hover:border-purple-400 rounded-3xl p-6 transition-all group cursor-pointer shadow-xs hover:shadow-md flex flex-col justify-between min-w-0"
+        >
+          <div>
+            <div className="w-12 h-12 rounded-2xl bg-purple-100 border border-purple-200 flex items-center justify-center text-purple-800 mb-4 group-hover:scale-105 transition-transform shadow-xs">
+              <BookOpen className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-extrabold text-slate-900 mb-2 group-hover:text-purple-800 transition-colors">
+              Guia dos Tipos de Bullying
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+              Aprenda a reconhecer as 7 formas de intimidação sistemática (físico, verbal, cyber, moral, social), descubra seus direitos legais e veja como reagir com segurança.
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs font-bold text-purple-800 pt-2 border-t border-purple-100">
+            <span>Explorar Guia e Autoavaliação</span>
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </div>
+
+        {/* Card 2: Anonymous Report & Protocol */}
+        <div 
+          onClick={() => setActiveTab('report')}
+          className="bg-white hover:bg-purple-50/40 border border-purple-200/90 hover:border-purple-400 rounded-3xl p-6 transition-all group cursor-pointer shadow-xs hover:shadow-md flex flex-col justify-between"
+        >
+          <div>
+            <div className="w-12 h-12 rounded-2xl bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-800 mb-4 group-hover:scale-105 transition-transform shadow-xs">
+              <Lock className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-extrabold text-slate-900 mb-2 group-hover:text-purple-800 transition-colors">
+              Denúncia 100% Anônima
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+              Escolha as tipologias de agressão, frequência temporal e local do incidente. Você recebe uma chave privada de protocolo para dialogar com o conselho escolar.
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs font-bold text-purple-800 pt-2 border-t border-purple-100">
+            <span>Abrir Formulário Protegido</span>
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </div>
+
+        {/* Card 3: Support & Analytics */}
+        <div 
+          onClick={() => setActiveTab('support')}
+          className="bg-white hover:bg-purple-50/40 border border-purple-200/90 hover:border-purple-400 rounded-3xl p-6 transition-all group cursor-pointer shadow-xs hover:shadow-md flex flex-col justify-between"
+        >
+          <div>
+            <div className="w-12 h-12 rounded-2xl bg-purple-100/80 border border-purple-200 flex items-center justify-center text-purple-700 mb-4 group-hover:scale-105 transition-transform shadow-xs">
+              <Heart className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-extrabold text-slate-900 mb-2 group-hover:text-purple-800 transition-colors">
+              Acolhimento & Descompressão
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+              Chat empático com assistente socioemocional, sons relaxantes sintetizados (chuva, ondas, vento, sino zen), ferramenta de respiração guiada 4-7-8 e redes de proteção (CVV 188).
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs font-bold text-purple-800 pt-2 border-t border-purple-100">
+            <span>Conversar Agora</span>
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </div>
+
+      </div>
+
+      {/* Quick Protocol Lookup Strip */}
+      <div className="bg-gradient-to-r from-purple-100/70 via-indigo-50/80 to-purple-100/70 border border-purple-200 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-purple-200/80 text-purple-900 flex items-center justify-center flex-shrink-0 shadow-xs">
+            <Search className="w-6 h-6" />
+          </div>
+          <div>
+            <h4 className="font-extrabold text-base sm:text-lg text-slate-900">
+              Já fez uma denúncia? Acompanhe o Protocolo
+            </h4>
+            <p className="text-xs sm:text-sm text-slate-600">
+              Verifique as medidas adotadas pela equipe pedagógica e troque mensagens em sigilo.
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setActiveTab('tracker')}
+          className="bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-xl flex items-center gap-2 flex-shrink-0 shadow-xs transition-all active:scale-95"
+        >
+          <Search className="w-4 h-4" />
+          <span>Consultar Meu Protocolo</span>
+        </button>
+      </div>
+
+      {/* Trust & Legal Banner Footer */}
+      <div className="mt-12 pt-8 border-t border-purple-200 text-center text-xs text-slate-500 space-y-2">
+        <p className="flex items-center justify-center gap-1.5 text-slate-700 font-semibold">
+          <ShieldCheck className="w-4 h-4 text-emerald-600" />
+          <span>Em conformidade com a <strong>Lei Federal nº 13.185/2015</strong> e <strong>Lei nº 14.811/2024</strong> (Tipificação do Bullying e Cyberbullying).</span>
+        </p>
+        <p className="text-[11px] text-slate-500">
+          Protegido por protocolos de anonimato inviolável. Não rastreamos endereços IP ou identificadores de aparelho.
+        </p>
+      </div>
+
+    </div>
+  );
+};
