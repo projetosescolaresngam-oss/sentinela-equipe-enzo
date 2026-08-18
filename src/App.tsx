@@ -21,7 +21,7 @@ const MainContent: React.FC = () => {
   const { activeTab } = useApp();
 
   return (
-    <main className="flex-1 w-full max-w-full overflow-x-hidden">
+    <main className="flex-1 w-full max-w-full overflow-x-hidden pb-16 md:pb-0">
       {activeTab === 'home' && <HomeHero />}
       {activeTab === 'education' && <EducationalModule />}
       {activeTab === 'report' && <ReportWizard />}
