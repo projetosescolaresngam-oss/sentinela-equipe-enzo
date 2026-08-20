@@ -2,7 +2,6 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { defineConfig, Plugin } from 'vite';
-import { GoogleGenAI } from '@google/genai';
 
 function devApiPlugin(): Plugin {
   return {
@@ -21,6 +20,7 @@ function devApiPlugin(): Plugin {
                 res.end(JSON.stringify({ error: 'GEMINI_API_KEY não configurada.', fallback: true }));
                 return;
               }
+              const { GoogleGenAI } = await import('@google/genai');
               const ai = new GoogleGenAI({ apiKey });
               const systemInstruction = `
 Você é a "Sentinela", assistente virtual de acolhimento e suporte socioemocional da plataforma escolar "Sentinela Escolar" (Brasil).
@@ -39,7 +39,7 @@ Seu papel é acolher estudantes, pais, professores e testemunhas de bullying com
               }));
             } catch (err: any) {
               res.writeHead(500, { 'Content-Type': 'application/json' });
-              res.end(JSON.stringify({ error: err.message, fallback: true }));
+              res.end(JSON.stringify({ error: err?.message || 'Erro', fallback: true }));
             }
           });
           return;
@@ -57,6 +57,7 @@ Seu papel é acolher estudantes, pais, professores e testemunhas de bullying com
                 res.end(JSON.stringify({ error: 'GEMINI_API_KEY não configurada.' }));
                 return;
               }
+              const { GoogleGenAI } = await import('@google/genai');
               const ai = new GoogleGenAI({ apiKey });
               const prompt = `Analise este relato de bullying escolar sob a Lei 13.185/15:\nProtocolo: ${report.id}\nTipos: ${(report.types || []).join(', ')}\nFrequência: ${report.frequency}\nLocal: ${report.location}\nDescrição: ${report.description}\n\nForneça: 1. Diagnóstico, 2. Risco, 3. Plano de ação pedagógico, 4. Sugestão de mensagem ao aluno.`;
               const response = await ai.models.generateContent({
@@ -67,7 +68,7 @@ Seu papel é acolher estudantes, pais, professores e testemunhas de bullying com
               res.end(JSON.stringify({ analysis: response.text || 'Análise concluída.' }));
             } catch (err: any) {
               res.writeHead(500, { 'Content-Type': 'application/json' });
-              res.end(JSON.stringify({ error: err.message }));
+              res.end(JSON.stringify({ error: err?.message || 'Erro' }));
             }
           });
           return;
@@ -88,6 +89,8 @@ export default defineConfig(() => {
       },
     },
     server: {
+      port: 3000,
+      host: '0.0.0.0',
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       // Do not modify—file watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
