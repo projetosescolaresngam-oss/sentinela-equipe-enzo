@@ -48,15 +48,17 @@ interface AppContextType {
   markNotificationAsRead: (notifId: string) => void;
   sendChatMessage: (content: string) => void;
   clearChat: () => void;
+  deleteReport: (reportId: string) => void;
+  deleteAllReports: () => void;
   exportReportsCSV: () => void;
   resetAllDataToDefault: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const STORAGE_KEY_REPORTS = 'sentinela_reports_v2';
-const STORAGE_KEY_NOTIFS = 'sentinela_notifs_v2';
-const STORAGE_KEY_CHAT = 'sentinela_chat_v2';
+const STORAGE_KEY_REPORTS = 'sentinela_reports_v3';
+const STORAGE_KEY_NOTIFS = 'sentinela_notifs_v3';
+const STORAGE_KEY_CHAT = 'sentinela_chat_v3';
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeTab, setActiveTab] = useState<'home' | 'education' | 'report' | 'tracker' | 'support' | 'admin'>('home');
@@ -66,9 +68,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isBreathingModalOpen, setIsBreathingModalOpen] = useState<boolean>(false);
   const [isLoadingScreen, setIsLoadingScreen] = useState<boolean>(true);
 
-  // Initialize reports from LocalStorage or Seed
+  // Initialize reports from LocalStorage or Seed (empty)
   const [reports, setReports] = useState<IncidentReport[]>(() => {
     try {
+      // Clean legacy caches
+      localStorage.removeItem('sentinela_reports_v2');
+      localStorage.removeItem('sentinela_reports');
       const saved = localStorage.getItem(STORAGE_KEY_REPORTS);
       if (saved) return JSON.parse(saved);
     } catch {
@@ -80,6 +85,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Initialize notifications
   const [notifications, setNotifications] = useState<AdminNotification[]>(() => {
     try {
+      // Clean legacy caches
+      localStorage.removeItem('sentinela_notifs_v2');
+      localStorage.removeItem('sentinela_notifs');
       const saved = localStorage.getItem(STORAGE_KEY_NOTIFS);
       if (saved) return JSON.parse(saved);
     } catch {
@@ -361,6 +369,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     document.body.removeChild(link);
   };
 
+  const deleteReport = (reportId: string) => {
+    setReports(prev => prev.filter(r => r.id !== reportId));
+    setNotifications(prev => prev.filter(n => n.reportId !== reportId));
+  };
+
+  const deleteAllReports = () => {
+    setReports([]);
+    setNotifications([]);
+    localStorage.removeItem(STORAGE_KEY_REPORTS);
+    localStorage.removeItem(STORAGE_KEY_NOTIFS);
+  };
+
   const resetAllDataToDefault = () => {
     setReports(INITIAL_REPORTS);
     setNotifications(INITIAL_NOTIFICATIONS);
@@ -394,6 +414,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       markNotificationAsRead,
       sendChatMessage,
       clearChat,
+      deleteReport,
+      deleteAllReports,
       exportReportsCSV,
       resetAllDataToDefault
     }}>

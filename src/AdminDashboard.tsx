@@ -22,7 +22,8 @@ import {
   MessageSquare,
   FileText,
   Building,
-  RotateCcw
+  RotateCcw,
+  Trash2
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -49,6 +50,8 @@ export const AdminDashboard: React.FC = () => {
     markNotificationAsRead, 
     updateReportStatus, 
     addMessageToProtocol, 
+    deleteReport,
+    deleteAllReports,
     exportReportsCSV,
     isAdminAuthenticated,
     setIsAdminAuthenticated,
@@ -57,6 +60,8 @@ export const AdminDashboard: React.FC = () => {
 
   const [passwordInput, setPasswordInput] = useState<string>('');
   const [authError, setAuthError] = useState<string>('');
+  const [showConfirmDeleteAll, setShowConfirmDeleteAll] = useState<boolean>(false);
+  const [reportToDelete, setReportToDelete] = useState<IncidentReport | null>(null);
   
   // Filters
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -177,13 +182,15 @@ export const AdminDashboard: React.FC = () => {
   }, [reports]);
 
   // Chart Data 3: Monthly timeline simulation
-  const monthlyTrendData = [
+  const monthlyTrendData = totalReports > 0 ? [
     { mes: 'Mar/26', denuncias: 4, resolvidos: 3 },
     { mes: 'Abr/26', denuncias: 6, resolvidos: 5 },
     { mes: 'Mai/26', denuncias: 8, resolvidos: 7 },
     { mes: 'Jun/26', denuncias: 3, resolvidos: 3 },
     { mes: 'Jul/26', denuncias: 2, resolvidos: 2 },
     { mes: 'Ago/26', denuncias: totalReports, resolvidos: resolvedReports },
+  ] : [
+    { mes: 'Ago/26', denuncias: 0, resolvidos: 0 }
   ];
 
   // Location Hotspots
@@ -296,10 +303,10 @@ export const AdminDashboard: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
           <button
             onClick={() => setShowMonthlyReportModal(true)}
-            className="bg-purple-600 hover:bg-purple-700 text-white text-xs sm:text-sm font-extrabold px-4 py-2.5 rounded-2xl flex items-center gap-2 shadow-xs transition-all active:scale-95"
+            className="bg-purple-600 hover:bg-purple-700 text-white text-xs sm:text-sm font-extrabold px-4 py-2.5 rounded-2xl flex items-center gap-2 shadow-xs transition-all active:scale-95 cursor-pointer"
           >
             <FileText className="w-4 h-4" />
             <span>Emitir Relatório Mensal</span>
@@ -307,7 +314,7 @@ export const AdminDashboard: React.FC = () => {
 
           <button
             onClick={exportReportsCSV}
-            className="bg-white hover:bg-purple-50 text-slate-800 text-xs sm:text-sm font-bold px-3.5 py-2.5 rounded-2xl flex items-center gap-1.5 border border-purple-300 shadow-2xs"
+            className="bg-white hover:bg-purple-50 text-slate-800 text-xs sm:text-sm font-bold px-3.5 py-2.5 rounded-2xl flex items-center gap-1.5 border border-purple-300 shadow-2xs cursor-pointer"
             title="Exportar CSV de Dados"
           >
             <Download className="w-4 h-4 text-purple-700" />
@@ -315,8 +322,18 @@ export const AdminDashboard: React.FC = () => {
           </button>
 
           <button
+            onClick={() => setShowConfirmDeleteAll(true)}
+            className="bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 text-xs sm:text-sm font-bold px-3.5 py-2.5 rounded-2xl flex items-center gap-1.5 border border-rose-200 shadow-2xs transition-colors cursor-pointer"
+            title="Apagar permanentemente todas as denúncias cadastradas"
+          >
+            <Trash2 className="w-4 h-4 text-rose-600" />
+            <span className="hidden sm:inline">Apagar Todas as Denúncias</span>
+            <span className="sm:hidden">Apagar Tudo</span>
+          </button>
+
+          <button
             onClick={() => setIsAdminAuthenticated(false)}
-            className="bg-purple-100 hover:bg-rose-100 text-purple-900 hover:text-rose-700 text-xs font-bold px-3 py-2.5 rounded-2xl border border-purple-300 transition-colors"
+            className="bg-purple-100 hover:bg-purple-200 text-purple-900 text-xs font-bold px-3 py-2.5 rounded-2xl border border-purple-300 transition-colors cursor-pointer"
             title="Sair do Modo Gestor"
           >
             Sair
@@ -376,28 +393,36 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         <div className="space-y-2">
-          {notifications.map((notif) => (
-            <div
-              key={notif.id}
-              onClick={() => markNotificationAsRead(notif.id)}
-              className={`p-3 rounded-2xl border flex items-center justify-between gap-3 text-xs transition-all cursor-pointer ${
-                notif.read
-                  ? 'bg-purple-50/40 border-purple-100 text-slate-500'
-                  : 'bg-purple-100/70 border-purple-300 text-slate-900 font-medium shadow-2xs'
-              }`}
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <span className={`w-2 h-2 rounded-full flex-shrink-0 ${notif.read ? 'bg-slate-400' : 'bg-purple-600 animate-ping'}`} />
-                <div className="min-w-0">
-                  <span className="font-extrabold text-slate-900 truncate block">{notif.title}</span>
-                  <p className="text-[11px] text-slate-600 truncate">{notif.message}</p>
-                </div>
-              </div>
-              <span className="text-[10px] text-slate-400 flex-shrink-0 font-medium">
-                {new Date(notif.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-              </span>
+          {notifications.length === 0 ? (
+            <div className="text-center py-5 text-slate-500 text-xs flex flex-col items-center justify-center gap-1.5">
+              <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+              <p className="font-semibold text-slate-700">Nenhum alerta ou notificação pendente.</p>
+              <p className="text-[11px] text-slate-400">Quando novos relatos forem enviados pelos alunos, as notificações aparecerão aqui.</p>
             </div>
-          ))}
+          ) : (
+            notifications.map((notif) => (
+              <div
+                key={notif.id}
+                onClick={() => markNotificationAsRead(notif.id)}
+                className={`p-3 rounded-2xl border flex items-center justify-between gap-3 text-xs transition-all cursor-pointer ${
+                  notif.read
+                    ? 'bg-purple-50/40 border-purple-100 text-slate-500'
+                    : 'bg-purple-100/70 border-purple-300 text-slate-900 font-medium shadow-2xs'
+                }`}
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className={`w-2 h-2 rounded-full flex-shrink-0 ${notif.read ? 'bg-slate-400' : 'bg-purple-600 animate-ping'}`} />
+                  <div className="min-w-0">
+                    <span className="font-extrabold text-slate-900 truncate block">{notif.title}</span>
+                    <p className="text-[11px] text-slate-600 truncate">{notif.message}</p>
+                  </div>
+                </div>
+                <span className="text-[10px] text-slate-400 flex-shrink-0 font-medium">
+                  {new Date(notif.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
@@ -494,20 +519,26 @@ export const AdminDashboard: React.FC = () => {
           <h3 className="font-extrabold text-base text-slate-900 mb-1">Zonas de Atenção na Escola</h3>
           <p className="text-xs text-slate-500 mb-4">Locais com maior volume de relatos</p>
           <div className="space-y-2.5">
-            {locationBreakdown.slice(0, 5).map(([loc, count], idx) => {
-              const pct = Math.round((count / totalReports) * 100);
-              return (
-                <div key={idx} className="bg-purple-50/60 p-2.5 rounded-2xl border border-purple-200">
-                  <div className="flex justify-between text-xs font-bold mb-1">
-                    <span className="text-slate-800 truncate">{loc}</span>
-                    <span className="text-purple-900 font-mono">{count} ({pct}%)</span>
+            {locationBreakdown.length === 0 ? (
+              <div className="text-center py-6 text-slate-400 text-xs italic">
+                Nenhuma zona de atenção identificada no momento.
+              </div>
+            ) : (
+              locationBreakdown.slice(0, 5).map(([loc, count], idx) => {
+                const pct = totalReports > 0 ? Math.round((count / totalReports) * 100) : 0;
+                return (
+                  <div key={idx} className="bg-purple-50/60 p-2.5 rounded-2xl border border-purple-200">
+                    <div className="flex justify-between text-xs font-bold mb-1">
+                      <span className="text-slate-800 truncate">{loc}</span>
+                      <span className="text-purple-900 font-mono">{count} ({pct}%)</span>
+                    </div>
+                    <div className="w-full bg-purple-200 h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-purple-600 h-full rounded-full" style={{ width: `${pct}%` }} />
+                    </div>
                   </div>
-                  <div className="w-full bg-purple-200 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-purple-600 h-full rounded-full" style={{ width: `${pct}%` }} />
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
 
@@ -576,64 +607,86 @@ export const AdminDashboard: React.FC = () => {
                 <th className="p-3.5">Frequência</th>
                 <th className="p-3.5">Status</th>
                 <th className="p-3.5">Mensagens</th>
-                <th className="p-3.5 text-right rounded-r-2xl">Ação</th>
+                <th className="p-3.5 text-right rounded-r-2xl">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-purple-100">
-              {filteredReports.map((rep) => {
-                const isCrit = rep.urgency === 'critica_sos';
-                return (
-                  <tr 
-                    key={rep.id}
-                    onClick={() => handleOpenReviewModal(rep)}
-                    className={`hover:bg-purple-50/80 transition-colors cursor-pointer ${
-                      isCrit ? 'bg-rose-50/60' : ''
-                    }`}
-                  >
-                    <td className="p-3.5 font-mono font-black text-purple-900">{rep.id}</td>
-                    <td className="p-3.5 capitalize font-bold text-slate-800">
-                      {rep.types.join(', ')}
-                    </td>
-                    <td className="p-3.5 text-slate-700">
-                      <span className="font-semibold">{rep.location}</span>
-                      <span className="text-[10px] text-slate-500 block">({rep.shift})</span>
-                    </td>
-                    <td className="p-3.5">
-                      <span className={`px-2 py-0.5 rounded-full font-extrabold uppercase text-[10px] ${
-                        rep.urgency === 'critica_sos' ? 'bg-rose-100 text-rose-800 border border-rose-300 animate-pulse' :
-                        rep.urgency === 'alta' ? 'bg-orange-100 text-orange-800 border border-orange-200' :
-                        rep.urgency === 'media' ? 'bg-purple-100 text-purple-900 border border-purple-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                      }`}>
-                        {rep.urgency}
-                      </span>
-                    </td>
-                    <td className="p-3.5 capitalize text-slate-600">{rep.frequency.replace(/_/g, ' ')}</td>
-                    <td className="p-3.5">
-                      <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
-                        rep.status === 'novo' ? 'bg-purple-100 text-purple-950 border border-purple-300' :
-                        rep.status === 'em_analise' ? 'bg-purple-200 text-purple-950 border border-purple-400' :
-                        rep.status === 'acao_em_andamento' ? 'bg-indigo-100 text-indigo-950 border border-indigo-200' : 'bg-emerald-100 text-emerald-900 border border-emerald-200'
-                      }`}>
-                        {rep.status.replace(/_/g, ' ')}
-                      </span>
-                    </td>
-                    <td className="p-3.5 text-slate-500 font-mono font-bold">
-                      {rep.messages.length} msg(s)
-                    </td>
-                    <td className="p-3.5 text-right">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenReviewModal(rep);
-                        }}
-                        className="bg-purple-600 hover:bg-purple-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-extrabold shadow-2xs transition-all active:scale-95"
-                      >
-                        Mediar
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+              {filteredReports.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="p-10 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2 max-w-md mx-auto text-slate-500">
+                      <div className="w-12 h-12 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center mb-1">
+                        <CheckCircle2 className="w-6 h-6" />
+                      </div>
+                      <p className="font-bold text-sm text-slate-800">Nenhuma denúncia cadastrada ou encontrada</p>
+                      <p className="text-xs text-slate-500 leading-relaxed">
+                        Todas as denúncias foram limpas do banco de dados ou nenhum registro corresponde aos filtros selecionados. As novas denúncias recebidas pelo formulário anônimo aparecerão aqui instantaneamente.
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredReports.map((rep) => {
+                  const isCrit = rep.urgency === 'critica_sos';
+                  return (
+                    <tr 
+                      key={rep.id}
+                      onClick={() => handleOpenReviewModal(rep)}
+                      className={`hover:bg-purple-50/80 transition-colors cursor-pointer ${
+                        isCrit ? 'bg-rose-50/60' : ''
+                      }`}
+                    >
+                      <td className="p-3.5 font-mono font-black text-purple-900">{rep.id}</td>
+                      <td className="p-3.5 capitalize font-bold text-slate-800">
+                        {rep.types.join(', ')}
+                      </td>
+                      <td className="p-3.5 text-slate-700">
+                        <span className="font-semibold">{rep.location}</span>
+                        <span className="text-[10px] text-slate-500 block">({rep.shift})</span>
+                      </td>
+                      <td className="p-3.5">
+                        <span className={`px-2 py-0.5 rounded-full font-extrabold uppercase text-[10px] ${
+                          rep.urgency === 'critica_sos' ? 'bg-rose-100 text-rose-800 border border-rose-300 animate-pulse' :
+                          rep.urgency === 'alta' ? 'bg-orange-100 text-orange-800 border border-orange-200' :
+                          rep.urgency === 'media' ? 'bg-purple-100 text-purple-900 border border-purple-300' : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                        }`}>
+                          {rep.urgency}
+                        </span>
+                      </td>
+                      <td className="p-3.5 capitalize text-slate-600">{rep.frequency.replace(/_/g, ' ')}</td>
+                      <td className="p-3.5">
+                        <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
+                          rep.status === 'novo' ? 'bg-purple-100 text-purple-950 border border-purple-300' :
+                          rep.status === 'em_analise' ? 'bg-purple-200 text-purple-950 border border-purple-400' :
+                          rep.status === 'acao_em_andamento' ? 'bg-indigo-100 text-indigo-950 border border-indigo-200' : 'bg-emerald-100 text-emerald-900 border border-emerald-200'
+                        }`}>
+                          {rep.status.replace(/_/g, ' ')}
+                        </span>
+                      </td>
+                      <td className="p-3.5 text-slate-500 font-mono font-bold">
+                        {rep.messages.length} msg(s)
+                      </td>
+                      <td className="p-3.5 text-right">
+                        <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={() => handleOpenReviewModal(rep)}
+                            className="bg-purple-600 hover:bg-purple-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-extrabold shadow-2xs transition-all active:scale-95 cursor-pointer"
+                          >
+                            Mediar
+                          </button>
+                          <button
+                            onClick={() => setReportToDelete(rep)}
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
+                            title="Apagar esta denúncia"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
@@ -789,23 +842,116 @@ export const AdminDashboard: React.FC = () => {
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-2">
+              <div className="flex items-center justify-between gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => setSelectedReportModal(null)}
-                  className="bg-purple-100 hover:bg-purple-200 text-purple-950 text-xs font-bold px-4 py-2.5 rounded-2xl transition-colors"
+                  onClick={() => {
+                    if (selectedReportModal) {
+                      setReportToDelete(selectedReportModal);
+                    }
+                  }}
+                  className="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold px-3.5 py-2.5 rounded-2xl border border-rose-200 flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
-                  Cancelar
+                  <Trash2 className="w-4 h-4 text-rose-600" />
+                  <span>Excluir Denúncia</span>
                 </button>
-                <button
-                  type="submit"
-                  className="bg-purple-600 hover:bg-purple-700 text-white text-xs font-extrabold px-5 py-2.5 rounded-2xl shadow-xs transition-all active:scale-95"
-                >
-                  Salvar Alterações e Enviar
-                </button>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedReportModal(null)}
+                    className="bg-purple-100 hover:bg-purple-200 text-purple-950 text-xs font-bold px-4 py-2.5 rounded-2xl transition-colors cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-purple-600 hover:bg-purple-700 text-white text-xs font-extrabold px-5 py-2.5 rounded-2xl shadow-xs transition-all active:scale-95 cursor-pointer"
+                  >
+                    Salvar Alterações e Enviar
+                  </button>
+                </div>
               </div>
             </form>
 
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal: Delete Single Report */}
+      {reportToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fade-in text-slate-800">
+          <div className="bg-white border border-rose-200 rounded-3xl max-w-md w-full p-6 text-slate-800 shadow-2xl relative">
+            <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mb-4">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-black text-slate-900 mb-2">
+              Excluir Denúncia #{reportToDelete.id}?
+            </h3>
+            <p className="text-xs text-slate-600 leading-relaxed mb-6">
+              Esta ação removerá permanentemente o relato, histórico de mensagens no protocolo e notificações associadas.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setReportToDelete(null)}
+                className="bg-purple-100 hover:bg-purple-200 text-purple-950 text-xs font-bold px-4 py-2.5 rounded-2xl transition-colors cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteReport(reportToDelete.id);
+                  if (selectedReportModal?.id === reportToDelete.id) {
+                    setSelectedReportModal(null);
+                  }
+                  setReportToDelete(null);
+                }}
+                className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold px-5 py-2.5 rounded-2xl shadow-xs transition-all active:scale-95 cursor-pointer flex items-center gap-1.5"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Sim, Excluir</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal: Delete ALL Reports */}
+      {showConfirmDeleteAll && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fade-in text-slate-800">
+          <div className="bg-white border border-rose-200 rounded-3xl max-w-md w-full p-6 text-slate-800 shadow-2xl relative">
+            <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mb-4">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-black text-slate-900 mb-2">
+              Apagar Todas as Denúncias?
+            </h3>
+            <p className="text-xs text-slate-600 leading-relaxed mb-6">
+              Tem certeza de que deseja apagar todas as denúncias registradas até agora? Todo o histórico de protocolos e notificações será limpo e a base de dados ficará vazia.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowConfirmDeleteAll(false)}
+                className="bg-purple-100 hover:bg-purple-200 text-purple-950 text-xs font-bold px-4 py-2.5 rounded-2xl transition-colors cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteAllReports();
+                  setSelectedReportModal(null);
+                  setShowConfirmDeleteAll(false);
+                }}
+                className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold px-5 py-2.5 rounded-2xl shadow-xs transition-all active:scale-95 cursor-pointer flex items-center gap-1.5"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Sim, Apagar Tudo</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
