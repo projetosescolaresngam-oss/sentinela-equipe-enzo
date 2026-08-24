@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Send, 
   ShieldCheck, 
@@ -51,6 +51,15 @@ export const ReportWizard: React.FC = () => {
   const [attachedFiles, setAttachedFiles] = useState<{ id: string; name: string; size: string; type: 'foto' | 'print' | 'bilhete' | 'outro' }[]>([]);
   const [generatedProtocol, setGeneratedProtocol] = useState<string | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
+
+  // Rolagem suave para o topo sempre que a etapa da denúncia for alterada
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth'
+    });
+  }, [currentStep]);
 
   const categoriesConfig: { id: BullyingCategory; name: string; icon: any; desc: string }[] = [
     { id: 'verbal', name: 'Verbal', icon: MessageSquareWarning, desc: 'Apelidos, ofensas, piadas humilhantes' },
