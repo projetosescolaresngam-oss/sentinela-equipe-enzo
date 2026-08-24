@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { 
   IncidentReport, 
   AdminNotification, 
@@ -8,9 +8,14 @@ import {
   SchoolShift, 
   ReporterRole, 
   UrgencyLevel, 
-  ReportStatus 
+  ReportStatus,
+  Achievement,
+  AchievementId,
+  EducationalActivityProgress,
+  UserQuizProgress
 } from './types';
 import { INITIAL_REPORTS, INITIAL_NOTIFICATIONS } from './initialData';
+import { INITIAL_ACHIEVEMENTS, INITIAL_EDUCATIONAL_PROGRESS } from './achievementsData';
 
 interface AppContextType {
   reports: IncidentReport[];
@@ -28,6 +33,29 @@ interface AppContextType {
   setIsBreathingModalOpen: (open: boolean) => void;
   isLoadingScreen: boolean;
   setIsLoadingScreen: (loading: boolean) => void;
+  
+  // Achievements & Educational Progress
+  achievements: Achievement[];
+  educationalProgress: EducationalActivityProgress;
+  latestUnlockedAchievement: Achievement | null;
+  dismissAchievementModal: () => void;
+  markActivityCompleted: (
+    activity: 
+      | 'viewedLaws' 
+      | 'completedQuiz' 
+      | 'exploredBullyingType' 
+      | 'completedRespectModule' 
+      | 'completedBreathingSession'
+      | 'interactedWithChat'
+      | 'checkedOrCopiedProtocol'
+      | 'submittedOrViewedReport',
+    param?: string
+  ) => void;
+  recordQuizCompletion: (
+    quizId: string,
+    score: number,
+    totalQuestions: number
+  ) => { isNewRecord: boolean; percentage: number };
   
   // Actions
   submitReport: (params: {
@@ -59,6 +87,8 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 const STORAGE_KEY_REPORTS = 'sentinela_reports_v3';
 const STORAGE_KEY_NOTIFS = 'sentinela_notifs_v3';
 const STORAGE_KEY_CHAT = 'sentinela_chat_v3';
+const STORAGE_KEY_ACHIEVEMENTS = 'sentinela_achievements_v1';
+const STORAGE_KEY_PROGRESS = 'sentinela_edu_progress_v1';
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeTab, setActiveTab] = useState<'home' | 'education' | 'report' | 'tracker' | 'support' | 'admin'>('home');
@@ -67,6 +97,42 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(false);
   const [isBreathingModalOpen, setIsBreathingModalOpen] = useState<boolean>(false);
   const [isLoadingScreen, setIsLoadingScreen] = useState<boolean>(true);
+
+  // Initialize Achievements from LocalStorage or Default
+  const [achievements, setAchievements] = useState<Achievement[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_ACHIEVEMENTS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Merge with initial data in case new badges were added
+        return INITIAL_ACHIEVEMENTS.map(initialBadge => {
+          const found = parsed.find((p: Achievement) => p.id === initialBadge.id);
+          return found ? { ...initialBadge, ...found } : initialBadge;
+        });
+      }
+    } catch {
+      // ignore
+    }
+    return INITIAL_ACHIEVEMENTS;
+  });
+
+  // Initialize Educational Activity Progress
+  const [educationalProgress, setEducationalProgress] = useState<EducationalActivityProgress>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_PROGRESS);
+      if (saved) return JSON.parse(saved);
+    } catch {
+      // ignore
+    }
+    return INITIAL_EDUCATIONAL_PROGRESS;
+  });
+
+  // Modal for celebrating latest unlocked badge
+  const [latestUnlockedAchievement, setLatestUnlockedAchievement] = useState<Achievement | null>(null);
+
+  const dismissAchievementModal = () => {
+    setLatestUnlockedAchievement(null);
+  };
 
   // Initialize reports from LocalStorage or Seed (empty)
   const [reports, setReports] = useState<IncidentReport[]>(() => {
@@ -123,6 +189,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Sync to LocalStorage
   useEffect(() => {
     try {
+      localStorage.setItem(STORAGE_KEY_ACHIEVEMENTS, JSON.stringify(achievements));
+    } catch {
+      // ignore
+    }
+  }, [achievements]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY_PROGRESS, JSON.stringify(educationalProgress));
+    } catch {
+      // ignore
+    }
+  }, [educationalProgress]);
+
+  useEffect(() => {
+    try {
       localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(reports));
     } catch {
       // ignore
@@ -144,6 +226,279 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // ignore
     }
   }, [chatMessages]);
+
+  // Recalculate Achievements Progress and Trigger Unlocks
+  const evaluateAchievements = useCallback((progress: EducationalActivityProgress) => {
+    setAchievements(prevAchievements => {
+      let newlyUnlocked: Achievement | null = null;
+
+      // Count completed quizzes
+      const quizzesList = (Object.values(progress.quizzesProgress || {}) as UserQuizProgress[]);
+      const completedQuizzesCount = quizzesList.filter(q => q.completed).length;
+      
+      // Count quizzes with >= 80% accuracy
+      const highAccuracyQuizzesCount = quizzesList.filter(
+        q => q.completed && q.totalQuestions > 0 && (q.bestScore / q.totalQuestions) >= 0.8
+      ).length;
+
+      // Check if any quiz has 100% (perfect score)
+      const hasPerfectScoreQuiz = quizzesList.some(
+        q => q.completed && q.totalQuestions > 0 && q.bestScore === q.totalQuestions
+      );
+
+      // Check Cyberbullying quiz (>=80%)
+      const cyberQuiz = progress.quizzesProgress?.['quiz-cyberbullying-digital'];
+      const hasCyberHighAccuracy = !!(cyberQuiz && cyberQuiz.completed && cyberQuiz.totalQuestions > 0 && (cyberQuiz.bestScore / cyberQuiz.totalQuestions) >= 0.8);
+
+      // Check Empathy quiz (>=80%)
+      const empathyQuiz = progress.quizzesProgress?.['quiz-empatia-respeito'];
+      const hasEmpathyHighAccuracy = !!(empathyQuiz && empathyQuiz.completed && empathyQuiz.totalQuestions > 0 && (empathyQuiz.bestScore / empathyQuiz.totalQuestions) >= 0.8);
+
+      // Total questions answered
+      const totalQuestionsAnswered = progress.totalQuestionsAnswered || (quizzesList.reduce((sum, q) => sum + (q.attempts * q.totalQuestions), 0));
+
+      // Explored types count
+      const exploredTypesCount = progress.exploredBullyingTypes?.length || 0;
+
+      // Breathing sessions count
+      const breathingCount = progress.breathingSessionsCount || (progress.completedBreathingSession ? 1 : 0);
+
+      // Count how many badges are already unlocked (for the collector badge)
+      const alreadyUnlockedCount = prevAchievements.filter(b => b.id !== 'colecionador_supremo' && b.isUnlocked).length;
+
+      const updated = prevAchievements.map(badge => {
+        let currentProgress = badge.currentProgress;
+        let isUnlocked = badge.isUnlocked;
+
+        switch (badge.id) {
+          case 'conhecedor_direitos': {
+            // Calouro Anti-Treta: 1 quiz ou leitura de leis
+            const hasCompleted = completedQuizzesCount >= 1 || progress.viewedLaws;
+            currentProgress = hasCompleted ? 1 : 0;
+            if (hasCompleted && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'aliado_escola_segura': {
+            // Trio Parada Firme da Paz: 3 quizzes concluídos
+            currentProgress = Math.min(3, completedQuizzesCount);
+            if (currentProgress >= 3 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'especialista_respeito': {
+            // Cérebro Galáctico do Respeito: 3 quizzes com >= 80%
+            currentProgress = Math.min(3, highAccuracyQuizzesCount);
+            if (currentProgress >= 3 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'protetor_comunidade': {
+            // Gabaritador Lendário: 5 quizzes concluídos
+            currentProgress = Math.min(5, completedQuizzesCount);
+            if (currentProgress >= 5 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'gabarito_perfeito': {
+            // Oráculo do 100%: 1 quiz com 100%
+            currentProgress = hasPerfectScoreQuiz ? 1 : 0;
+            if (hasPerfectScoreQuiz && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'speedrunner_sabedoria': {
+            // Detetive Cibernético: quiz cyberbullying >= 80%
+            currentProgress = hasCyberHighAccuracy ? 1 : 0;
+            if (hasCyberHighAccuracy && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'enciclopedia_viva': {
+            // Maratonista de Neurônios: 20 questões respondidas
+            currentProgress = Math.min(20, totalQuestionsAnswered);
+            if (currentProgress >= 20 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'explorador_matriz': {
+            // Curioso Nível Hard: 7 tipos explorados
+            currentProgress = Math.min(7, exploredTypesCount);
+            if (currentProgress >= 7 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'advogado_do_bem': {
+            // Doutor em Não-Vacilo: Leis lidas
+            currentProgress = progress.viewedLaws ? 1 : 0;
+            if (progress.viewedLaws && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'coracao_de_ouro': {
+            // Embaixador da Empatia: Módulo de Respeito concluído
+            currentProgress = progress.completedRespectModule ? 1 : 0;
+            if (progress.completedRespectModule && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'campeao_inclusao': {
+            // Radar Anti-Exclusão Social: Quiz empatia >= 80%
+            currentProgress = hasEmpathyHighAccuracy ? 1 : 0;
+            if (hasEmpathyHighAccuracy && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'mente_tranquila': {
+            // Monge Zen: 1 sessão de respiração
+            currentProgress = progress.completedBreathingSession ? 1 : 0;
+            if (progress.completedBreathingSession && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'mestre_zen': {
+            // Pulmão de Aço da Serenidade: 3 sessões de respiração
+            currentProgress = Math.min(3, breathingCount);
+            if (currentProgress >= 3 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'desabafo_seguro': {
+            // Coração Leve, Mente Clara: Interação com chat
+            currentProgress = progress.interactedWithChat ? 1 : 0;
+            if (progress.interactedWithChat && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'guardiao_digital': {
+            // Agente Secreto do Protocolo: Consulta ou cópia
+            currentProgress = progress.checkedOrCopiedProtocol ? 1 : 0;
+            if (progress.checkedOrCopiedProtocol && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'radar_antizueira': {
+            // Escudo Guardião Ativado: Relato ou consulta
+            currentProgress = progress.submittedOrViewedReport ? 1 : 0;
+            if (progress.submittedOrViewedReport && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'sentinela_noturno': {
+            // Sentinela Noturno da Paz: Atividade na plataforma
+            currentProgress = 1;
+            if (!isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'colecionador_supremo': {
+            // Lorde Supremo dos Distintivos: 10 badges
+            currentProgress = Math.min(10, alreadyUnlockedCount);
+            if (currentProgress >= 10 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          default:
+            break;
+        }
+
+        // If newly unlocked in this run
+        if (isUnlocked && !badge.isUnlocked) {
+          const unlockedBadge: Achievement = {
+            ...badge,
+            isUnlocked: true,
+            currentProgress,
+            unlockedAt: new Date().toISOString()
+          };
+          if (!newlyUnlocked) {
+            newlyUnlocked = unlockedBadge;
+          }
+          return unlockedBadge;
+        }
+
+        return {
+          ...badge,
+          currentProgress,
+          isUnlocked
+        };
+      });
+
+      if (newlyUnlocked) {
+        setLatestUnlockedAchievement(newlyUnlocked);
+      }
+
+      return updated;
+    });
+  }, []);
+
+  // Action to record quiz completion with score calculation & best score tracking
+  const recordQuizCompletion = (
+    quizId: string,
+    score: number,
+    totalQuestions: number
+  ): { isNewRecord: boolean; percentage: number } => {
+    const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
+    let isNewRecord = false;
+
+    setEducationalProgress(prev => {
+      const existing = prev.quizzesProgress?.[quizId];
+      const previousBest = existing ? existing.bestScore : 0;
+      isNewRecord = !existing || score > previousBest;
+
+      const updatedQuizRecord = {
+        quizId,
+        completed: true,
+        attempts: (existing?.attempts || 0) + 1,
+        lastScore: score,
+        bestScore: Math.max(previousBest, score),
+        totalQuestions,
+        lastCompletedAt: new Date().toISOString()
+      };
+
+      const updatedQuizzesProgress = {
+        ...(prev.quizzesProgress || {}),
+        [quizId]: updatedQuizRecord
+      };
+
+      const totalCompleted = (Object.values(updatedQuizzesProgress) as UserQuizProgress[]).filter(q => q.completed).length;
+
+      const nextProgress: EducationalActivityProgress = {
+        ...prev,
+        completedQuiz: true,
+        quizzesProgress: updatedQuizzesProgress,
+        totalQuizzesCompleted: totalCompleted,
+        totalQuestionsAnswered: (prev.totalQuestionsAnswered || 0) + totalQuestions
+      };
+
+      evaluateAchievements(nextProgress);
+      return nextProgress;
+    });
+
+    return { isNewRecord, percentage };
+  };
+
+  // Action to mark educational activities
+  const markActivityCompleted = (
+    activity: 
+      | 'viewedLaws' 
+      | 'completedQuiz' 
+      | 'exploredBullyingType' 
+      | 'completedRespectModule' 
+      | 'completedBreathingSession'
+      | 'interactedWithChat'
+      | 'checkedOrCopiedProtocol'
+      | 'submittedOrViewedReport',
+    param?: string
+  ) => {
+    setEducationalProgress(prev => {
+      let next = { ...prev };
+      if (activity === 'viewedLaws') {
+        next.viewedLaws = true;
+      } else if (activity === 'completedQuiz') {
+        next.completedQuiz = true;
+      } else if (activity === 'exploredBullyingType' && param) {
+        if (!next.exploredBullyingTypes.includes(param)) {
+          next.exploredBullyingTypes = [...next.exploredBullyingTypes, param];
+        }
+      } else if (activity === 'completedRespectModule') {
+        next.completedRespectModule = true;
+      } else if (activity === 'completedBreathingSession') {
+        next.completedBreathingSession = true;
+        next.breathingSessionsCount = (next.breathingSessionsCount || 0) + 1;
+      } else if (activity === 'interactedWithChat') {
+        next.interactedWithChat = true;
+      } else if (activity === 'checkedOrCopiedProtocol') {
+        next.checkedOrCopiedProtocol = true;
+      } else if (activity === 'submittedOrViewedReport') {
+        next.submittedOrViewedReport = true;
+      }
+      
+      evaluateAchievements(next);
+      return next;
+    });
+  };
 
   // Submit anonymous report
   const submitReport = (params: {
@@ -181,6 +536,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     setReports(prev => [newReport, ...prev]);
     setLastGeneratedProtocol(protocolId);
+    markActivityCompleted('submittedOrViewedReport');
 
     // Create admin notification
     const newNotif: AdminNotification = {
@@ -202,7 +558,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const getReportByProtocol = (protocolId: string): IncidentReport | undefined => {
     const cleanId = protocolId.trim().toUpperCase();
-    return reports.find(r => r.id.toUpperCase() === cleanId);
+    const found = reports.find(r => r.id.toUpperCase() === cleanId);
+    if (found) {
+      markActivityCompleted('checkedOrCopiedProtocol');
+    }
+    return found;
   };
 
   const addMessageToProtocol = (
@@ -257,6 +617,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     setChatMessages(prev => [...prev, userMsg]);
+    markActivityCompleted('interactedWithChat');
 
     const fallbackResponse = (text: string): { reply: string; quickOptions: string[] } => {
       const lower = text.toLowerCase();
@@ -384,10 +745,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const resetAllDataToDefault = () => {
     setReports(INITIAL_REPORTS);
     setNotifications(INITIAL_NOTIFICATIONS);
+    setAchievements(INITIAL_ACHIEVEMENTS);
+    setEducationalProgress(INITIAL_EDUCATIONAL_PROGRESS);
     clearChat();
     localStorage.removeItem(STORAGE_KEY_REPORTS);
     localStorage.removeItem(STORAGE_KEY_NOTIFS);
     localStorage.removeItem(STORAGE_KEY_CHAT);
+    localStorage.removeItem(STORAGE_KEY_ACHIEVEMENTS);
+    localStorage.removeItem(STORAGE_KEY_PROGRESS);
   };
 
   return (
@@ -407,6 +772,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setIsBreathingModalOpen,
       isLoadingScreen,
       setIsLoadingScreen,
+      achievements,
+      educationalProgress,
+      latestUnlockedAchievement,
+      dismissAchievementModal,
+      markActivityCompleted,
+      recordQuizCompletion,
       submitReport,
       getReportByProtocol,
       addMessageToProtocol,
@@ -431,3 +802,4 @@ export const useApp = () => {
   }
   return context;
 };
+

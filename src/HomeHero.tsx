@@ -13,12 +13,16 @@ import {
   Lock,
   Sparkles,
   Heart,
-  MessageSquareWarning
+  MessageSquareWarning,
+  Trophy,
+  Award
 } from 'lucide-react';
 import { useApp } from './AppContext';
 
 export const HomeHero: React.FC = () => {
-  const { setActiveTab, setIsLoadingScreen } = useApp();
+  const { setActiveTab, setIsLoadingScreen, achievements } = useApp();
+  const unlockedCount = achievements.filter(a => a.isUnlocked).length;
+  const totalCount = achievements.length;
 
   return (
     <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-12 py-8 sm:py-14 animate-fade-in text-slate-800">
@@ -85,14 +89,14 @@ export const HomeHero: React.FC = () => {
               <BookOpen className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-extrabold text-slate-900 mb-2 group-hover:text-purple-800 transition-colors">
-              Guia dos Tipos de Bullying
+              Guia & Quizzes Educativos
             </h3>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
-              Aprenda a reconhecer as 7 formas de intimidação sistemática (físico, verbal, cyber, moral, social), descubra seus direitos legais e veja como reagir com segurança.
+              Aprenda a reconhecer os 7 tipos de bullying, teste seus conhecimentos nos Quizzes Anti-Bullying, conheça as leis e desbloqueie conquistas na plataforma.
             </p>
           </div>
           <div className="flex items-center gap-1.5 text-xs font-bold text-purple-800 pt-2 border-t border-purple-100">
-            <span>Explorar Guia e Autoavaliação</span>
+            <span>Explorar Guia & Quizzes</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
           </div>
         </div>
@@ -141,6 +145,36 @@ export const HomeHero: React.FC = () => {
           </div>
         </div>
 
+      </div>
+
+      {/* Achievements Incentive Strip */}
+      <div className="bg-white border border-purple-200/90 rounded-3xl p-6 mb-8 shadow-xs flex flex-col md:flex-row items-center justify-between gap-5">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-700 shrink-0 shadow-2xs">
+            <Trophy className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h4 className="font-extrabold text-base text-slate-900">
+                Sistema de Conquistas Educativas & Badges
+              </h4>
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-purple-100 text-purple-900 border border-purple-200">
+                {unlockedCount}/{totalCount} Desbloqueadas
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 mt-0.5">
+              Aprenda sobre direitos, segurança escolar, empatia e autocuidado para conquistar insígnias e fortalecer nossa comunidade.
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setActiveTab('education')}
+          className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-950 font-bold text-xs flex items-center justify-center gap-2 shrink-0 border border-purple-300 transition-all active:scale-95 cursor-pointer"
+        >
+          <Award className="w-4 h-4 text-purple-800" />
+          <span>Ver Minhas Conquistas</span>
+        </button>
       </div>
 
       {/* Quick Protocol Lookup Strip */}

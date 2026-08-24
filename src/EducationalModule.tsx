@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   BookOpen, 
   MessageSquareWarning, 
@@ -13,21 +13,46 @@ import {
   AlertTriangle, 
   HelpCircle,
   ArrowRight,
-  Send
+  Send,
+  Trophy,
+  CheckCircle2,
+  Sparkles,
+  Heart,
+  Target,
+  Play
 } from 'lucide-react';
-import { BULLYING_TYPES_INFO, QUIZ_QUESTIONS } from './educationalData';
-import { BullyingCategory } from './types';
+import { BULLYING_TYPES_INFO } from './educationalData';
+import { EDUCATIONAL_QUIZZES } from './quizData';
+import { BullyingCategory, UserQuizProgress } from './types';
 import { useApp } from './AppContext';
+import { AchievementsView } from './AchievementsView';
+import { QuizModule } from './QuizModule';
 
 export const EducationalModule: React.FC = () => {
-  const { setActiveTab } = useApp();
+  const { 
+    setActiveTab, 
+    achievements, 
+    educationalProgress, 
+    markActivityCompleted 
+  } = useApp();
+
   const [selectedType, setSelectedType] = useState<BullyingCategory>('verbal');
-  const [quizStep, setQuizStep] = useState<number>(0);
-  const [quizScore, setQuizScore] = useState<number>(0);
-  const [quizCompleted, setQuizCompleted] = useState<boolean>(false);
-  const [activeTabSub, setActiveTabSub] = useState<'types' | 'quiz' | 'legislation'>('types');
+  const [activeTabSub, setActiveTabSub] = useState<'types' | 'quiz' | 'legislation' | 'achievements'>('types');
+  const [selectedQuizId, setSelectedQuizId] = useState<string | undefined>(undefined);
+
+  const totalAchievements = achievements.length;
+  const unlockedAchievementsCount = achievements.filter(a => a.isUnlocked).length;
+
+  const quizzesProgress = educationalProgress.quizzesProgress || {};
+  const totalCompletedQuizzes = (Object.values(quizzesProgress) as UserQuizProgress[]).filter(q => q.completed).length;
+  const totalAvailableQuizzes = EDUCATIONAL_QUIZZES.length;
 
   const currentTypeInfo = BULLYING_TYPES_INFO.find(t => t.id === selectedType) || BULLYING_TYPES_INFO[0];
+
+  // Automatically register explored type
+  useEffect(() => {
+    markActivityCompleted('exploredBullyingType', selectedType);
+  }, [selectedType]);
 
   const getIcon = (id: BullyingCategory) => {
     switch (id) {
@@ -42,20 +67,18 @@ export const EducationalModule: React.FC = () => {
     }
   };
 
-  const handleQuizAnswer = (points: number) => {
-    const newScore = quizScore + points;
-    setQuizScore(newScore);
-    if (quizStep + 1 < QUIZ_QUESTIONS.length) {
-      setQuizStep(quizStep + 1);
-    } else {
-      setQuizCompleted(true);
-    }
+  const handleCompleteLaws = () => {
+    markActivityCompleted('viewedLaws');
   };
 
-  const resetQuiz = () => {
-    setQuizStep(0);
-    setQuizScore(0);
-    setQuizCompleted(false);
+  const handleCompleteRespectModule = () => {
+    markActivityCompleted('completedRespectModule');
+  };
+
+  const handleOpenSpecificQuiz = (quizId: string) => {
+    setSelectedQuizId(quizId);
+    setActiveTabSub('quiz');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -71,15 +94,18 @@ export const EducationalModule: React.FC = () => {
           Identifique os Tipos de Bullying e Saiba Como Reagir
         </h1>
         <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-          Conhecimento é a primeira linha de defesa. Entenda as diferentes formas de agressão sistemática, conheça seus direitos e aprenda estratégias seguras para se proteger e apoiar seus colegas.
+          Conhecimento é a primeira linha de defesa. Entenda as diferentes formas de agressão sistemática, teste seus conhecimentos nos quizzes educativos, conheça seus direitos e desbloqueie conquistas.
         </p>
 
         {/* Sub Navigation */}
         <div className="flex justify-center mt-6 overflow-x-auto pb-1 scrollbar-none">
           <div className="inline-flex bg-white border border-purple-200/90 p-1.5 rounded-2xl gap-1 shrink-0 shadow-xs">
             <button
-              onClick={() => setActiveTabSub('types')}
-              className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
+              onClick={() => {
+                setActiveTabSub('types');
+                setSelectedQuizId(undefined);
+              }}
+              className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
                 activeTabSub === 'types'
                   ? 'bg-purple-600 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-purple-50'
@@ -87,25 +113,59 @@ export const EducationalModule: React.FC = () => {
             >
               Matriz dos 7 Tipos
             </button>
+
             <button
-              onClick={() => setActiveTabSub('quiz')}
-              className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
+              onClick={() => {
+                setActiveTabSub('quiz');
+                setSelectedQuizId(undefined);
+              }}
+              className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeTabSub === 'quiz'
                   ? 'bg-purple-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-purple-50'
+                  : 'text-purple-950 bg-purple-50/80 hover:bg-purple-100'
               }`}
             >
-              Autoavaliação Rápida
+              <Target className="w-3.5 h-3.5 text-purple-700" />
+              <span>Quiz Anti-Bullying</span>
+              <span className={`text-[10px] font-extrabold px-1.5 py-0.2 rounded-full ${
+                activeTabSub === 'quiz' ? 'bg-white/20 text-white' : 'bg-purple-200 text-purple-900'
+              }`}>
+                {totalCompletedQuizzes}/{totalAvailableQuizzes}
+              </span>
             </button>
+
             <button
-              onClick={() => setActiveTabSub('legislation')}
-              className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
+              onClick={() => {
+                setActiveTabSub('legislation');
+                setSelectedQuizId(undefined);
+              }}
+              className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
                 activeTabSub === 'legislation'
                   ? 'bg-purple-600 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-purple-50'
               }`}
             >
               Leis e Proteção Legal
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveTabSub('achievements');
+                setSelectedQuizId(undefined);
+              }}
+              className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
+                activeTabSub === 'achievements'
+                  ? 'bg-purple-600 text-white shadow-xs'
+                  : 'text-purple-900 bg-purple-50 hover:bg-purple-100'
+              }`}
+            >
+              <Trophy className="w-3.5 h-3.5" />
+              <span>Minhas Conquistas</span>
+              <span className={`text-[10px] font-extrabold px-1.5 py-0.2 rounded-full ${
+                activeTabSub === 'achievements' ? 'bg-white/20 text-white' : 'bg-purple-200 text-purple-900'
+              }`}>
+                {unlockedAchievementsCount}/{totalAchievements}
+              </span>
             </button>
           </div>
         </div>
@@ -115,7 +175,7 @@ export const EducationalModule: React.FC = () => {
       {activeTabSub === 'types' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full max-w-full">
           
-          {/* Category Selector (Horizontal Scroll Row on Mobile & Sidebar on Desktop) */}
+          {/* Category Selector */}
           <div className="lg:col-span-4 bg-white p-3.5 rounded-3xl border border-purple-200/90 shadow-xs min-w-0 max-w-full overflow-hidden">
             <div className="flex items-center justify-between px-1 mb-2">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
@@ -126,15 +186,15 @@ export const EducationalModule: React.FC = () => {
               </span>
             </div>
 
-            {/* Responsive Row (Horizontal on Mobile / Vertical on Desktop) */}
             <div className="flex lg:flex-col overflow-x-auto lg:overflow-visible gap-2 pb-2 lg:pb-0 scrollbar-none snap-x snap-mandatory touch-pan-x w-full max-w-full">
               {BULLYING_TYPES_INFO.map((item) => {
                 const isSelected = selectedType === item.id;
+                const isExplored = educationalProgress.exploredBullyingTypes.includes(item.id);
                 return (
                   <button
                     key={item.id}
                     onClick={() => setSelectedType(item.id)}
-                    className={`snap-start shrink-0 lg:w-full min-w-[210px] sm:min-w-[240px] lg:min-w-0 text-left p-3 sm:p-3.5 rounded-2xl flex items-center gap-3 transition-all border ${
+                    className={`snap-start shrink-0 lg:w-full min-w-[210px] sm:min-w-[240px] lg:min-w-0 text-left p-3 sm:p-3.5 rounded-2xl flex items-center gap-3 transition-all border cursor-pointer ${
                       isSelected
                         ? 'bg-purple-100/90 border-purple-400 text-slate-950 font-bold shadow-xs ring-1 ring-purple-400/50'
                         : 'bg-purple-50/40 border-purple-100 text-slate-700 hover:bg-purple-100/50 hover:text-slate-900'
@@ -146,7 +206,12 @@ export const EducationalModule: React.FC = () => {
                       {getIcon(item.id)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-xs sm:text-sm truncate text-slate-900">{item.name}</h3>
+                      <div className="flex items-center gap-1.5">
+                        <h3 className="font-bold text-xs sm:text-sm truncate text-slate-900">{item.name}</h3>
+                        {isExplored && (
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" aria-label="Módulo explorado" />
+                        )}
+                      </div>
                       <p className="text-[11px] text-slate-500 truncate">{item.shortDesc}</p>
                     </div>
                     <ArrowRight className={`w-4 h-4 shrink-0 transition-transform ${isSelected ? 'text-purple-800 translate-x-1' : 'text-slate-400'}`} />
@@ -172,13 +237,15 @@ export const EducationalModule: React.FC = () => {
                 </div>
               </div>
 
-              <button
-                onClick={() => setActiveTab('report')}
-                className="bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-xs active:scale-95"
-              >
-                <Send className="w-4 h-4" />
-                <span>Denunciar este Tipo</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setActiveTab('report')}
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs sm:text-sm px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-xs active:scale-95 cursor-pointer"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>Denunciar este Tipo</span>
+                </button>
+              </div>
             </div>
 
             {/* Description */}
@@ -223,7 +290,7 @@ export const EducationalModule: React.FC = () => {
             </div>
 
             {/* Action Matrix: How to React */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div className="bg-purple-100/50 border border-purple-300/60 rounded-2xl p-4">
                 <h4 className="font-bold text-sm text-purple-950 flex items-center gap-2 mb-3">
                   <ShieldCheck className="w-4 h-4 text-purple-800" />
@@ -255,6 +322,73 @@ export const EducationalModule: React.FC = () => {
               </div>
             </div>
 
+            {/* Interactive Quiz Integration Strip for this Module */}
+            <div className="bg-gradient-to-r from-purple-100/90 via-indigo-50/90 to-purple-100/90 border border-purple-300/80 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-2xs mb-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-purple-200 text-purple-900 flex items-center justify-center shrink-0">
+                  <Target className="w-5 h-5 text-purple-800" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-sm text-purple-950">
+                    Teste Seus Conhecimentos no Quiz
+                  </h4>
+                  <p className="text-xs text-slate-600">
+                    Responda ao quiz sobre {currentTypeInfo.name.toLowerCase()} para reforçar o aprendizado e avançar em suas conquistas.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => handleOpenSpecificQuiz(
+                  currentTypeInfo.id === 'cyberbullying' 
+                    ? 'quiz-cyberbullying-digital' 
+                    : 'quiz-bullying-fundamentos'
+                )}
+                className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs flex items-center gap-1.5 shrink-0 transition-all active:scale-95 shadow-xs cursor-pointer"
+              >
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>Fazer Quiz Deste Tema</span>
+              </button>
+            </div>
+
+            {/* Respect & Empathy Module Banner with Achievement Trigger */}
+            <div className="bg-purple-50/70 border border-purple-200/80 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-purple-200 text-purple-900 flex items-center justify-center shrink-0">
+                  <HeartHandshake className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-sm text-purple-950">
+                    Módulo de Respeito, Empatia e Convivência
+                  </h4>
+                  <p className="text-xs text-slate-600">
+                    Entendeu como acolher colegas e intervir com segurança como testemunha ativa?
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={handleCompleteRespectModule}
+                className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 shrink-0 transition-all cursor-pointer ${
+                  educationalProgress.completedRespectModule
+                    ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                    : 'bg-purple-600 hover:bg-purple-700 text-white shadow-xs active:scale-95'
+                }`}
+              >
+                {educationalProgress.completedRespectModule ? (
+                  <>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Concluído ✅</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    <span>Marcar como Lido e Compreendido</span>
+                  </>
+                )}
+              </button>
+            </div>
+
           </div>
 
         </div>
@@ -262,98 +396,61 @@ export const EducationalModule: React.FC = () => {
 
       {/* Quiz Tab */}
       {activeTabSub === 'quiz' && (
-        <div className="max-w-2xl mx-auto bg-white border border-purple-200/90 rounded-3xl p-6 sm:p-8 text-slate-800 shadow-xs">
-          {!quizCompleted ? (
-            <div>
-              <div className="flex items-center justify-between mb-6 pb-4 border-b border-purple-100">
-                <div className="flex items-center gap-2 text-purple-800 text-xs font-bold uppercase tracking-wider">
-                  <HelpCircle className="w-4 h-4 text-purple-700" />
-                  <span>Pergunta {quizStep + 1} de {QUIZ_QUESTIONS.length}</span>
-                </div>
-                <div className="w-32 bg-purple-100 h-2 rounded-full overflow-hidden">
-                  <div 
-                    className="bg-purple-600 h-full transition-all duration-300"
-                    style={{ width: `${((quizStep + 1) / QUIZ_QUESTIONS.length) * 100}%` }}
-                  />
-                </div>
-              </div>
-
-              <h3 className="text-lg sm:text-xl font-bold mb-6 text-slate-900">
-                {QUIZ_QUESTIONS[quizStep].question}
-              </h3>
-
-              <div className="space-y-3">
-                {QUIZ_QUESTIONS[quizStep].options.map((opt, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handleQuizAnswer(opt.points)}
-                    className="w-full text-left p-4 rounded-2xl bg-purple-50/50 hover:bg-purple-100/70 border border-purple-200 text-slate-800 transition-all text-sm flex items-center justify-between group shadow-2xs"
-                  >
-                    <span className="font-medium">{opt.text}</span>
-                    <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-purple-800 group-hover:translate-x-1 transition-all" />
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-6">
-              <div className="w-16 h-16 rounded-3xl bg-purple-100 border border-purple-300 flex items-center justify-center text-purple-900 mx-auto mb-4 shadow-2xs">
-                <ShieldCheck className="w-8 h-8" />
-              </div>
-              <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 mb-2">Resultado da Avaliação</h3>
-              
-              {quizScore >= 6 ? (
-                <div className="bg-rose-50 border border-rose-200 rounded-2xl p-5 mb-6 text-left">
-                  <h4 className="font-bold text-rose-900 text-sm mb-1">
-                    ⚠️ Sinais Claros de Intimidação Sistemática (Bullying)
-                  </h4>
-                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-                    Suas respostas indicam que você está vivenciando situações repetitivas de sofrimento ou hostilidade que violam seus direitos. É fundamental registrar um relato anônimo para que a escola possa agir e oferecer proteção imediata.
-                  </p>
-                </div>
-              ) : quizScore >= 2 ? (
-                <div className="bg-purple-50 border border-purple-300 rounded-2xl p-5 mb-6 text-left">
-                  <h4 className="font-bold text-purple-900 text-sm mb-1">
-                    ⚠️ Conflitos Pontuais com Risco de Agravamento
-                  </h4>
-                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-                    Você relatou episódios que merecem atenção preventiva antes que se tornem recorrentes. Converse com um orientador ou envie uma denúncia anônima para mediação pacífica.
-                  </p>
-                </div>
-              ) : (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 mb-6 text-left">
-                  <h4 className="font-bold text-emerald-900 text-sm mb-1">
-                    ✅ Ambiente Geralmente Seguro
-                  </h4>
-                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-                    Não foram identificados padrões crônicos de bullying no momento. Continue sendo um parceiro ativo e acolha os colegas que precisarem de apoio.
-                  </p>
-                </div>
-              )}
-
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <button
-                  onClick={() => setActiveTab('report')}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-sm px-6 py-3 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-transform active:scale-95"
-                >
-                  <Send className="w-4 h-4" />
-                  <span>Fazer Denúncia Anônima Agora</span>
-                </button>
-                <button
-                  onClick={resetQuiz}
-                  className="bg-purple-100 hover:bg-purple-200 text-purple-950 font-bold text-sm px-6 py-3 rounded-xl transition-colors border border-purple-300"
-                >
-                  Refazer Avaliação
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+        <QuizModule
+          initialQuizId={selectedQuizId}
+          onGoToAchievements={() => {
+            setActiveTabSub('achievements');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onNavigateToTab={(tab) => {
+            setActiveTabSub(tab);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        />
       )}
 
       {/* Legislation & Rights Tab */}
       {activeTabSub === 'legislation' && (
         <div className="max-w-4xl mx-auto space-y-6">
+          
+          {/* Header Action / Status */}
+          <div className="bg-gradient-to-r from-purple-100/90 via-indigo-50/90 to-purple-100/90 border border-purple-300/80 rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-2xs">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-purple-200 text-purple-900 flex items-center justify-center shrink-0 shadow-2xs">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-black text-base sm:text-lg text-purple-950">
+                  Módulo de Legislação e Direitos Protegidos
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600">
+                  Conheça seus direitos fundamentais e o que diz a lei brasileira contra o bullying.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={handleCompleteLaws}
+              className={`px-5 py-3 rounded-2xl font-black text-xs sm:text-sm flex items-center gap-2 shrink-0 transition-all cursor-pointer ${
+                educationalProgress.viewedLaws
+                  ? 'bg-emerald-100 text-emerald-950 border border-emerald-300 shadow-2xs'
+                  : 'bg-purple-600 hover:bg-purple-700 text-white shadow-xs active:scale-95'
+              }`}
+            >
+              {educationalProgress.viewedLaws ? (
+                <>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Leitura de Direitos Concluída ✅</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  <span>Marcar Módulo como Lido</span>
+                </>
+              )}
+            </button>
+          </div>
+
           <div className="bg-white border border-purple-200/90 rounded-3xl p-6 sm:p-8 text-slate-800 shadow-xs">
             <h3 className="text-xl font-extrabold text-purple-950 mb-2">Lei Federal nº 13.185/2015</h3>
             <p className="text-sm text-slate-700 mb-4 leading-relaxed">
@@ -376,11 +473,37 @@ export const EducationalModule: React.FC = () => {
             <p className="text-sm text-slate-700 mb-4 leading-relaxed">
               Tipifica expressamente o <strong>Bullying</strong> (Art. 146-A) e o <strong>Cyberbullying</strong> (Art. 146-A, Parágrafo Único) no Código Penal Brasileiro, prevendo penas severas para crimes cometidos por meio de redes sociais, transmissões em tempo real ou ambientes virtuais de acesso público.
             </p>
-            <div className="bg-purple-100/60 border border-purple-300/80 p-4 rounded-2xl text-xs text-purple-950 font-medium leading-relaxed">
+            <div className="bg-purple-100/60 border border-purple-300/80 p-4 rounded-2xl text-xs text-purple-950 font-medium leading-relaxed mb-6">
               O ambiente virtual <strong>não é terra sem lei</strong>. Publicações difamatórias, figurinhas ofensivas e ataques em grupos deixam rastros digitais auditáveis e acarretam responsabilização dos envolvidos e de seus responsáveis legais.
             </div>
+
+            {/* Quick Quiz Shortcut */}
+            <div className="bg-purple-50 border border-purple-200 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div>
+                <h4 className="font-extrabold text-sm text-slate-900">Quiz de Leis e Direitos</h4>
+                <p className="text-xs text-slate-600">Teste seus conhecimentos sobre o marco legal e canais de proteção.</p>
+              </div>
+              <button
+                onClick={() => handleOpenSpecificQuiz('quiz-direitos-legislacao')}
+                className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs shrink-0 cursor-pointer active:scale-95"
+              >
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>Fazer Quiz de Legislação</span>
+              </button>
+            </div>
           </div>
+
         </div>
+      )}
+
+      {/* Achievements Sub Tab */}
+      {activeTabSub === 'achievements' && (
+        <AchievementsView 
+          onNavigateToTab={(tab) => {
+            setActiveTabSub(tab);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }} 
+        />
       )}
 
     </div>

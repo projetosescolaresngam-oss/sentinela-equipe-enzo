@@ -5,7 +5,7 @@ import { SoundPlayer } from './SoundPlayer';
 import { soundEngine } from './relaxingAudio';
 
 export const BreathingModal: React.FC = () => {
-  const { isBreathingModalOpen, setIsBreathingModalOpen } = useApp();
+  const { isBreathingModalOpen, setIsBreathingModalOpen, markActivityCompleted } = useApp();
   const [phase, setPhase] = useState<'inspire' | 'segure' | 'expire'>('inspire');
   const [secondsLeft, setSecondsLeft] = useState<number>(4);
   const [cycleCount, setCycleCount] = useState<number>(0);
@@ -46,7 +46,13 @@ export const BreathingModal: React.FC = () => {
         } else {
           setPhase('inspire');
           playCurrentPhaseSound('inspire');
-          setCycleCount(c => c + 1);
+          setCycleCount(c => {
+            const next = c + 1;
+            if (next >= 1) {
+              markActivityCompleted('completedBreathingSession');
+            }
+            return next;
+          });
           return 4;
         }
       });

@@ -1,6 +1,6 @@
 {
   "name": "Sentinela Escolar - Plataforma Anti-Bullying",
-  "description": "Plataforma integrada de prevenção e combate ao bullying escolar com denúncias anônimas criptografadas, apoio emocional em tempo real, guia educativo e painel de inteligência de dados.",
+  "description": "Plataforma integrada de prevenção e combate ao bullying escolar com denúncias anônimas criptografadas, apoio emocional em tempo real, guia educativo interativo com sistema de conquistas e badges motivacionais, e painel de inteligência de dados.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

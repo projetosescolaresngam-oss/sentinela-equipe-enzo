@@ -15,6 +15,7 @@ import { EmotionalChat } from './EmotionalChat';
 import { AdminDashboard } from './AdminDashboard';
 import { BreathingModal } from './BreathingModal';
 import { LoadingScreen } from './LoadingScreen';
+import { AchievementUnlockModal } from './AchievementUnlockModal';
 import { ShieldCheck, Heart, Sparkles } from 'lucide-react';
 
 const MainContent: React.FC = () => {
@@ -101,6 +102,7 @@ const AppInner: React.FC = () => {
       <MainContent />
       <Footer />
       <BreathingModal />
+      <AchievementUnlockModal />
     </div>
   );
 };
