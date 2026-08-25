@@ -285,7 +285,7 @@ export const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-12 py-8 sm:py-12 animate-fade-in text-slate-800">
+    <div className="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 animate-fade-in text-slate-800">
       
       {/* Header Actions */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-purple-200/80 mb-8">

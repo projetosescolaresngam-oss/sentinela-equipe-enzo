@@ -15,7 +15,8 @@ import {
   Heart,
   MessageSquareWarning,
   Trophy,
-  Award
+  Award,
+  Compass
 } from 'lucide-react';
 import { useApp } from './AppContext';
 
@@ -25,7 +26,7 @@ export const HomeHero: React.FC = () => {
   const totalCount = achievements.length;
 
   return (
-    <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-12 py-8 sm:py-14 animate-fade-in text-slate-800">
+    <div className="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 animate-fade-in text-slate-800">
       
       {/* Hero Header */}
       <div className="text-center max-w-5xl mx-auto mb-14">
@@ -34,6 +35,15 @@ export const HomeHero: React.FC = () => {
             <ShieldCheck className="w-4 h-4 text-purple-700" />
             <span>Plataforma Oficial de Acolhimento e Prevenção Escolar</span>
           </div>
+
+          <button
+            onClick={() => setActiveTab('guide')}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-purple-100/90 hover:bg-purple-200 border border-purple-300 text-purple-950 text-xs font-extrabold shadow-2xs transition-all active:scale-95 cursor-pointer"
+            title="Ver o Guia e Tutorial completo do site"
+          >
+            <Compass className="w-3.5 h-3.5 text-purple-700" />
+            <span>Guia do Site & Conquistas</span>
+          </button>
 
           <button
             onClick={() => setIsLoadingScreen(true)}
@@ -60,15 +70,23 @@ export const HomeHero: React.FC = () => {
         <div className="flex flex-wrap items-center justify-center gap-4">
           <button
             onClick={() => setActiveTab('report')}
-            className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-extrabold text-sm sm:text-base px-8 py-4 rounded-2xl flex items-center gap-3 shadow-md shadow-purple-500/25 transition-all active:scale-95"
+            className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-extrabold text-sm sm:text-base px-8 py-4 rounded-2xl flex items-center gap-3 shadow-md shadow-purple-500/25 transition-all active:scale-95 cursor-pointer"
           >
             <Send className="w-5 h-5" />
             <span>Fazer Denúncia Anônima</span>
           </button>
 
           <button
+            onClick={() => setActiveTab('guide')}
+            className="bg-purple-100/90 hover:bg-purple-200 text-purple-950 font-bold text-sm sm:text-base px-7 py-4 rounded-2xl flex items-center gap-2.5 border border-purple-300 shadow-xs transition-all cursor-pointer"
+          >
+            <Compass className="w-5 h-5 text-purple-800" />
+            <span>Guia & Como Usar</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('support')}
-            className="bg-white hover:bg-purple-50 text-slate-800 font-bold text-sm sm:text-base px-7 py-4 rounded-2xl flex items-center gap-2.5 border border-purple-200 shadow-xs transition-all"
+            className="bg-white hover:bg-purple-50 text-slate-800 font-bold text-sm sm:text-base px-7 py-4 rounded-2xl flex items-center gap-2.5 border border-purple-200 shadow-xs transition-all cursor-pointer"
           >
             <HeartHandshake className="w-5 h-5 text-purple-600" />
             <span>Apoio Emocional & Chat</span>
@@ -169,7 +187,7 @@ export const HomeHero: React.FC = () => {
         </div>
 
         <button
-          onClick={() => setActiveTab('education')}
+          onClick={() => setActiveTab('achievements')}
           className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-950 font-bold text-xs flex items-center justify-center gap-2 shrink-0 border border-purple-300 transition-all active:scale-95 cursor-pointer"
         >
           <Award className="w-4 h-4 text-purple-800" />

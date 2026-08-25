@@ -137,7 +137,7 @@ export const ReportWizard: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl w-full mx-auto px-4 sm:px-8 lg:px-12 py-8 sm:py-12 animate-fade-in text-slate-800">
+    <div className="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 animate-fade-in text-slate-800">
       
       {/* Header */}
       <div className="text-center mb-8 max-w-3xl mx-auto">

@@ -7,14 +7,17 @@ import {
   HeartHandshake, 
   BarChart3, 
   PhoneCall, 
-  Wind,
-  Menu,
-  X,
-  Sparkles,
-  ChevronRight,
-  Heart
+  Wind, 
+  Menu, 
+  X, 
+  Sparkles, 
+  ChevronRight, 
+  Heart,
+  Compass,
+  Trophy
 } from 'lucide-react';
 import { useApp } from './AppContext';
+import { AppTab } from './types';
 
 export const Navbar: React.FC = () => {
   const { 
@@ -22,20 +25,22 @@ export const Navbar: React.FC = () => {
     setActiveTab, 
     notifications, 
     setIsBreathingModalOpen,
-    setIsLoadingScreen
+    setIsLoadingScreen,
+    achievements
   } = useApp();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const unreadNotifs = notifications.filter(n => !n.read).length;
+  const unlockedBadgesCount = achievements.filter(a => a.isUnlocked).length;
 
   interface NavItem {
-    id: 'home' | 'education' | 'report' | 'tracker' | 'support' | 'admin';
+    id: AppTab;
     label: string;
     shortLabel: string;
     description: string;
     icon: React.ComponentType<{ className?: string }>;
     highlight?: boolean;
-    badge?: number | null;
+    badge?: number | string | null;
   }
 
   const navItems: NavItem[] = [
@@ -47,9 +52,23 @@ export const Navbar: React.FC = () => {
       icon: ShieldCheck 
     },
     { 
+      id: 'guide', 
+      label: 'Guia / Tutorial', 
+      shortLabel: 'Guia', 
+      description: 'Como usar e passo a passo', 
+      icon: Compass 
+    },
+    { 
+      id: 'achievements', 
+      label: 'Conquistas', 
+      shortLabel: 'Conquistas', 
+      description: 'Distintivos e molduras de honra', 
+      icon: Trophy
+    },
+    { 
       id: 'education', 
       label: 'Tipos de Bullying', 
-      shortLabel: 'Guia Bullying', 
+      shortLabel: 'Bullying', 
       description: 'Leis, sinais e como agir', 
       icon: BookOpen 
     },
@@ -94,7 +113,7 @@ export const Navbar: React.FC = () => {
   return (
     <>
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-purple-200/90 text-slate-800 transition-colors shadow-2xs w-full">
-        <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-12">
+        <div className="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-18 gap-2 sm:gap-4">
             
             {/* Logo / Brand Framing */}

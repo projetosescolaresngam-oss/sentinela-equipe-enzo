@@ -1,26 +1,11 @@
 import React from 'react';
 import { 
-  Trophy, 
-  ShieldCheck, 
-  HeartHandshake, 
-  Heart, 
-  Wind, 
-  BookOpen, 
-  Sparkles, 
   X, 
   CheckCircle2,
-  Target,
-  Zap,
-  Bot,
-  Scale,
-  Eye,
-  Smile,
-  Compass,
-  Crown,
-  Award,
   PartyPopper
 } from 'lucide-react';
 import { Achievement } from './types';
+import { AchievementBadgeFrame } from './AchievementBadgeFrame';
 
 interface AchievementUnlockModalProps {
   achievement: Achievement | null;
@@ -29,44 +14,6 @@ interface AchievementUnlockModalProps {
 
 export const AchievementUnlockModal: React.FC<AchievementUnlockModalProps> = ({ achievement, onClose }) => {
   if (!achievement) return null;
-
-  const renderIcon = () => {
-    const iconClass = "w-8 h-8 sm:w-10 sm:h-10";
-    switch (achievement.iconType) {
-      case 'trophy':
-        return <Trophy className={`${iconClass} text-amber-500`} aria-hidden="true" />;
-      case 'crown':
-        return <Crown className={`${iconClass} text-amber-500`} aria-hidden="true" />;
-      case 'shield':
-        return <ShieldCheck className={`${iconClass} text-purple-600`} aria-hidden="true" />;
-      case 'handshake':
-        return <HeartHandshake className={`${iconClass} text-indigo-600`} aria-hidden="true" />;
-      case 'heart':
-        return <Heart className={`${iconClass} text-rose-500 fill-rose-500`} aria-hidden="true" />;
-      case 'wind':
-        return <Wind className={`${iconClass} text-teal-600`} aria-hidden="true" />;
-      case 'target':
-        return <Target className={`${iconClass} text-emerald-600`} aria-hidden="true" />;
-      case 'sparkles':
-        return <Sparkles className={`${iconClass} text-amber-500`} aria-hidden="true" />;
-      case 'zap':
-        return <Zap className={`${iconClass} text-yellow-500 fill-yellow-400`} aria-hidden="true" />;
-      case 'bot':
-        return <Bot className={`${iconClass} text-blue-600`} aria-hidden="true" />;
-      case 'scale':
-        return <Scale className={`${iconClass} text-indigo-600`} aria-hidden="true" />;
-      case 'eye':
-        return <Eye className={`${iconClass} text-purple-600`} aria-hidden="true" />;
-      case 'smile':
-        return <Smile className={`${iconClass} text-amber-500`} aria-hidden="true" />;
-      case 'compass':
-        return <Compass className={`${iconClass} text-teal-600`} aria-hidden="true" />;
-      case 'award':
-        return <Award className={`${iconClass} text-purple-600`} aria-hidden="true" />;
-      default:
-        return <BookOpen className={`${iconClass} text-purple-600`} aria-hidden="true" />;
-    }
-  };
 
   const getTierBadge = () => {
     switch (achievement.tier) {
@@ -125,12 +72,21 @@ export const AchievementUnlockModal: React.FC<AchievementUnlockModalProps> = ({ 
           <span>Nova Conquista Desbloqueada!</span>
         </div>
 
-        {/* Big Animated Badge Icon with Funny Sticker */}
-        <div className="relative w-22 h-22 sm:w-24 sm:h-24 mx-auto rounded-3xl bg-gradient-to-br from-purple-50 to-indigo-50 border-2 border-purple-300 flex items-center justify-center mb-3 shadow-md">
-          {renderIcon()}
+        {/* Big Retro Framed Badge Showcase */}
+        <div className="relative my-3 flex justify-center items-center">
+          <div className="p-2 rounded-3xl bg-gradient-to-b from-slate-900/5 to-slate-900/10 border border-purple-200/70 shadow-inner">
+            <AchievementBadgeFrame
+              achievementId={achievement.id}
+              tier={achievement.tier}
+              isUnlocked={true}
+              size={110}
+              showGlow={true}
+              animate={true}
+            />
+          </div>
           
           {/* Floating Funny Sticker Emoji */}
-          <div className="absolute -top-2 -right-2 text-2xl sm:text-3xl bg-white border-2 border-purple-200 rounded-full w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center shadow-md animate-pulse">
+          <div className="absolute -top-2 right-1/4 translate-x-4 text-2xl sm:text-3xl bg-white border-2 border-purple-200 rounded-full w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center shadow-md animate-pulse">
             {achievement.funnySticker || '✨'}
           </div>
         </div>

@@ -92,6 +92,8 @@ export interface AdminNotification {
   read: boolean;
 }
 
+export type AppTab = 'home' | 'education' | 'achievements' | 'report' | 'tracker' | 'support' | 'admin' | 'guide';
+
 export type AchievementId = 
   | 'conhecedor_direitos'
   | 'aliado_escola_segura'

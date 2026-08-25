@@ -8,7 +8,9 @@ import { AppProvider, useApp } from './AppContext';
 import { Navbar } from './Navbar';
 import { EmergencyBanner } from './EmergencyBanner';
 import { HomeHero } from './HomeHero';
+import { PlatformGuideView } from './PlatformGuideView';
 import { EducationalModule } from './EducationalModule';
+import { AchievementsView } from './AchievementsView';
 import { ReportWizard } from './ReportWizard';
 import { ProtocolTracker } from './ProtocolTracker';
 import { EmotionalChat } from './EmotionalChat';
@@ -16,7 +18,7 @@ import { AdminDashboard } from './AdminDashboard';
 import { BreathingModal } from './BreathingModal';
 import { LoadingScreen } from './LoadingScreen';
 import { AchievementUnlockModal } from './AchievementUnlockModal';
-import { ShieldCheck, Heart, Sparkles } from 'lucide-react';
+import { ShieldCheck, Heart, Sparkles, Compass, Trophy } from 'lucide-react';
 
 const MainContent: React.FC = () => {
   const { activeTab } = useApp();
@@ -24,6 +26,8 @@ const MainContent: React.FC = () => {
   return (
     <main className="flex-1 w-full max-w-full overflow-x-hidden pb-16 md:pb-0">
       {activeTab === 'home' && <HomeHero />}
+      {activeTab === 'guide' && <PlatformGuideView />}
+      {activeTab === 'achievements' && <AchievementsView />}
       {activeTab === 'education' && <EducationalModule />}
       {activeTab === 'report' && <ReportWizard />}
       {activeTab === 'tracker' && <ProtocolTracker />}
@@ -38,7 +42,7 @@ const Footer: React.FC = () => {
 
   return (
     <footer className="bg-purple-100/60 border-t border-purple-200/80 text-slate-600 text-xs py-8 transition-colors w-full max-w-full overflow-hidden">
-      <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-8 lg:px-12">
+      <div className="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           
           <div className="flex items-center gap-2.5">
@@ -53,6 +57,14 @@ const Footer: React.FC = () => {
 
           {/* Footer Quick Links */}
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-medium">
+            <button onClick={() => setActiveTab('guide')} className="text-purple-900 font-bold hover:text-purple-700 transition-colors inline-flex items-center gap-1">
+              <Compass className="w-3.5 h-3.5" />
+              <span>Guia do Site & Tutorial</span>
+            </button>
+            <button onClick={() => setActiveTab('achievements')} className="text-purple-900 font-bold hover:text-purple-700 transition-colors inline-flex items-center gap-1">
+              <Trophy className="w-3.5 h-3.5 text-amber-600" />
+              <span>Conquistas</span>
+            </button>
             <button onClick={() => setActiveTab('education')} className="hover:text-purple-800 transition-colors">
               Tipos de Bullying
             </button>

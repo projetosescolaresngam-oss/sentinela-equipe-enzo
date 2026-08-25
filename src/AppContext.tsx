@@ -12,7 +12,8 @@ import {
   Achievement,
   AchievementId,
   EducationalActivityProgress,
-  UserQuizProgress
+  UserQuizProgress,
+  AppTab
 } from './types';
 import { INITIAL_REPORTS, INITIAL_NOTIFICATIONS } from './initialData';
 import { INITIAL_ACHIEVEMENTS, INITIAL_EDUCATIONAL_PROGRESS } from './achievementsData';
@@ -21,8 +22,8 @@ interface AppContextType {
   reports: IncidentReport[];
   notifications: AdminNotification[];
   chatMessages: ChatMessage[];
-  activeTab: 'home' | 'education' | 'report' | 'tracker' | 'support' | 'admin';
-  setActiveTab: (tab: 'home' | 'education' | 'report' | 'tracker' | 'support' | 'admin') => void;
+  activeTab: AppTab;
+  setActiveTab: (tab: AppTab) => void;
   selectedCategoryDetail: BullyingCategory | null;
   setSelectedCategoryDetail: (cat: BullyingCategory | null) => void;
   lastGeneratedProtocol: string | null;
@@ -91,7 +92,7 @@ const STORAGE_KEY_ACHIEVEMENTS = 'sentinela_achievements_v1';
 const STORAGE_KEY_PROGRESS = 'sentinela_edu_progress_v1';
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [activeTab, setActiveTab] = useState<'home' | 'education' | 'report' | 'tracker' | 'support' | 'admin'>('home');
+  const [activeTab, setActiveTab] = useState<AppTab>('home');
   const [selectedCategoryDetail, setSelectedCategoryDetail] = useState<BullyingCategory | null>(null);
   const [lastGeneratedProtocol, setLastGeneratedProtocol] = useState<string | null>(null);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(false);

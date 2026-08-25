@@ -26,11 +26,14 @@ import {
   PartyPopper,
   Volume2,
   VolumeX,
-  RotateCw
+  RotateCw,
+  Maximize2,
+  X
 } from 'lucide-react';
 import { Achievement, AchievementCategory } from './types';
 import { useApp } from './AppContext';
 import { soundEngine } from './relaxingAudio';
+import { AchievementBadgeFrame } from './AchievementBadgeFrame';
 
 interface AchievementsViewProps {
   onNavigateToTab?: (tab: 'types' | 'quiz' | 'legislation') => void;
@@ -53,6 +56,7 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [tipIndex, setTipIndex] = useState<number>(0);
   const [celebratedBadgeId, setCelebratedBadgeId] = useState<string | null>(null);
+  const [inspectedBadge, setInspectedBadge] = useState<Achievement | null>(null);
 
   const totalAchievements = achievements.length;
   const unlockedCount = achievements.filter(a => a.isUnlocked).length;
@@ -104,13 +108,16 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
 
   const rankInfo = getRankInfo();
 
-  // Play celebration sound when clicking an unlocked card
+  // Play celebration sound when clicking an unlocked card & open inspection
   const handleBadgeClick = (item: Achievement) => {
     if (item.isUnlocked) {
       setCelebratedBadgeId(item.id);
       soundEngine.playChimeSuccess();
       setTimeout(() => setCelebratedBadgeId(null), 1800);
+    } else {
+      soundEngine.playPop();
     }
+    setInspectedBadge(item);
   };
 
   const nextTip = () => {
@@ -220,111 +227,143 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
   }, [achievements, selectedCategory, selectedStatus, searchQuery]);
 
   return (
-    <div className="w-full max-w-full space-y-6 animate-fade-in text-slate-800">
+    <div className="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 animate-fade-in text-slate-800 space-y-6">
       
-      {/* Header & Overview Showcase */}
-      <div className="bg-white border border-purple-200/90 rounded-3xl p-6 sm:p-8 shadow-xs relative overflow-hidden">
-        
-        {/* Glow Accent */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-100/40 rounded-full blur-3xl pointer-events-none" />
+      {/* Top Banner / Hero */}
+      <div className="bg-white border border-purple-200/90 rounded-3xl p-6 sm:p-8 lg:p-10 shadow-xs relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-100/50 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-indigo-100/40 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
-          
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-100 border border-purple-300 text-purple-950 text-xs font-black uppercase tracking-wider mb-3 shadow-2xs">
+        <div className="relative z-10 w-full">
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-100 border border-purple-300 text-purple-950 text-xs font-black uppercase tracking-wider shadow-2xs">
               <Trophy className="w-4 h-4 text-purple-700" aria-hidden="true" />
               <span>Distintivos & Conquistas de Honra Escolar</span>
             </div>
-            
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mb-2">
-              🏆 Minhas Conquistas ({unlockedCount}/{totalAchievements})
-            </h2>
-            
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
-              Aprenda a combater a zueira pesada, pratique a empatia e domine seus direitos protegidos por lei. Cada conquista é salva com 100% de sigilo no seu dispositivo.
-            </p>
 
-            {/* Current Level / Rank Badge */}
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-100 border border-amber-300 text-amber-950 text-xs font-black shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+              <span>{unlockedCount}/{totalAchievements} Conquistas ({progressPercent}%)</span>
+            </span>
+          </div>
+
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-3">
+            Minhas Conquistas Escolares: <br />
+            <span className="bg-gradient-to-r from-purple-700 via-purple-800 to-indigo-700 bg-clip-text text-transparent">
+              Distintivos de Honra, Empatia e Conhecimento
+            </span>
+          </h1>
+
+          <p className="text-sm sm:text-base text-slate-600 leading-relaxed mb-6 max-w-4xl">
+            Aprenda a combater a zueira pesada, pratique a empatia e domine seus direitos protegidos por lei. Cada conquista é salva com 100% de sigilo no seu dispositivo.
+          </p>
+
+          {/* Quick Action Badges & Level Row */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4 border-t border-purple-100/80">
+            {/* Rank / Level Badge */}
             <div className={`inline-flex items-center gap-3 p-3 rounded-2xl border ${rankInfo.color} shadow-2xs`}>
               <span className="text-2xl">{rankInfo.badgeEmoji}</span>
               <div>
                 <span className="text-[10px] font-black uppercase tracking-wider opacity-80 block">Seu Nível Atual:</span>
-                <strong className="text-sm sm:text-base font-black block">{rankInfo.title}</strong>
+                <strong className="text-sm font-black block">{rankInfo.title}</strong>
                 <span className="text-xs opacity-90">{rankInfo.description}</span>
               </div>
             </div>
-          </div>
 
-          {/* Overall Progress Gauge Card */}
-          <div className="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 rounded-3xl p-5 sm:p-6 flex flex-col justify-between min-w-[270px] shrink-0 shadow-2xs">
-            <div className="flex items-center justify-between gap-3 mb-3">
-              <span className="flex items-center gap-2 text-xs font-black text-purple-950">
-                <Award className="w-4 h-4 text-purple-700" aria-hidden="true" />
-                <span>Progresso Total:</span>
-              </span>
-              <span className="font-mono text-sm font-black text-purple-900 bg-white px-2.5 py-1 rounded-xl border border-purple-200 shadow-2xs">
-                {unlockedCount} / {totalAchievements}
-              </span>
-            </div>
-
-            {/* Progress Bar */}
-            <div 
-              role="progressbar"
-              aria-valuenow={progressPercent}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-label={`Progresso geral das conquistas: ${progressPercent}%`}
-              className="w-full bg-purple-200/90 h-3.5 rounded-full overflow-hidden p-0.5 mb-2 shadow-inner"
-            >
-              <div 
-                className="bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-500 h-full rounded-full transition-all duration-700"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-
-            <div className="flex items-center justify-between text-xs text-purple-900 font-bold">
-              <span>{progressPercent}% completado</span>
-              <span>{totalAchievements - unlockedCount} restantes</span>
-            </div>
-
-            <div className="mt-3 pt-3 border-t border-purple-200/80 text-[11px] text-slate-500 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-              <span>Clique nos desbloqueados para comemorar!</span>
+            {/* Quick Action Buttons */}
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                onClick={() => setActiveTab('education')}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+              >
+                <Target className="w-4 h-4" />
+                <span>Testar Quizzes</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('report')}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-950 border border-purple-300 font-extrabold text-xs transition-all active:scale-95 cursor-pointer"
+              >
+                <ShieldCheck className="w-4 h-4 text-purple-800" />
+                <span>Denúncia Anônima</span>
+              </button>
             </div>
           </div>
 
         </div>
       </div>
 
-      {/* Humorous Anti-Bullying Tip of the Day */}
-      <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-purple-50 border border-amber-200/90 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-xl shrink-0 shadow-2xs">
-            💡
+      {/* Progress & Tip Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Overall Progress Gauge Card */}
+        <div className="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 rounded-3xl p-5 sm:p-6 flex flex-col justify-between shadow-2xs">
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <span className="flex items-center gap-2 text-xs font-black text-purple-950">
+              <Award className="w-4 h-4 text-purple-700" aria-hidden="true" />
+              <span>Progresso Total:</span>
+            </span>
+            <span className="font-mono text-sm font-black text-purple-900 bg-white px-2.5 py-1 rounded-xl border border-purple-200 shadow-2xs">
+              {unlockedCount} / {totalAchievements}
+            </span>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-black text-amber-900 uppercase tracking-wider">
-                Dica Rápida do Sentinela
-              </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-200/70 text-amber-950 font-bold">
-                Bom Senso #0{tipIndex + 1}
-              </span>
-            </div>
-            <p className="text-xs sm:text-sm font-medium text-slate-700 mt-1 italic leading-relaxed">
-              {FUNNY_TIPS[tipIndex]}
-            </p>
+
+          {/* Progress Bar */}
+          <div 
+            role="progressbar"
+            aria-valuenow={progressPercent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`Progresso geral das conquistas: ${progressPercent}%`}
+            className="w-full bg-purple-200/90 h-3 rounded-full overflow-hidden p-0.5 mb-2 shadow-inner"
+          >
+            <div 
+              className="bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-500 h-full rounded-full transition-all duration-700"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+
+          <div className="flex items-center justify-between text-xs text-purple-900 font-bold">
+            <span>{progressPercent}% completado</span>
+            <span>{totalAchievements - unlockedCount} restantes</span>
+          </div>
+
+          <div className="mt-3 pt-3 border-t border-purple-200/80 text-[11px] text-slate-500 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+            <span>Clique nos cartões para comemorar ou inspecionar!</span>
           </div>
         </div>
 
-        <button
-          onClick={nextTip}
-          className="shrink-0 py-2 px-3.5 rounded-xl bg-white hover:bg-amber-100/60 border border-amber-300 text-amber-950 font-extrabold text-xs flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer active:scale-95"
-          title="Ver outra dica divertida"
-        >
-          <RotateCw className="w-3.5 h-3.5 text-amber-700" />
-          <span>Outra Dica</span>
-        </button>
+        {/* Humorous Anti-Bullying Tip of the Day */}
+        <div className="md:col-span-2 bg-gradient-to-r from-amber-50 via-orange-50 to-purple-50 border border-amber-200/90 rounded-3xl p-5 sm:p-6 flex flex-col justify-between shadow-2xs">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-xl shrink-0 shadow-2xs">
+              💡
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black text-amber-900 uppercase tracking-wider">
+                  Dica Rápida do Sentinela
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-200/70 text-amber-950 font-bold">
+                  Bom Senso #0{tipIndex + 1}
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm font-medium text-slate-700 mt-2 italic leading-relaxed">
+                {FUNNY_TIPS[tipIndex]}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-amber-200/70 flex justify-end">
+            <button
+              onClick={nextTip}
+              className="py-1.5 px-3 rounded-xl bg-white hover:bg-amber-100/60 border border-amber-300 text-amber-950 font-extrabold text-xs flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer active:scale-95"
+              title="Ver outra dica divertida"
+            >
+              <RotateCw className="w-3.5 h-3.5 text-amber-700" />
+              <span>Outra Dica</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Filter & Search Controls Bar */}
@@ -507,8 +546,8 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
         </div>
       )}
 
-      {/* Badges Grid (18 Humorous & Intuitive Cards) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+      {/* Badges Grid (18 Humorous & Intuitive Cards with Retro Pixel Frames) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         {filteredAchievements.map((item) => {
           const isUnlocked = item.isUnlocked;
           const showProgressBar = item.maxProgress > 1;
@@ -522,7 +561,7 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
               className={`group rounded-3xl p-5 sm:p-6 transition-all duration-300 border flex flex-col justify-between relative overflow-hidden ${
                 isUnlocked
                   ? 'bg-white border-purple-300/90 shadow-xs ring-1 ring-purple-200/70 hover:shadow-md hover:border-purple-400 cursor-pointer'
-                  : 'bg-white/85 border-slate-200/90 text-slate-600 shadow-2xs hover:border-purple-200'
+                  : 'bg-white/85 border-slate-200/90 text-slate-600 shadow-2xs hover:border-purple-200 cursor-pointer'
               } ${isCelebrated ? 'scale-[1.02] ring-4 ring-amber-300 animate-pulse' : ''}`}
             >
               {/* Confetti Glow when clicked */}
@@ -537,18 +576,20 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
 
               <div>
                 
-                {/* Card Header: Icon + Tier + Status */}
-                <div className="flex items-start justify-between gap-3 mb-3">
+                {/* Card Header: Retro Framed Photo Badge + Tier + Status */}
+                <div className="flex items-start justify-between gap-3 mb-3.5">
                   
-                  {/* Badge Icon Box with Funny Sticker Overlay */}
-                  <div className="relative">
-                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border shrink-0 transition-transform group-hover:scale-105 ${
-                      isUnlocked
-                        ? 'bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-300 shadow-2xs'
-                        : 'bg-slate-100 border-slate-200'
-                    }`}>
-                      {renderIcon(item.iconType, isUnlocked)}
-                    </div>
+                  {/* Badge Custom Framed Photo with Funny Sticker Overlay */}
+                  <div className="relative group/frame">
+                    <AchievementBadgeFrame
+                      achievementId={item.id}
+                      tier={item.tier}
+                      isUnlocked={isUnlocked}
+                      size={68}
+                      showGlow={isUnlocked}
+                      animate={true}
+                      className="transition-transform group-hover:scale-105"
+                    />
                     
                     {/* Funny Sticker Emoji */}
                     <div 
@@ -558,6 +599,11 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
                       title="Símbolo divertido"
                     >
                       {item.funnySticker}
+                    </div>
+
+                    {/* Quick Expand Icon Hint */}
+                    <div className="absolute -bottom-1 -right-1 p-1 rounded-md bg-slate-900/80 text-white opacity-0 group-hover/frame:opacity-100 transition-opacity text-[10px]">
+                      <Maximize2 className="w-2.5 h-2.5" />
                     </div>
                   </div>
 
@@ -580,6 +626,11 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
                         <span>🔒 Bloqueada</span>
                       </span>
                     )}
+
+                    <span className="text-[10px] text-purple-700 font-bold hover:underline flex items-center gap-1 mt-1">
+                      <span>Ver moldura</span>
+                      <Maximize2 className="w-2.5 h-2.5" />
+                    </span>
                   </div>
                 </div>
 
@@ -676,6 +727,134 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
           );
         })}
       </div>
+
+      {/* DETAILED FRAMED BADGE INSPECTION MODAL */}
+      {inspectedBadge && (
+        <div 
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="inspected-badge-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fade-in text-slate-800"
+          onClick={() => setInspectedBadge(null)}
+        >
+          <div 
+            className="bg-white border-2 border-purple-300 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative text-center animate-scale-up overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Ambient Background Glow */}
+            <div className="absolute -top-12 -right-12 w-40 h-40 bg-purple-200/50 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-amber-200/50 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Close Button */}
+            <button
+              onClick={() => setInspectedBadge(null)}
+              aria-label="Fechar visualização de moldura"
+              className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-slate-700 hover:bg-purple-50 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Header Badge Type */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-purple-100 border border-purple-300 text-purple-950 text-xs font-black uppercase tracking-wider mb-4 shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-purple-700" />
+              <span>Moldura Oficial do Sentinela</span>
+            </div>
+
+            {/* High-Resolution Framed Badge Showcase */}
+            <div className="my-3 flex justify-center items-center relative">
+              <div className="p-3 rounded-3xl bg-gradient-to-b from-slate-900/5 to-slate-900/10 border border-purple-200/60 shadow-inner">
+                <AchievementBadgeFrame
+                  achievementId={inspectedBadge.id}
+                  tier={inspectedBadge.tier}
+                  isUnlocked={inspectedBadge.isUnlocked}
+                  size={128}
+                  showGlow={inspectedBadge.isUnlocked}
+                  animate={true}
+                />
+              </div>
+
+              {/* Floating Sticker on top right of frame */}
+              <div className="absolute top-0 right-1/4 translate-x-4 -translate-y-2 w-9 h-9 rounded-full bg-white border-2 border-purple-300 shadow-md flex items-center justify-center text-lg">
+                {inspectedBadge.funnySticker}
+              </div>
+            </div>
+
+            {/* Tier & Status Pills */}
+            <div className="flex items-center justify-center gap-2 mb-2">
+              {getTierLabel(inspectedBadge.tier)}
+              {inspectedBadge.isUnlocked ? (
+                <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-900 text-xs font-black">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>Conquistada</span>
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-slate-100 border border-slate-300 text-slate-700 text-xs font-black">
+                  <Lock className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Ainda Bloqueada</span>
+                </span>
+              )}
+            </div>
+
+            {/* Title & Subtitle */}
+            <h2 id="inspected-badge-title" className="text-xl sm:text-2xl font-black text-slate-900 mb-1">
+              {inspectedBadge.title}
+            </h2>
+
+            {inspectedBadge.subtitle && (
+              <p className="text-xs font-bold text-purple-800 mb-3 italic">
+                "{inspectedBadge.subtitle}"
+              </p>
+            )}
+
+            {/* Description */}
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4 px-2">
+              {inspectedBadge.isUnlocked 
+                ? (inspectedBadge.unlockedDescription || inspectedBadge.description) 
+                : inspectedBadge.description}
+            </p>
+
+            {/* Funny Quote */}
+            {inspectedBadge.funnyQuote && (
+              <div className="bg-purple-50/90 border border-purple-200/90 rounded-2xl p-3 text-xs text-purple-950 font-medium italic mb-4">
+                {inspectedBadge.funnyQuote}
+              </div>
+            )}
+
+            {/* Requirement / Mission CTA */}
+            {!inspectedBadge.isUnlocked ? (
+              <div className="space-y-3 pt-2">
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-xs text-amber-950 text-left">
+                  <strong className="block mb-0.5">🎯 Como Conquistar:</strong>
+                  <span>{inspectedBadge.requirementHint}</span>
+                </div>
+
+                <button
+                  onClick={() => {
+                    const id = inspectedBadge.id;
+                    setInspectedBadge(null);
+                    handleActionClick(id);
+                  }}
+                  className="w-full py-3 px-5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-95 cursor-pointer"
+                >
+                  <span>Ir Para a Missão Agora</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  setCelebratedBadgeId(inspectedBadge.id);
+                  soundEngine.playChimeSuccess();
+                  setInspectedBadge(null);
+                }}
+                className="w-full py-3 px-5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-95 cursor-pointer"
+              >
+                <span>🎉 Comemorar Conquista!</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
     </div>
   );
