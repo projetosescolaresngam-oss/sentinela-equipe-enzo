@@ -1,4 +1,4 @@
-import { Achievement, EducationalActivityProgress } from './types';
+import { Achievement, EducationalActivityProgress, RankTierInfo } from './types';
 
 export const INITIAL_ACHIEVEMENTS: Achievement[] = [
   {
@@ -285,10 +285,96 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
     tier: 'bronze',
     iconType: 'award',
     isUnlocked: false,
+    isSecret: true,
     currentProgress: 1,
     maxProgress: 1,
     progressUnit: 'acesso à plataforma',
-    requirementHint: 'Explore os módulos educativos ou ferramentas do Sentinela Escolar.'
+    requirementHint: 'Explore os recursos do Sentinela Escolar.'
+  },
+  {
+    id: 'primeiro_passo_simulacao',
+    title: 'Protagonista da Empatia',
+    subtitle: 'Primeiro Passo nas Simulações Interativas',
+    description: 'Conclua sua primeira simulação interativa de tomada de decisões no cotidiano escolar.',
+    unlockedDescription: 'Sensacional! Você viveu sua primeira história interativa e tomou decisões conscientes na prática.',
+    funnyQuote: '‘Você não apenas assiste ao filme: você muda o roteiro para um final muito mais justo!’',
+    funnySticker: '🎭',
+    category: 'sabedoria',
+    tier: 'bronze',
+    iconType: 'sparkles',
+    isUnlocked: false,
+    currentProgress: 0,
+    maxProgress: 1,
+    progressUnit: 'simulação concluída',
+    requirementHint: 'Conclua qualquer 1 simulação interativa na aba "Simulações 🎭".'
+  },
+  {
+    id: 'olhar_empatico',
+    title: 'Coração de Escudo & Acolhimento',
+    subtitle: 'Olhar Empático nas decisões do dia a dia',
+    description: 'Escolha ações deliberadas de apoio, escuta ativa e acolhimento a colegas nas simulações.',
+    unlockedDescription: 'Que sensibilidade brilhante! Suas escolhas acolheram colegas vulneráveis com respeito e empatia.',
+    funnyQuote: '‘Com esse nível de empatia, até o Wi-Fi da escola se conecta melhor ao seu bom coração!’',
+    funnySticker: '🤝',
+    category: 'empatia',
+    tier: 'prata',
+    iconType: 'heart',
+    isUnlocked: false,
+    currentProgress: 0,
+    maxProgress: 3,
+    progressUnit: 'escolhas de empatia',
+    requirementHint: 'Faça 3 escolhas empáticas de apoio nas simulações interativas.'
+  },
+  {
+    id: 'decisao_segura',
+    title: 'Estrategista da Proteção',
+    subtitle: 'Decisões Seguras que evitam riscos e conflitos',
+    description: 'Complete 3 simulações alcançando finais seguros e com apoio institucional de adultos responsáveis.',
+    unlockedDescription: 'Inteligência pura! Você provou que proteger a escola significa buscar ajuda com segurança e sem violência.',
+    funnyQuote: '‘Segurança em primeiro lugar: você pensa rápido e aciona os apoios certos como um verdadeiro mestre.’',
+    funnySticker: '🛡️',
+    category: 'escudo',
+    tier: 'ouro',
+    iconType: 'shield',
+    isUnlocked: false,
+    currentProgress: 0,
+    maxProgress: 3,
+    progressUnit: 'simulações seguras',
+    requirementHint: 'Conclua 3 simulações com decisões voltadas à segurança e mediação segura.'
+  },
+  {
+    id: 'pensador_estrategico',
+    title: 'Mestre do Multiverso Escolar',
+    subtitle: 'Pensador Estratégico e explorador de caminhos',
+    description: 'Explore diferentes caminhos e descubra finais variados em uma mesma simulação interativa.',
+    unlockedDescription: 'Curiosidade de elite! Você rejogou e descobriu caminhos alternativos para entender todas as consequências.',
+    funnyQuote: '‘Doutor Estranho ficaria com inveja da sua habilidade de prever e testar todas as ramificações!’',
+    funnySticker: '🧠',
+    category: 'detetive',
+    tier: 'ouro',
+    iconType: 'compass',
+    isUnlocked: false,
+    currentProgress: 0,
+    maxProgress: 2,
+    progressUnit: 'finais em 1 cenário',
+    requirementHint: 'Descubra pelo menos 2 finais/caminhos diferentes em uma mesma simulação.'
+  },
+  {
+    id: 'guardiao_comunidade_sim',
+    title: 'Guardião Supremo da Convivência',
+    subtitle: 'Completou todas as 10 simulações interativas',
+    description: 'Vivencie e conclua todas as 10 situações fictícias disponíveis no Sentinela Escolar.',
+    unlockedDescription: 'Platina lendária! Você dominou todas as 10 simulações interativas e é uma referência de cultura de paz.',
+    funnyQuote: '‘Você platinou o laboratório de decisões éticas! O universo escolar está muito mais seguro com você.’',
+    funnySticker: '🌟',
+    category: 'sabedoria',
+    tier: 'lendario',
+    iconType: 'crown',
+    isUnlocked: false,
+    currentProgress: 0,
+    maxProgress: 10,
+    progressUnit: 'simulações zeradas',
+    requirementHint: 'Complete todas as 10 simulações interativas disponíveis.'
   },
   {
     id: 'colecionador_supremo',
@@ -322,5 +408,90 @@ export const INITIAL_EDUCATIONAL_PROGRESS: EducationalActivityProgress = {
   accessedPlatformNightOrDay: true,
   quizzesProgress: {},
   totalQuestionsAnswered: 0,
-  totalQuizzesCompleted: 0
+  totalQuizzesCompleted: 0,
+  
+  // Simulações Interativas
+  completedSimulations: [],
+  exploredSimulationOutcomes: {},
+  totalSimulationChoicesMade: 0,
+  empathyChoicesCount: 0,
+  safetyChoicesCount: 0,
+  strategicExplorationsCount: 0,
+  discoveredSecretOutcomesCount: 0
+};
+
+export const RANK_TIERS: RankTierInfo[] = [
+  {
+    levelNumber: 1,
+    minAchievements: 0,
+    title: '🛡️ Aprendiz da Cultura de Paz',
+    badgeEmoji: '🌱',
+    description: 'Iniciando a jornada com curiosidade e descobrindo seus direitos fundamentais.',
+    color: 'text-emerald-900 bg-emerald-100 border-emerald-300'
+  },
+  {
+    levelNumber: 2,
+    minAchievements: 3,
+    title: '⚡ Sentinela em Treinamento',
+    badgeEmoji: '⚡',
+    description: 'Já acolhe colegas isolados e pratica técnicas de respiração e respeito.',
+    color: 'text-blue-900 bg-blue-100 border-blue-300'
+  },
+  {
+    levelNumber: 3,
+    minAchievements: 6,
+    title: '🏆 Guardião da Convivência',
+    badgeEmoji: '🏆',
+    description: 'Argumentos éticos imbatíveis e atitudes ativas contra o bullying.',
+    color: 'text-indigo-900 bg-indigo-100 border-indigo-300'
+  },
+  {
+    levelNumber: 4,
+    minAchievements: 10,
+    title: '👑 Lorde Sentinela da Mediação',
+    badgeEmoji: '👑',
+    description: 'Mais sábio que enciclopédia e mestre na desescalada pacífica de conflitos.',
+    color: 'text-purple-900 bg-purple-100 border-purple-300'
+  },
+  {
+    levelNumber: 5,
+    minAchievements: 15,
+    title: '💎 Mestre Supremo do Bom Senso',
+    badgeEmoji: '💎',
+    description: 'Referência absoluta de empatia, sigilo e segurança no cotidiano escolar.',
+    color: 'text-cyan-900 bg-cyan-100 border-cyan-300'
+  },
+  {
+    levelNumber: 6,
+    minAchievements: 19,
+    title: '🔥 Senhor da Proteção & Respeito',
+    badgeEmoji: '🔥',
+    description: 'Estrategista de elite! Domina quizzes, leis e simulações com maestria.',
+    color: 'text-rose-900 bg-rose-100 border-rose-300'
+  },
+  {
+    levelNumber: 7,
+    minAchievements: 22,
+    title: '🌟 Lenda da Escola Sem Bullying',
+    badgeEmoji: '🌟',
+    description: 'Atingiu o patamar lendário de atitudes de paz, proteção e empatia.',
+    color: 'text-amber-900 bg-amber-100 border-amber-300'
+  },
+  {
+    levelNumber: 8,
+    minAchievements: 23,
+    title: '👑 Lenda Suprema do Sentinela',
+    badgeEmoji: '👑',
+    description: 'Platina total (23/23 conquistas)! O ápice supremo da cultura de paz escolar.',
+    color: 'text-amber-950 bg-gradient-to-r from-amber-200 to-yellow-300 border-amber-400'
+  }
+];
+
+export const getRankInfo = (unlockedCount: number): RankTierInfo => {
+  for (let i = RANK_TIERS.length - 1; i >= 0; i--) {
+    if (unlockedCount >= RANK_TIERS[i].minAchievements) {
+      return RANK_TIERS[i];
+    }
+  }
+  return RANK_TIERS[0];
 };

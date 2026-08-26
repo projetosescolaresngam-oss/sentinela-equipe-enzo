@@ -92,7 +92,7 @@ export interface AdminNotification {
   read: boolean;
 }
 
-export type AppTab = 'home' | 'education' | 'achievements' | 'report' | 'tracker' | 'support' | 'admin' | 'guide';
+export type AppTab = 'home' | 'education' | 'simulations' | 'achievements' | 'report' | 'tracker' | 'support' | 'admin' | 'guide';
 
 export type AchievementId = 
   | 'conhecedor_direitos'
@@ -112,7 +112,13 @@ export type AchievementId =
   | 'radar_antizueira'
   | 'colecionador_supremo'
   | 'sentinela_noturno'
-  | 'campeao_inclusao';
+  | 'campeao_inclusao'
+  // Novas conquistas de Simulações Interativas:
+  | 'primeiro_passo_simulacao'
+  | 'olhar_empatico'
+  | 'decisao_segura'
+  | 'pensador_estrategico'
+  | 'guardiao_comunidade_sim';
 
 export type AchievementCategory = 'sabedoria' | 'detetive' | 'empatia' | 'zen' | 'escudo';
 export type AchievementTier = 'bronze' | 'prata' | 'ouro' | 'lendario';
@@ -150,6 +156,7 @@ export interface Achievement {
   maxProgress: number;
   progressUnit?: string;
   requirementHint: string;
+  isSecret?: boolean;
 }
 
 export type QuizOptionLetter = 'A' | 'B' | 'C' | 'D';
@@ -203,5 +210,131 @@ export interface EducationalActivityProgress {
   quizzesProgress: Record<string, UserQuizProgress>;
   totalQuestionsAnswered: number;
   totalQuizzesCompleted: number;
+  
+  // Progresso das Simulações Interativas
+  completedSimulations: string[]; // IDs de simulações com pelo menos 1 final alcançado
+  exploredSimulationOutcomes: Record<string, string[]>; // scenarioId -> outcomeIds[]
+  totalSimulationChoicesMade: number;
+  empathyChoicesCount: number;
+  safetyChoicesCount: number;
+  strategicExplorationsCount: number; // cenários onde >= 2 caminhos/finais foram explorados
+  discoveredSecretOutcomesCount?: number;
 }
+
+// Tipos das Simulações Interativas
+export type SimulationTheme = 
+  | 'inclusao_empatia'
+  | 'cyberbullying'
+  | 'respeito_limites'
+  | 'privacidade_digital'
+  | 'responsabilidade_boatos'
+  | 'acolhimento'
+  | 'desescalada_conflito'
+  | 'pressao_colegas'
+  | 'seguranca_ameacas'
+  | 'testemunha_ativa';
+
+export type OutcomeType = 'positivo' | 'aprendizado' | 'atencao' | 'alerta' | 'especial';
+
+export type SimulationChoiceTone = 
+  | 'empatia' 
+  | 'seguranca' 
+  | 'neutro' 
+  | 'arriscado' 
+  | 'impulso' 
+  | 'omissao' 
+  | 'apoio'
+  | 'reflexao';
+
+export interface SimulationCharacter {
+  name: string;
+  role: string; // ex: "Colega de turma", "Professor de História", "Orientadora Pedagógica"
+  avatarEmoji: string;
+  color: string;
+  personality?: string;
+}
+
+export interface SimulationDialogue {
+  characterName: string;
+  text: string;
+  isUser?: boolean;
+  avatarEmoji?: string;
+}
+
+export interface SimulationChoice {
+  id: string;
+  text: string;
+  iconEmoji?: string; // 🟢, 🟡, 🔵, 🔴, ⭐, 🟣
+  tone: SimulationChoiceTone;
+  attitudeLabel?: string; // ex: "Atitude Segura", "Atitude Empática", "Atitude Impulsiva", "Omissão"
+  consequenceText: string;
+  nextNodeId: string; // ID do próximo nó (ou ID do outcome final se terminar)
+  metricImpact?: {
+    decision?: number;
+    empathy?: number;
+    safety?: number;
+  };
+}
+
+export interface SimulationNode {
+  id: string;
+  stepNumber: number;
+  totalStepsEstimated?: number;
+  title?: string;
+  narrative: string;
+  locationTag: string; // ex: "Pátio do Recreio", "Grupo de Mensagens", "Corredor da Escola"
+  dialogues?: SimulationDialogue[];
+  promptQuestion: string; // "O que você faz agora?"
+  choices: SimulationChoice[];
+}
+
+export interface SimulationOutcome {
+  id: string;
+  type: OutcomeType;
+  title: string;
+  badgeLabel: string;
+  badgeColor: string;
+  narrativeResult: string;
+  whatHappened: string;
+  whyChoicesLedHere: string;
+  saferBehaviorAdvice: string;
+  coreLearning: string;
+  isSpecialSecret?: boolean;
+  secretDiscoveryTitle?: string;
+  bonusXp?: number;
+  metrics: {
+    decision: number; // 0-100%
+    empathy: number;  // 0-100%
+    safety: number;   // 0-100%
+  };
+}
+
+export interface SimulationScenario {
+  id: string;
+  scenarioNumber: number;
+  title: string;
+  subtitle: string;
+  theme: SimulationTheme;
+  themeLabel: string;
+  estimatedMinutes: number;
+  iconName: string;
+  accentColor: string;
+  coverGradient: string;
+  summary: string;
+  characters: SimulationCharacter[];
+  initialNodeId: string;
+  nodes: Record<string, SimulationNode>;
+  outcomes: Record<string, SimulationOutcome>;
+  totalPossibleOutcomes: number;
+}
+
+export interface RankTierInfo {
+  minAchievements: number;
+  title: string;
+  badgeEmoji: string;
+  description: string;
+  color: string;
+  levelNumber: number;
+}
+
 

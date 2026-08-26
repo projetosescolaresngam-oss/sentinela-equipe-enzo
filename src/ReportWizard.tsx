@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { useApp } from './AppContext';
 import { BullyingCategory, IncidentFrequency, SchoolShift, ReporterRole, UrgencyLevel } from './types';
+import { centerElementInViewport } from './utils/scrollHelper';
 
 export const ReportWizard: React.FC = () => {
   const { submitReport, setActiveTab } = useApp();
@@ -105,6 +106,7 @@ export const ReportWizard: React.FC = () => {
       return;
     }
     setCurrentStep(prev => prev + 1);
+    centerElementInViewport('#report-wizard-container', { topOffset: 80, delay: 40 });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -127,6 +129,7 @@ export const ReportWizard: React.FC = () => {
 
     setGeneratedProtocol(protocol);
     setCurrentStep(5); // Completion step
+    centerElementInViewport('#report-wizard-container', { topOffset: 80, delay: 40 });
   };
 
   const handleCopyProtocol = () => {
@@ -137,7 +140,7 @@ export const ReportWizard: React.FC = () => {
   };
 
   return (
-    <div className="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 animate-fade-in text-slate-800">
+    <div id="report-wizard-container" className="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 animate-fade-in text-slate-800">
       
       {/* Header */}
       <div className="text-center mb-8 max-w-3xl mx-auto">

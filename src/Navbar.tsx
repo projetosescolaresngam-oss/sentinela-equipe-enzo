@@ -66,6 +66,13 @@ export const Navbar: React.FC = () => {
       icon: Trophy
     },
     { 
+      id: 'simulations', 
+      label: 'Simulações 🎭', 
+      shortLabel: 'Simulações', 
+      description: 'Histórias e decisões no cotidiano', 
+      icon: Sparkles
+    },
+    { 
       id: 'education', 
       label: 'Tipos de Bullying', 
       shortLabel: 'Bullying', 

@@ -67,18 +67,26 @@ export const HomeHero: React.FC = () => {
         </p>
 
         {/* Primary CTA Buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-3.5">
+          <button
+            onClick={() => setActiveTab('simulations')}
+            className="bg-gradient-to-r from-purple-700 via-indigo-700 to-purple-800 hover:from-purple-800 hover:to-indigo-800 text-white font-extrabold text-sm sm:text-base px-7 py-4 rounded-2xl flex items-center gap-2.5 shadow-md shadow-purple-500/25 transition-all active:scale-95 cursor-pointer ring-2 ring-purple-300/60"
+          >
+            <Sparkles className="w-5 h-5 text-purple-200" />
+            <span>Simulações Interativas 🎭</span>
+          </button>
+
           <button
             onClick={() => setActiveTab('report')}
-            className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-extrabold text-sm sm:text-base px-8 py-4 rounded-2xl flex items-center gap-3 shadow-md shadow-purple-500/25 transition-all active:scale-95 cursor-pointer"
+            className="bg-purple-900 hover:bg-purple-950 text-white font-extrabold text-sm sm:text-base px-7 py-4 rounded-2xl flex items-center gap-2.5 shadow-xs transition-all active:scale-95 cursor-pointer"
           >
-            <Send className="w-5 h-5" />
+            <Send className="w-5 h-5 text-purple-300" />
             <span>Fazer Denúncia Anônima</span>
           </button>
 
           <button
             onClick={() => setActiveTab('guide')}
-            className="bg-purple-100/90 hover:bg-purple-200 text-purple-950 font-bold text-sm sm:text-base px-7 py-4 rounded-2xl flex items-center gap-2.5 border border-purple-300 shadow-xs transition-all cursor-pointer"
+            className="bg-purple-100/90 hover:bg-purple-200 text-purple-950 font-bold text-sm sm:text-base px-6 py-4 rounded-2xl flex items-center gap-2 border border-purple-300 shadow-xs transition-all cursor-pointer"
           >
             <Compass className="w-5 h-5 text-purple-800" />
             <span>Guia & Como Usar</span>
@@ -86,10 +94,10 @@ export const HomeHero: React.FC = () => {
 
           <button
             onClick={() => setActiveTab('support')}
-            className="bg-white hover:bg-purple-50 text-slate-800 font-bold text-sm sm:text-base px-7 py-4 rounded-2xl flex items-center gap-2.5 border border-purple-200 shadow-xs transition-all cursor-pointer"
+            className="bg-white hover:bg-purple-50 text-slate-800 font-bold text-sm sm:text-base px-6 py-4 rounded-2xl flex items-center gap-2 border border-purple-200 shadow-xs transition-all cursor-pointer"
           >
             <HeartHandshake className="w-5 h-5 text-purple-600" />
-            <span>Apoio Emocional & Chat</span>
+            <span>Apoio Emocional</span>
           </button>
         </div>
       </div>

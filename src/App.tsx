@@ -10,6 +10,7 @@ import { EmergencyBanner } from './EmergencyBanner';
 import { HomeHero } from './HomeHero';
 import { PlatformGuideView } from './PlatformGuideView';
 import { EducationalModule } from './EducationalModule';
+import { SimulationsModule } from './SimulationsModule';
 import { AchievementsView } from './AchievementsView';
 import { ReportWizard } from './ReportWizard';
 import { ProtocolTracker } from './ProtocolTracker';
@@ -28,6 +29,7 @@ const MainContent: React.FC = () => {
       {activeTab === 'home' && <HomeHero />}
       {activeTab === 'guide' && <PlatformGuideView />}
       {activeTab === 'achievements' && <AchievementsView />}
+      {activeTab === 'simulations' && <SimulationsModule />}
       {activeTab === 'education' && <EducationalModule />}
       {activeTab === 'report' && <ReportWizard />}
       {activeTab === 'tracker' && <ProtocolTracker />}
@@ -64,6 +66,10 @@ const Footer: React.FC = () => {
             <button onClick={() => setActiveTab('achievements')} className="text-purple-900 font-bold hover:text-purple-700 transition-colors inline-flex items-center gap-1">
               <Trophy className="w-3.5 h-3.5 text-amber-600" />
               <span>Conquistas</span>
+            </button>
+            <button onClick={() => setActiveTab('simulations')} className="text-purple-900 font-bold hover:text-purple-700 transition-colors inline-flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+              <span>Simulações 🎭</span>
             </button>
             <button onClick={() => setActiveTab('education')} className="hover:text-purple-800 transition-colors">
               Tipos de Bullying

@@ -16,13 +16,16 @@ import {
 } from 'lucide-react';
 import { useApp } from './AppContext';
 import { IncidentReport, ReportStatus } from './types';
+import { smoothScrollToElement } from './utils/scrollHelper';
+import { MediationReportButtons } from './MediationReportButtons';
 
 export const ProtocolTracker: React.FC = () => {
   const { 
     reports, 
     lastGeneratedProtocol, 
     addMessageToProtocol, 
-    setActiveTab 
+    setActiveTab,
+    isAdminAuthenticated
   } = useApp();
 
   const [inputProtocol, setInputProtocol] = useState<string>(lastGeneratedProtocol || '');
@@ -47,6 +50,11 @@ export const ProtocolTracker: React.FC = () => {
     const clean = inputProtocol.trim().toUpperCase();
     const found = reports.find(r => r.id.toUpperCase() === clean);
     setSelectedReport(found || null);
+    if (found) {
+      smoothScrollToElement('#protocol-result-details', { position: 'auto', delay: 40 });
+    } else {
+      smoothScrollToElement('#protocol-not-found', { position: 'auto', delay: 40 });
+    }
   };
 
   const handleSendMessage = (e: React.FormEvent) => {
@@ -55,6 +63,7 @@ export const ProtocolTracker: React.FC = () => {
 
     addMessageToProtocol(selectedReport.id, replyText.trim(), 'estudante');
     setReplyText('');
+    smoothScrollToElement('#protocol-chat-messages', { position: 'center', delay: 40 });
   };
 
   const getStatusBadge = (status: ReportStatus) => {
@@ -130,8 +139,9 @@ export const ProtocolTracker: React.FC = () => {
                 const found = reports.find(r => r.id.toUpperCase() === code.toUpperCase());
                 setSelectedReport(found || null);
                 setHasSearched(true);
+                smoothScrollToElement(found ? '#protocol-result-details' : '#protocol-not-found', { position: 'auto', delay: 40 });
               }}
-              className="px-2.5 py-1 rounded-xl bg-purple-100/70 hover:bg-purple-200 text-purple-950 font-mono font-semibold transition-colors border border-purple-300/70"
+              className="px-2.5 py-1 rounded-xl bg-purple-100/70 hover:bg-purple-200 text-purple-950 font-mono font-semibold transition-colors border border-purple-300/70 cursor-pointer"
             >
               {code}
             </button>
@@ -141,7 +151,7 @@ export const ProtocolTracker: React.FC = () => {
 
       {/* Results Display */}
       {hasSearched && !selectedReport && (
-        <div className="bg-white border border-purple-200/90 rounded-3xl p-8 text-center text-slate-700 shadow-xs">
+        <div id="protocol-not-found" className="bg-white border border-purple-200/90 rounded-3xl p-8 text-center text-slate-700 shadow-xs">
           <AlertCircle className="w-12 h-12 text-purple-600 mx-auto mb-3" />
           <h3 className="text-lg font-bold text-slate-900 mb-1">Protocolo não localizado</h3>
           <p className="text-xs text-slate-500 max-w-md mx-auto mb-4">
@@ -149,7 +159,7 @@ export const ProtocolTracker: React.FC = () => {
           </p>
           <button
             onClick={() => setActiveTab('report')}
-            className="text-xs font-bold text-purple-800 hover:underline"
+            className="text-xs font-bold text-purple-800 hover:underline cursor-pointer"
           >
             Deseja registrar uma nova denúncia anônima?
           </button>
@@ -157,7 +167,7 @@ export const ProtocolTracker: React.FC = () => {
       )}
 
       {selectedReport && (
-        <div className="space-y-6 animate-fade-in">
+        <div id="protocol-result-details" className="space-y-6 animate-fade-in">
           
           {/* Card Status */}
           <div className="bg-white border border-purple-200/90 rounded-3xl p-6 sm:p-8 text-slate-800 shadow-xs">
@@ -230,6 +240,13 @@ export const ProtocolTracker: React.FC = () => {
               </div>
             )}
 
+            {/* Acesso a Exportação Oficial para Gestão Escolar Autenticada */}
+            {isAdminAuthenticated && (
+              <div className="mt-6 pt-4 border-t border-purple-100">
+                <MediationReportButtons report={selectedReport} />
+              </div>
+            )}
+
           </div>
 
           {/* Secure Messaging Channel with Council */}
@@ -245,7 +262,7 @@ export const ProtocolTracker: React.FC = () => {
             </div>
 
             {/* Message Thread */}
-            <div className="space-y-4 max-h-96 overflow-y-auto pr-2 mb-6 scrollbar-none">
+            <div id="protocol-chat-messages" className="space-y-4 max-h-96 overflow-y-auto pr-2 mb-6 scrollbar-none">
               {selectedReport.messages.length === 0 ? (
                 <div className="text-center py-8 text-slate-500 text-xs">
                   <Clock className="w-8 h-8 mx-auto mb-2 text-purple-600" />

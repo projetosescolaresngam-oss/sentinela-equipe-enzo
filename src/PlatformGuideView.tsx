@@ -35,6 +35,8 @@ import {
 import { useApp } from './AppContext';
 import { AppTab } from './types';
 import { AchievementBadgeFrame } from './AchievementBadgeFrame';
+import { smoothScrollToElement } from './utils/scrollHelper';
+import { RANK_TIERS } from './achievementsData';
 
 interface GuideSection {
   id: string;
@@ -47,7 +49,8 @@ interface GuideSection {
 
 const SECTIONS: GuideSection[] = [
   { id: 'visao-geral', title: 'Visão Geral & Como Funciona o Sentinela', shortTitle: 'Visão Geral', icon: ShieldCheck, color: 'text-purple-600 bg-purple-100 border-purple-300' },
-  { id: 'conquistas', title: 'Sistema de Conquistas & Distintivos', shortTitle: '🏆 Conquistas', icon: Trophy, color: 'text-amber-600 bg-amber-100 border-amber-300', badge: '18 Badges' },
+  { id: 'simulacoes', title: 'Simulações Interativas & Tomada de Decisão', shortTitle: '🎭 Simulações', icon: Sparkles, color: 'text-purple-700 bg-purple-100 border-purple-300', badge: 'Novo' },
+  { id: 'conquistas', title: 'Sistema de Conquistas & Distintivos', shortTitle: '🏆 Conquistas', icon: Trophy, color: 'text-amber-600 bg-amber-100 border-amber-300', badge: 'Ranks' },
   { id: 'denuncia', title: 'Como Fazer uma Denúncia 100% Anônima', shortTitle: '🔒 Denúncia Anônima', icon: Send, color: 'text-indigo-600 bg-indigo-100 border-indigo-300' },
   { id: 'protocolo', title: 'Acompanhamento do Protocolo & Chat Seguro', shortTitle: '🔍 Protocolo', icon: Search, color: 'text-blue-600 bg-blue-100 border-blue-300' },
   { id: 'educacao', title: 'Matriz dos 7 Tipos, Leis & Quizzes', shortTitle: '📚 Quizzes & Leis', icon: BookOpen, color: 'text-emerald-600 bg-emerald-100 border-emerald-300' },
@@ -58,7 +61,7 @@ const SECTIONS: GuideSection[] = [
 ];
 
 export const PlatformGuideView: React.FC = () => {
-  const { setActiveTab, setIsBreathingModalOpen, setIsLoadingScreen, achievements } = useApp();
+  const { setActiveTab, setIsBreathingModalOpen, achievements } = useApp();
   
   const [activeSection, setActiveSection] = useState<string>('visao-geral');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -69,10 +72,7 @@ export const PlatformGuideView: React.FC = () => {
 
   const scrollToSection = (id: string) => {
     setActiveSection(id);
-    const element = document.getElementById(`guide-section-${id}`);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    smoothScrollToElement(`#guide-section-${id}`, { topOffset: 88, position: 'top' });
   };
 
   const faqs = [
@@ -86,7 +86,11 @@ export const PlatformGuideView: React.FC = () => {
     },
     {
       q: "Como funcionam as conquistas e medalhas?",
-      a: "Existem 18 distintivos exclusivos com títulos bem-humorados e educativos. Você ganha conquistas completando quizzes, acertando 80% ou 100%, explorando as 7 categorias da Matriz de Bullying, lendo os artigos das Leis 13.185 e 14.811, praticando respiração guiada ou acompanhando protocolos. Todas as suas conquistas ficam guardadas com 100% de privacidade no seu navegador."
+      a: `Existem ${totalBadgesCount} distintivos exclusivos com títulos bem-humorados e educativos. Você ganha conquistas completando quizzes, explorando simulações interativas, descobrindo finais variados, lendo artigos de leis e praticando respiração. Todas as suas conquistas ficam guardadas com 100% de privacidade no seu navegador.`
+    },
+    {
+      q: "Como funcionam as Simulações Interativas?",
+      a: "As simulações são histórias interativas do cotidiano escolar onde suas escolhas determinam o rumo dos acontecimentos. Existem múltiplos caminhos, finais positivos, finais de alerta e até finais secretos especiais que concedem bônus de XP e desbloqueiam conquistas exclusivas!"
     },
     {
       q: "Posso denunciar se eu apenas presenciei uma agressão como testemunha?",
@@ -131,17 +135,24 @@ export const PlatformGuideView: React.FC = () => {
           </h1>
 
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed mb-6 max-w-3xl">
-            Este tutorial detalha cada funcionalidade do sistema: como denunciar anonimamente, desbloquear os <strong>18 distintivos de honra</strong>, testar seus conhecimentos em quizzes, relaxar com a técnica de respiração 4-7-8 e acompanhar protocolos com a equipe escolar.
+            Este tutorial detalha cada funcionalidade do sistema: como denunciar anonimamente, vivenciar as <strong>simulações interativas 🎭</strong>, desbloquear todos os <strong>{totalBadgesCount} distintivos de honra</strong>, testar seus conhecimentos em quizzes, relaxar com a técnica 4-7-8 e acompanhar protocolos protegidos.
           </p>
 
           {/* Quick Action Badges */}
           <div className="flex flex-wrap items-center gap-2.5 pt-2">
             <button
+              onClick={() => setActiveTab('simulations')}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-extrabold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4 text-purple-200" />
+              <span>Simulações Interativas 🎭</span>
+            </button>
+            <button
               onClick={() => setActiveTab('achievements')}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
             >
               <Trophy className="w-4 h-4" />
-              <span>Explorar Conquistas ({unlockedBadgesCount})</span>
+              <span>Explorar Conquistas ({unlockedBadgesCount}/{totalBadgesCount})</span>
             </button>
             <button
               onClick={() => setActiveTab('report')}
@@ -245,7 +256,71 @@ export const PlatformGuideView: React.FC = () => {
         </div>
       </section>
 
-      {/* SECTION 2: SISTEMA DE CONQUISTAS (DESTAQUE PEDIDO PELO USUÁRIO) */}
+      {/* SECTION 1.5: SIMULAÇÕES INTERATIVAS */}
+      <section id="guide-section-simulacoes" className="bg-gradient-to-br from-purple-900 via-indigo-900 to-slate-900 text-white rounded-3xl p-6 sm:p-9 shadow-lg space-y-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-purple-500/30 border border-purple-400/40 flex items-center justify-center text-white text-2xl shadow-inner shrink-0">
+              🎭
+            </div>
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/30 border border-purple-400/50 text-purple-200 text-xs font-black uppercase tracking-wider mb-1">
+                <span>Novo Módulo • Tomada de Decisão</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white">
+                Simulações Interativas do Cotidiano Escolar
+              </h2>
+              <p className="text-xs sm:text-sm text-purple-200 mt-1 max-w-2xl">
+                Coloque-se no centro de histórias reais com personagens marcantes. Cada escolha gera desdobramentos autênticos, múltiplos finais e recompensas de XP.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setActiveTab('simulations')}
+            className="self-start md:self-center px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer flex items-center gap-2"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Jogar Simulações 🎭</span>
+          </button>
+        </div>
+
+        {/* Como funciona o sistema de simulações */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div className="p-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-xs space-y-2">
+            <div className="w-8 h-8 rounded-xl bg-purple-400/20 flex items-center justify-center text-lg">
+              🌿
+            </div>
+            <strong className="text-white text-sm block">1. Árvore de Escolhas</strong>
+            <p className="text-purple-200 leading-relaxed">
+              4 a 6 caminhos por situação: postura empática, atitude segura, intervenção impulsiva ou observação estratégica.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-xs space-y-2">
+            <div className="w-8 h-8 rounded-xl bg-purple-400/20 flex items-center justify-center text-lg">
+              ⭐
+            </div>
+            <strong className="text-white text-sm block">2. Múltiplos Finais & Segredos</strong>
+            <p className="text-purple-200 leading-relaxed">
+              Finais Positivos, de Alerta, de Aprendizado e Finais Secretos Especiais com bônus de pontuação e medalhas raras.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-xs space-y-2">
+            <div className="w-8 h-8 rounded-xl bg-purple-400/20 flex items-center justify-center text-lg">
+              🛡️
+            </div>
+            <strong className="text-white text-sm block">3. Análise Educativa Completa</strong>
+            <p className="text-purple-200 leading-relaxed">
+              Ao final, você recebe um diagnóstico detalhado explicando as consequências de cada atitude e o comportamento seguro recomendado.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 2: SISTEMA DE CONQUISTAS (DINÂMICO) */}
       <section id="guide-section-conquistas" className="bg-gradient-to-br from-amber-50/70 via-purple-50/50 to-white border-2 border-amber-300/80 rounded-3xl p-6 sm:p-9 shadow-xs space-y-6">
         
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -261,236 +336,104 @@ export const PlatformGuideView: React.FC = () => {
                 Sistema de Conquistas & Distintivos de Honra Escolar
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
-                Aprender sobre convivência pacífica e direitos pode ser leve e divertido! São <strong>18 conquistas exclusivas</strong> com patentes bem-humoradas e medalhas.
+                Aprender sobre convivência pacífica e direitos pode ser leve e divertido! São <strong>{totalBadgesCount} conquistas exclusivas</strong> com patentes de evolução e medalhas.
               </p>
             </div>
           </div>
 
           <button
-            onClick={() => setActiveTab('education')}
+            onClick={() => setActiveTab('achievements')}
             className="self-start md:self-center px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer flex items-center gap-2"
           >
             <Trophy className="w-4 h-4" />
-            <span>Ver Meus Distintivos ({unlockedBadgesCount}/18)</span>
+            <span>Ver Meus Distintivos ({unlockedBadgesCount}/{totalBadgesCount})</span>
           </button>
         </div>
 
-        {/* The 5 Ranks / Levels */}
+        {/* The Dynamic Ranks / Levels */}
         <div className="bg-white border border-amber-200 rounded-2xl p-5 sm:p-6 shadow-2xs space-y-4">
-          <h3 className="text-sm sm:text-base font-black text-slate-900 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-500" />
-            <span>As 5 Patentes do Sentinela (Conforme Você Evolui):</span>
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm sm:text-base font-black text-slate-900 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-500" />
+              <span>Hierarquia de Patentes do Sentinela (Conforme Você Evolui):</span>
+            </h3>
+            <span className="text-xs font-bold text-slate-500">{RANK_TIERS.length} Níveis de Mestria</span>
+          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-            
-            <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-center space-y-1">
-              <span className="text-2xl block">🌱</span>
-              <strong className="text-xs font-black text-emerald-950 block">Novato da Paz</strong>
-              <span className="text-[10px] text-emerald-800 block">0 a 2 Conquistas</span>
-              <p className="text-[10px] text-slate-500 mt-1">Primeiros passos nos quizzes e leitura das leis.</p>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-blue-50 border border-blue-200 text-center space-y-1">
-              <span className="text-2xl block">🥋</span>
-              <strong className="text-xs font-black text-blue-950 block">Guardião em Treino</strong>
-              <span className="text-[10px] text-blue-800 block">3 a 5 Conquistas</span>
-              <p className="text-[10px] text-slate-500 mt-1">Já acolhe colegas e domina técnicas de respeito.</p>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-indigo-50 border border-indigo-200 text-center space-y-1">
-              <span className="text-2xl block">⚡</span>
-              <strong className="text-xs font-black text-indigo-950 block">Faixa Preta Respeito</strong>
-              <span className="text-[10px] text-indigo-800 block">6 a 9 Conquistas</span>
-              <p className="text-[10px] text-slate-500 mt-1">Argumentos éticos imbatíveis contra grosserias.</p>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-purple-50 border border-purple-200 text-center space-y-1">
-              <span className="text-2xl block">🧙‍♂️</span>
-              <strong className="text-xs font-black text-purple-950 block">Mestre da Convivência</strong>
-              <span className="text-[10px] text-purple-800 block">10 a 14 Conquistas</span>
-              <p className="text-[10px] text-slate-500 mt-1">Mais calmo que lagoa e sábio na resolução pacífica.</p>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-center space-y-1">
-              <span className="text-2xl block">👑</span>
-              <strong className="text-xs font-black text-amber-950 block">Lorde Supremo</strong>
-              <span className="text-[10px] text-amber-800 block">15 a 18 Conquistas</span>
-              <p className="text-[10px] text-slate-500 mt-1">Zerou a jornada e possui imunidade a fofocas!</p>
-            </div>
-
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {RANK_TIERS.map((rank) => (
+              <div 
+                key={rank.levelNumber} 
+                className={`p-3.5 rounded-xl border text-center space-y-1 transition-all ${rank.color}`}
+              >
+                <span className="text-2xl block">{rank.badgeEmoji}</span>
+                <strong className="text-xs font-black block">{rank.title}</strong>
+                <span className="text-[10px] opacity-80 block font-bold">A partir de {rank.minAchievements} Conquistas</span>
+                <p className="text-[10px] opacity-75 mt-1 leading-snug">{rank.description}</p>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* How to unlock badges guide list */}
+        {/* How to unlock badges guide list (DYNAMIC) */}
         <div className="bg-white border border-amber-200 rounded-2xl p-5 sm:p-6 shadow-2xs space-y-4">
-          <h3 className="text-sm sm:text-base font-black text-slate-900 flex items-center gap-2">
-            <Award className="w-4 h-4 text-purple-700" />
-            <span>Guia Rápido: Como Desbloquear os 18 Distintivos</span>
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm sm:text-base font-black text-slate-900 flex items-center gap-2">
+              <Award className="w-4 h-4 text-purple-700" />
+              <span>Catálogo Completo: Todos os {totalBadgesCount} Distintivos Disponíveis</span>
+            </h3>
+            <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
+              {unlockedBadgesCount} de {totalBadgesCount} Desbloqueados
+            </span>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-            
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="conhecedor_direitos" tier="bronze" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">1. Calouro Anti-Treta (Bronze)</strong>
-                <span className="text-slate-600">Complete qualquer 1 quiz na aba educativa.</span>
-              </div>
-            </div>
+            {achievements.map((badge, index) => {
+              const isSecret = badge.isSecret;
 
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="aliado_escola_segura" tier="prata" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">2. Trio Parada Firme da Paz (Prata)</strong>
-                <span className="text-slate-600">Complete 3 quizzes diferentes na plataforma.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="especialista_respeito" tier="ouro" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">3. Cérebro Galáctico do Respeito (Ouro)</strong>
-                <span className="text-slate-600">Alcance aproveitamento de 80%+ em 3 quizzes.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="protetor_comunidade" tier="lendario" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">4. Gabaritador Lendário (Lendário)</strong>
-                <span className="text-slate-600">Complete todos os 5 quizzes disponíveis.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="gabarito_perfeito" tier="ouro" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">5. Oráculo do 100% Sem Chute (Ouro)</strong>
-                <span className="text-slate-600">Acerte 5 de 5 perguntas (100%) em qualquer quiz.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="speedrunner_sabedoria" tier="prata" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">6. Detetive Cibernético Anti-Fake (Prata)</strong>
-                <span className="text-slate-600">Acerte 80%+ no quiz de Cyberbullying.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="enciclopedia_viva" tier="ouro" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">7. Maratonista de Neurônios (Ouro)</strong>
-                <span className="text-slate-600">Acumule 20 perguntas respondidas em quizzes.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="explorador_matriz" tier="prata" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">8. Curioso Nível Hard: 7 em 1 (Prata)</strong>
-                <span className="text-slate-600">Explore todas as 7 abas na Matriz de Bullying.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="advogado_do_bem" tier="bronze" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">9. Doutor em Não-Vacilo (Bronze)</strong>
-                <span className="text-slate-600">Leia o módulo de Legislação e marque como lido.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="coracao_de_ouro" tier="bronze" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">10. Embaixador da Empatia Master (Bronze)</strong>
-                <span className="text-slate-600">Leia o módulo de Respeito e Empatia Escolar.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="campeao_inclusao" tier="prata" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">11. Radar Anti-Exclusão Social (Prata)</strong>
-                <span className="text-slate-600">Tire 80%+ no quiz de Empatia & Convivência.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="mente_tranquila" tier="bronze" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">12. Monge Zen Anti-Estresse (Bronze)</strong>
-                <span className="text-slate-600">Faça 1 sessão de respiração guiada 4-7-8.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="mestre_zen" tier="prata" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">13. Pulmão de Aço da Serenidade (Prata)</strong>
-                <span className="text-slate-600">Complete 3 sessões completas de respiração.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="desabafo_seguro" tier="bronze" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">14. Coração Leve, Mente Clara (Bronze)</strong>
-                <span className="text-slate-600">Envie mensagem na Central de Apoio Emocional.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="guardiao_digital" tier="prata" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">15. Agente Secreto do Protocolo (Prata)</strong>
-                <span className="text-slate-600">Consulte um protocolo na aba de acompanhamento.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="radar_antizueira" tier="bronze" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">16. Escudo Guardião Ativado (Bronze)</strong>
-                <span className="text-slate-600">Envie um relato seguro ou consulte seu código.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="sentinela_noturno" tier="bronze" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">17. Sentinela Noturno da Paz (Bronze)</strong>
-                <span className="text-slate-600">Acesse e explore os recursos do Sentinela.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center gap-3">
-              <AchievementBadgeFrame achievementId="colecionador_supremo" tier="lendario" isUnlocked={true} size={48} />
-              <div>
-                <strong className="text-slate-900 block font-black">18. Lorde Supremo dos Distintivos (Lendário)</strong>
-                <span className="text-slate-600">Desbloqueie 10 ou mais conquistas no sistema.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-start gap-2.5">
-              <span className="text-lg">🦉</span>
-              <div>
-                <strong className="text-slate-900 block">Sentinela Noturno da Paz:</strong>
-                <span className="text-slate-600">Acesse e explore as ferramentas da plataforma.</span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-100 flex items-start gap-2.5">
-              <span className="text-lg">🏆</span>
-              <div>
-                <strong className="text-slate-900 block">Lorde Supremo dos Distintivos:</strong>
-                <span className="text-slate-600">Desbloqueie pelo menos 10 conquistas no sistema.</span>
-              </div>
-            </div>
-
+              return (
+                <div 
+                  key={badge.id}
+                  className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${
+                    badge.isUnlocked 
+                      ? 'bg-amber-50/50 border-amber-200' 
+                      : 'bg-purple-50/40 border-purple-100'
+                  }`}
+                >
+                  <AchievementBadgeFrame 
+                    achievementId={badge.id} 
+                    tier={badge.tier} 
+                    isUnlocked={badge.isUnlocked} 
+                    size={48} 
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
+                      <strong className="text-slate-900 font-black truncate">
+                        {index + 1}. {badge.title}
+                      </strong>
+                      <span className={`text-[10px] px-1.5 py-0.2 rounded font-black uppercase ${
+                        badge.tier === 'lendario' ? 'bg-amber-100 text-amber-900 border border-amber-300' :
+                        badge.tier === 'ouro' ? 'bg-yellow-100 text-yellow-900 border border-yellow-300' :
+                        badge.tier === 'prata' ? 'bg-slate-200 text-slate-800' :
+                        'bg-amber-100/70 text-amber-900'
+                      }`}>
+                        {badge.tier}
+                      </span>
+                      {isSecret && (
+                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-purple-200 text-purple-900 font-black">
+                          🔒 Secreta
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-slate-600 text-[11px] leading-relaxed">
+                      {isSecret && !badge.isUnlocked 
+                        ? '‘Descubra uma das sequências ocultas ou desfechos especiais da plataforma.’'
+                        : badge.requirementHint}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 

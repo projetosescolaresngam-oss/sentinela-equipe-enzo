@@ -13,7 +13,9 @@ import {
   AchievementId,
   EducationalActivityProgress,
   UserQuizProgress,
-  AppTab
+  AppTab,
+  SimulationChoiceTone,
+  OutcomeType
 } from './types';
 import { INITIAL_REPORTS, INITIAL_NOTIFICATIONS } from './initialData';
 import { INITIAL_ACHIEVEMENTS, INITIAL_EDUCATIONAL_PROGRESS } from './achievementsData';
@@ -57,6 +59,18 @@ interface AppContextType {
     score: number,
     totalQuestions: number
   ) => { isNewRecord: boolean; percentage: number };
+  
+  // Simulations Progress Actions
+  recordSimulationChoice: (
+    scenarioId: string, 
+    choiceTone: SimulationChoiceTone
+  ) => void;
+  recordSimulationOutcome: (
+    scenarioId: string, 
+    outcomeId: string, 
+    outcomeType: OutcomeType,
+    isSpecialSecret?: boolean
+  ) => void;
   
   // Actions
   submitReport: (params: {
@@ -375,6 +389,41 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             if (!isUnlocked) isUnlocked = true;
             break;
           }
+          case 'primeiro_passo_simulacao': {
+            // Protagonista da Empatia: 1 simulação concluída
+            const simCount = progress.completedSimulations?.length || 0;
+            currentProgress = Math.min(1, simCount);
+            if (simCount >= 1 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'olhar_empatico': {
+            // Coração de Escudo & Acolhimento: 3 escolhas de empatia
+            const empCount = progress.empathyChoicesCount || 0;
+            currentProgress = Math.min(3, empCount);
+            if (empCount >= 3 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'decisao_segura': {
+            // Estrategista da Proteção: 3 simulações voltadas à segurança
+            const safeCount = progress.safetyChoicesCount || 0;
+            currentProgress = Math.min(3, safeCount);
+            if (safeCount >= 3 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'pensador_estrategico': {
+            // Mestre do Multiverso Escolar: 2 ou mais finais explorados em um mesmo cenário
+            const stratCount = progress.strategicExplorationsCount || 0;
+            currentProgress = Math.min(2, stratCount > 0 ? 2 : 0);
+            if (stratCount >= 1 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'guardiao_comunidade_sim': {
+            // Guardião Supremo da Convivência: 10 simulações concluídas
+            const totalSims = progress.completedSimulations?.length || 0;
+            currentProgress = Math.min(10, totalSims);
+            if (totalSims >= 10 && !isUnlocked) isUnlocked = true;
+            break;
+          }
           case 'colecionador_supremo': {
             // Lorde Supremo dos Distintivos: 10 badges
             currentProgress = Math.min(10, alreadyUnlockedCount);
@@ -496,6 +545,70 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         next.submittedOrViewedReport = true;
       }
       
+      evaluateAchievements(next);
+      return next;
+    });
+  };
+
+  // Record simulation individual choices
+  const recordSimulationChoice = (
+    _scenarioId: string,
+    choiceTone: SimulationChoiceTone
+  ) => {
+    setEducationalProgress(prev => {
+      const isEmpathy = choiceTone === 'empatia' || choiceTone === 'apoio';
+      const isSafety = choiceTone === 'seguranca' || choiceTone === 'reflexao';
+
+      const next: EducationalActivityProgress = {
+        ...prev,
+        totalSimulationChoicesMade: (prev.totalSimulationChoicesMade || 0) + 1,
+        empathyChoicesCount: (prev.empathyChoicesCount || 0) + (isEmpathy ? 1 : 0),
+        safetyChoicesCount: (prev.safetyChoicesCount || 0) + (isSafety ? 1 : 0)
+      };
+      evaluateAchievements(next);
+      return next;
+    });
+  };
+
+  // Record simulation scenario completion and outcome discovery
+  const recordSimulationOutcome = (
+    scenarioId: string,
+    outcomeId: string,
+    _outcomeType: OutcomeType,
+    isSpecialSecret?: boolean
+  ) => {
+    setEducationalProgress(prev => {
+      const prevCompleted = prev.completedSimulations || [];
+      const isNewCompletion = !prevCompleted.includes(scenarioId);
+      const nextCompleted = isNewCompletion ? [...prevCompleted, scenarioId] : prevCompleted;
+
+      const prevOutcomesMap = prev.exploredSimulationOutcomes || {};
+      const currentScenarioOutcomes = prevOutcomesMap[scenarioId] || [];
+      const isNewOutcome = !currentScenarioOutcomes.includes(outcomeId);
+      const nextScenarioOutcomes = isNewOutcome 
+        ? [...currentScenarioOutcomes, outcomeId] 
+        : currentScenarioOutcomes;
+
+      const nextOutcomesMap = {
+        ...prevOutcomesMap,
+        [scenarioId]: nextScenarioOutcomes
+      };
+
+      // Check how many scenarios have >= 2 outcomes explored (strategic thinking)
+      const scenariosWithMultipleOutcomes = (Object.values(nextOutcomesMap) as string[][]).filter(
+        outcomes => outcomes && outcomes.length >= 2
+      ).length;
+
+      const secretBonus = (isSpecialSecret && isNewOutcome) ? 1 : 0;
+
+      const next: EducationalActivityProgress = {
+        ...prev,
+        completedSimulations: nextCompleted,
+        exploredSimulationOutcomes: nextOutcomesMap,
+        strategicExplorationsCount: scenariosWithMultipleOutcomes,
+        discoveredSecretOutcomesCount: (prev.discoveredSecretOutcomesCount || 0) + secretBonus
+      };
+
       evaluateAchievements(next);
       return next;
     });
@@ -779,6 +892,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       dismissAchievementModal,
       markActivityCompleted,
       recordQuizCompletion,
+      recordSimulationChoice,
+      recordSimulationOutcome,
       submitReport,
       getReportByProtocol,
       addMessageToProtocol,

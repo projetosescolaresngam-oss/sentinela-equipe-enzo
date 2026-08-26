@@ -34,6 +34,8 @@ import { Achievement, AchievementCategory } from './types';
 import { useApp } from './AppContext';
 import { soundEngine } from './relaxingAudio';
 import { AchievementBadgeFrame } from './AchievementBadgeFrame';
+import { useScrollIntoView } from './hooks/useScrollIntoView';
+import { RANK_TIERS, getRankInfo } from './achievementsData';
 
 interface AchievementsViewProps {
   onNavigateToTab?: (tab: 'types' | 'quiz' | 'legislation') => void;
@@ -50,13 +52,16 @@ const FUNNY_TIPS = [
 
 export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateToTab }) => {
   const { achievements, setActiveTab } = useApp();
+  const { center } = useScrollIntoView({ topOffset: 80, behavior: 'smooth' });
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'unlocked' | 'in_progress' | 'locked'>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [tipIndex, setTipIndex] = useState<number>(0);
   const [celebratedBadgeId, setCelebratedBadgeId] = useState<string | null>(null);
+  const [focusedBadgeId, setFocusedBadgeId] = useState<string | null>(null);
   const [inspectedBadge, setInspectedBadge] = useState<Achievement | null>(null);
+  const [showRankLadder, setShowRankLadder] = useState<boolean>(false);
 
   const totalAchievements = achievements.length;
   const unlockedCount = achievements.filter(a => a.isUnlocked).length;
@@ -64,52 +69,11 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
   const lockedCount = achievements.filter(a => !a.isUnlocked && a.currentProgress === 0).length;
   const progressPercent = totalAchievements > 0 ? Math.round((unlockedCount / totalAchievements) * 100) : 0;
 
-  // Funny Rank title based on unlocked count
-  const getRankInfo = () => {
-    if (unlockedCount >= 15) {
-      return {
-        title: "👑 Lorde Supremo Anti-Bullying",
-        description: "Imunidade total a grosserias e mestre supremo do bom senso escolar.",
-        color: "text-amber-900 bg-amber-100 border-amber-300",
-        badgeEmoji: "👑"
-      };
-    }
-    if (unlockedCount >= 10) {
-      return {
-        title: "🧙‍♂️ Mestre Yoda da Convivência",
-        description: "Mais sábio que o professor de história e mais calmo que lagoa serena.",
-        color: "text-purple-900 bg-purple-100 border-purple-300",
-        badgeEmoji: "✨"
-      };
-    }
-    if (unlockedCount >= 6) {
-      return {
-        title: "⚡ Faixa Preta do Respeito",
-        description: "Seus argumentos de convivência ética desarmam qualquer discussão boba.",
-        color: "text-indigo-900 bg-indigo-100 border-indigo-300",
-        badgeEmoji: "⚡"
-      };
-    }
-    if (unlockedCount >= 3) {
-      return {
-        title: "🥋 Guardião em Treinamento",
-        description: "Já defende o amigo no recreio e não aceita exclusão em trabalhos de grupo.",
-        color: "text-blue-900 bg-blue-100 border-blue-300",
-        badgeEmoji: "🛡️"
-      };
-    }
-    return {
-      title: "🌱 Novato da Cultura de Paz",
-      description: "Começando a jornada de respeito e descobrindo seus direitos protegidos por lei.",
-      color: "text-emerald-900 bg-emerald-100 border-emerald-300",
-      badgeEmoji: "🌱"
-    };
-  };
+  const rankInfo = getRankInfo(unlockedCount);
 
-  const rankInfo = getRankInfo();
-
-  // Play celebration sound when clicking an unlocked card & open inspection
+  // Play celebration sound when clicking an unlocked card & smoothly center card in view
   const handleBadgeClick = (item: Achievement) => {
+    setFocusedBadgeId(item.id);
     if (item.isUnlocked) {
       setCelebratedBadgeId(item.id);
       soundEngine.playChimeSuccess();
@@ -117,7 +81,29 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
     } else {
       soundEngine.playPop();
     }
-    setInspectedBadge(item);
+
+    const cardEl = document.getElementById('badge-card-' + item.id);
+
+    // 1. Identify the card and smoothly center it vertically in the viewport (scrolling up or down automatically)
+    center(cardEl, 0, () => {
+      setInspectedBadge(item);
+    });
+
+    // 2. Fallback timeout to ensure the modal opens gracefully even on instant scrolls
+    setTimeout(() => {
+      setInspectedBadge((current) => current || item);
+    }, 180);
+  };
+
+  const handleCloseInspection = () => {
+    const badgeId = inspectedBadge?.id;
+    setInspectedBadge(null);
+    if (badgeId) {
+      const cardEl = document.getElementById('badge-card-' + badgeId);
+      if (cardEl) {
+        center(cardEl, 40);
+      }
+    }
   };
 
   const nextTip = () => {
@@ -176,6 +162,17 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
   };
 
   const handleActionClick = (achievementId: string) => {
+    if (
+      achievementId === 'primeiro_passo_simulacao' ||
+      achievementId === 'olhar_empatico' ||
+      achievementId === 'decisao_segura' ||
+      achievementId === 'pensador_estrategico' ||
+      achievementId === 'guardiao_comunidade_sim'
+    ) {
+      setActiveTab('simulations');
+      return;
+    }
+
     if (achievementId === 'conhecedor_direitos' || achievementId === 'aliado_escola_segura' || achievementId === 'especialista_respeito' || achievementId === 'protetor_comunidade' || achievementId === 'gabarito_perfeito' || achievementId === 'speedrunner_sabedoria' || achievementId === 'enciclopedia_viva' || achievementId === 'campeao_inclusao') {
       if (onNavigateToTab) onNavigateToTab('quiz');
       else setActiveTab('education');
@@ -255,16 +252,22 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
           </h1>
 
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed mb-6 max-w-4xl">
-            Aprenda a combater a zueira pesada, pratique a empatia e domine seus direitos protegidos por lei. Cada conquista é salva com 100% de sigilo no seu dispositivo.
+            Aprenda a combater a zueira pesada, pratique a empatia, vivencie simulações e domine seus direitos protegidos por lei. Cada conquista é salva com 100% de sigilo no seu dispositivo.
           </p>
 
           {/* Quick Action Badges & Level Row */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4 border-t border-purple-100/80">
             {/* Rank / Level Badge */}
-            <div className={`inline-flex items-center gap-3 p-3 rounded-2xl border ${rankInfo.color} shadow-2xs`}>
+            <div 
+              onClick={() => setShowRankLadder(!showRankLadder)}
+              className={`inline-flex items-center gap-3 p-3.5 rounded-2xl border ${rankInfo.color} shadow-2xs cursor-pointer hover:shadow-md transition-all active:scale-[0.99]`}
+            >
               <span className="text-2xl">{rankInfo.badgeEmoji}</span>
               <div>
-                <span className="text-[10px] font-black uppercase tracking-wider opacity-80 block">Seu Nível Atual:</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider opacity-80 block">Nível {rankInfo.levelNumber} de {RANK_TIERS.length}</span>
+                  <span className="text-[10px] underline font-bold opacity-80">Ver Todos os Ranks</span>
+                </div>
                 <strong className="text-sm font-black block">{rankInfo.title}</strong>
                 <span className="text-xs opacity-90">{rankInfo.description}</span>
               </div>
@@ -272,6 +275,13 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
 
             {/* Quick Action Buttons */}
             <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                onClick={() => setActiveTab('simulations')}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-extrabold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+              >
+                <Sparkles className="w-4 h-4 text-purple-200" />
+                <span>Simulações 🎭</span>
+              </button>
               <button
                 onClick={() => setActiveTab('education')}
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
@@ -288,6 +298,56 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
               </button>
             </div>
           </div>
+
+          {/* Expandable Rank Progression Ladder */}
+          {showRankLadder && (
+            <div className="mt-4 p-5 rounded-2xl bg-white/90 border border-purple-200 shadow-sm animate-fade-in space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-black text-purple-950 uppercase tracking-wider flex items-center gap-1.5">
+                  <Crown className="w-4 h-4 text-amber-500" />
+                  Hierarquia Completa de Ranks e Títulos do Sentinela
+                </h4>
+                <button 
+                  onClick={() => setShowRankLadder(false)}
+                  className="text-xs text-slate-500 hover:text-slate-900 font-bold cursor-pointer"
+                >
+                  Fechar ✕
+                </button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
+                {RANK_TIERS.map((tier) => {
+                  const isCurrent = unlockedCount >= tier.minAchievements && (
+                    tier.levelNumber === RANK_TIERS.length || 
+                    unlockedCount < (RANK_TIERS[tier.levelNumber]?.minAchievements ?? 999)
+                  );
+                  return (
+                    <div 
+                      key={tier.levelNumber}
+                      className={`p-3 rounded-xl border text-xs space-y-1 transition-all ${
+                        isCurrent 
+                          ? `${tier.color} ring-2 ring-purple-600 font-black shadow-xs` 
+                          : 'bg-slate-50 border-slate-200 text-slate-600'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-lg">{tier.badgeEmoji}</span>
+                        <span className="text-[10px] font-bold opacity-75">
+                          {tier.minAchievements}+ distintivos
+                        </span>
+                      </div>
+                      <strong className="block text-slate-900 font-bold">{tier.title}</strong>
+                      <p className="text-[10px] text-slate-500 leading-tight">{tier.description}</p>
+                      {isCurrent && (
+                        <span className="inline-block mt-1 px-1.5 py-0.5 rounded bg-purple-600 text-white text-[9px] font-black uppercase">
+                          Patente Atual
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
         </div>
       </div>
@@ -547,22 +607,24 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
       )}
 
       {/* Badges Grid (18 Humorous & Intuitive Cards with Retro Pixel Frames) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+      <div id="achievements-grid-section" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         {filteredAchievements.map((item) => {
           const isUnlocked = item.isUnlocked;
           const showProgressBar = item.maxProgress > 1;
           const progressPercentItem = Math.min(100, Math.round((item.currentProgress / item.maxProgress) * 100));
           const isCelebrated = celebratedBadgeId === item.id;
+          const isFocused = focusedBadgeId === item.id;
 
           return (
             <div
               key={item.id}
+              id={`badge-card-${item.id}`}
               onClick={() => handleBadgeClick(item)}
               className={`group rounded-3xl p-5 sm:p-6 transition-all duration-300 border flex flex-col justify-between relative overflow-hidden ${
                 isUnlocked
                   ? 'bg-white border-purple-300/90 shadow-xs ring-1 ring-purple-200/70 hover:shadow-md hover:border-purple-400 cursor-pointer'
                   : 'bg-white/85 border-slate-200/90 text-slate-600 shadow-2xs hover:border-purple-200 cursor-pointer'
-              } ${isCelebrated ? 'scale-[1.02] ring-4 ring-amber-300 animate-pulse' : ''}`}
+              } ${isFocused ? 'ring-2 ring-purple-500 shadow-lg' : ''} ${isCelebrated ? 'scale-[1.02] ring-4 ring-amber-300 animate-pulse' : ''}`}
             >
               {/* Confetti Glow when clicked */}
               {isCelebrated && (
@@ -636,19 +698,21 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
 
                 {/* Title */}
                 <h3 className={`text-base font-black mb-0.5 leading-snug ${isUnlocked ? 'text-slate-900' : 'text-slate-700'}`}>
-                  {item.title}
+                  {item.isSecret && !isUnlocked ? '🔒 Conquista Secreta' : item.title}
                 </h3>
 
                 {/* Subtitle / Funny Hook */}
                 {item.subtitle && (
                   <p className="text-[11px] font-bold text-purple-800 mb-2 italic line-clamp-1">
-                    "{item.subtitle}"
+                    {item.isSecret && !isUnlocked ? '“???”' : `"${item.subtitle}"`}
                   </p>
                 )}
 
                 {/* Description */}
                 <p className="text-xs text-slate-600 leading-relaxed mb-3">
-                  {isUnlocked ? (item.unlockedDescription || item.description) : item.description}
+                  {item.isSecret && !isUnlocked 
+                    ? 'Descubra uma das sequências ocultas, desfechos especiais ou caminhos inusitados na plataforma.'
+                    : (isUnlocked ? (item.unlockedDescription || item.description) : item.description)}
                 </p>
 
                 {/* Funny Quote Box */}
@@ -658,7 +722,9 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
                       ? 'bg-purple-50/70 border-purple-200/80 text-purple-950' 
                       : 'bg-slate-50 border-slate-200 text-slate-500'
                   }`}>
-                    {item.funnyQuote}
+                    {item.isSecret && !isUnlocked 
+                      ? '“O mistério recompensa quem explora com empatia e coragem.”'
+                      : item.funnyQuote}
                   </div>
                 )}
 
@@ -666,7 +732,11 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
                 {!isUnlocked && (
                   <div className="bg-purple-50/50 border border-purple-200/60 p-2.5 rounded-xl text-[11px] text-slate-600 mb-3">
                     <span className="font-extrabold text-purple-950 block mb-0.5">🎯 Como desbloquear:</span>
-                    <p className="leading-snug">{item.requirementHint}</p>
+                    <p className="leading-snug">
+                      {item.isSecret 
+                        ? '‘Requisito secreto. Explore simulações ou ferramentas especiais para desvendar.’' 
+                        : item.requirementHint}
+                    </p>
                   </div>
                 )}
 
@@ -735,9 +805,10 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
           aria-modal="true"
           aria-labelledby="inspected-badge-title"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fade-in text-slate-800"
-          onClick={() => setInspectedBadge(null)}
+          onClick={handleCloseInspection}
         >
           <div 
+            id="inspected-badge-modal-card"
             className="bg-white border-2 border-purple-300 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative text-center animate-scale-up overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
@@ -747,7 +818,7 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
 
             {/* Close Button */}
             <button
-              onClick={() => setInspectedBadge(null)}
+              onClick={handleCloseInspection}
               aria-label="Fechar visualização de moldura"
               className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-slate-700 hover:bg-purple-50 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400 cursor-pointer"
             >

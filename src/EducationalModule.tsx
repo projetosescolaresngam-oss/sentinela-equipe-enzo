@@ -27,6 +27,8 @@ import { BullyingCategory, UserQuizProgress } from './types';
 import { useApp } from './AppContext';
 import { AchievementsView } from './AchievementsView';
 import { QuizModule } from './QuizModule';
+import { smoothScrollToElement } from './utils/scrollHelper';
+import { useScrollIntoView } from './hooks/useScrollIntoView';
 
 export const EducationalModule: React.FC = () => {
   const { 
@@ -35,6 +37,8 @@ export const EducationalModule: React.FC = () => {
     educationalProgress, 
     markActivityCompleted 
   } = useApp();
+
+  const { center } = useScrollIntoView({ topOffset: 80, behavior: 'smooth' });
 
   const [selectedType, setSelectedType] = useState<BullyingCategory>('verbal');
   const [activeTabSub, setActiveTabSub] = useState<'types' | 'quiz' | 'legislation' | 'achievements'>('types');
@@ -78,7 +82,7 @@ export const EducationalModule: React.FC = () => {
   const handleOpenSpecificQuiz = (quizId: string) => {
     setSelectedQuizId(quizId);
     setActiveTabSub('quiz');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    smoothScrollToElement('#educational-subtab-container', { position: 'top', delay: 50 });
   };
 
   return (
@@ -98,12 +102,13 @@ export const EducationalModule: React.FC = () => {
         </p>
 
         {/* Sub Navigation */}
-        <div className="flex justify-center mt-6 overflow-x-auto pb-1 scrollbar-none">
+        <div id="educational-subtab-container" className="flex justify-center mt-6 overflow-x-auto pb-1 scrollbar-none">
           <div className="inline-flex bg-white border border-purple-200/90 p-1.5 rounded-2xl gap-1 shrink-0 shadow-xs">
             <button
               onClick={() => {
                 setActiveTabSub('types');
                 setSelectedQuizId(undefined);
+                smoothScrollToElement('#educational-subtab-container', { position: 'top', delay: 40 });
               }}
               className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
                 activeTabSub === 'types'
@@ -118,6 +123,7 @@ export const EducationalModule: React.FC = () => {
               onClick={() => {
                 setActiveTabSub('quiz');
                 setSelectedQuizId(undefined);
+                smoothScrollToElement('#educational-subtab-container', { position: 'top', delay: 40 });
               }}
               className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeTabSub === 'quiz'
@@ -138,6 +144,7 @@ export const EducationalModule: React.FC = () => {
               onClick={() => {
                 setActiveTabSub('legislation');
                 setSelectedQuizId(undefined);
+                smoothScrollToElement('#educational-subtab-container', { position: 'top', delay: 40 });
               }}
               className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
                 activeTabSub === 'legislation'
@@ -152,6 +159,7 @@ export const EducationalModule: React.FC = () => {
               onClick={() => {
                 setActiveTabSub('achievements');
                 setSelectedQuizId(undefined);
+                smoothScrollToElement('#educational-subtab-container', { position: 'top', delay: 40 });
               }}
               className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeTabSub === 'achievements'
@@ -193,7 +201,10 @@ export const EducationalModule: React.FC = () => {
                 return (
                   <button
                     key={item.id}
-                    onClick={() => setSelectedType(item.id)}
+                    onClick={() => {
+                      setSelectedType(item.id);
+                      center('#bullying-type-detail-card', 30);
+                    }}
                     className={`snap-start shrink-0 lg:w-full min-w-[210px] sm:min-w-[240px] lg:min-w-0 text-left p-3 sm:p-3.5 rounded-2xl flex items-center gap-3 transition-all border cursor-pointer ${
                       isSelected
                         ? 'bg-purple-100/90 border-purple-400 text-slate-950 font-bold shadow-xs ring-1 ring-purple-400/50'
@@ -222,7 +233,7 @@ export const EducationalModule: React.FC = () => {
           </div>
 
           {/* Right Detail Card */}
-          <div className="lg:col-span-8 bg-white border border-purple-200/90 rounded-3xl p-6 sm:p-8 text-slate-800 shadow-xs min-w-0 max-w-full overflow-hidden">
+          <div id="bullying-type-detail-card" className="lg:col-span-8 bg-white border border-purple-200/90 rounded-3xl p-6 sm:p-8 text-slate-800 shadow-xs min-w-0 max-w-full overflow-hidden">
             
             <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-purple-100">
               <div className="flex items-center gap-3">

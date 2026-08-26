@@ -42,6 +42,9 @@ import {
 } from 'recharts';
 import { useApp } from './AppContext';
 import { IncidentReport, ReportStatus, UrgencyLevel, BullyingCategory } from './types';
+import { smoothScrollToElement } from './utils/scrollHelper';
+import { useScrollIntoView } from './hooks/useScrollIntoView';
+import { MediationReportButtons } from './MediationReportButtons';
 
 export const AdminDashboard: React.FC = () => {
   const { 
@@ -57,6 +60,8 @@ export const AdminDashboard: React.FC = () => {
     setIsAdminAuthenticated,
     resetAllDataToDefault
   } = useApp();
+
+  const { center } = useScrollIntoView({ topOffset: 80, behavior: 'smooth' });
 
   const [passwordInput, setPasswordInput] = useState<string>('');
   const [authError, setAuthError] = useState<string>('');
@@ -90,8 +95,10 @@ export const AdminDashboard: React.FC = () => {
       if (!res.ok) throw new Error('Falha ao analisar');
       const data = await res.json();
       setAiAnalysis(data.analysis || 'Análise concluída.');
+      smoothScrollToElement('#ai-analysis-box', { position: 'center', delay: 80 });
     } catch {
       setAiAnalysis('Análise Pedagógica Preliminar: O caso envolve múltiplos episódios e requer intervenção restaurativa imediata da equipe gestora, com acolhimento confidencial do estudante e diálogo preventivo em sala de aula, em conformidade com as diretrizes da Lei 13.185/2015.');
+      smoothScrollToElement('#ai-analysis-box', { position: 'center', delay: 80 });
     } finally {
       setIsAnalyzing(false);
     }
@@ -203,11 +210,22 @@ export const AdminDashboard: React.FC = () => {
   }, [reports]);
 
   const handleOpenReviewModal = (report: IncidentReport) => {
-    setSelectedReportModal(report);
     setNewStatusValue(report.status);
     setAdminNotesValue(report.adminNotes || '');
     setAdminResponseText('');
     setAiAnalysis('');
+
+    const rowEl = document.getElementById('report-row-' + report.id);
+
+    // 1. Identify the report row and smoothly center it in the viewport using the custom hook
+    center(rowEl, 0, () => {
+      setSelectedReportModal(report);
+    });
+
+    // 2. Fallback timeout to ensure the mediation modal opens gracefully
+    setTimeout(() => {
+      setSelectedReportModal((current) => current || report);
+    }, 200);
   };
 
   const handleSaveModalChanges = (e: React.FormEvent) => {
@@ -631,6 +649,7 @@ export const AdminDashboard: React.FC = () => {
                   return (
                     <tr 
                       key={rep.id}
+                      id={`report-row-${rep.id}`}
                       onClick={() => handleOpenReviewModal(rep)}
                       className={`hover:bg-purple-50/80 transition-colors cursor-pointer ${
                         isCrit ? 'bg-rose-50/60' : ''
@@ -696,7 +715,7 @@ export const AdminDashboard: React.FC = () => {
       {/* Review / Feedback Modal */}
       {selectedReportModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in text-slate-800">
-          <div className="bg-white border border-purple-200 rounded-3xl max-w-2xl w-full p-6 text-slate-800 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+          <div id="mediation-modal-card" className="bg-white border border-purple-200 rounded-3xl max-w-2xl w-full p-6 text-slate-800 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             
             <button
               onClick={() => setSelectedReportModal(null)}
@@ -752,7 +771,7 @@ export const AdminDashboard: React.FC = () => {
                 </button>
               </div>
               {aiAnalysis ? (
-                <div className="mt-2 text-xs text-slate-800 bg-white p-3 rounded-xl border border-purple-200/80 whitespace-pre-line leading-relaxed max-h-48 overflow-y-auto">
+                <div id="ai-analysis-box" className="mt-2 text-xs text-slate-800 bg-white p-3 rounded-xl border border-purple-200/80 whitespace-pre-line leading-relaxed max-h-48 overflow-y-auto">
                   {aiAnalysis}
                 </div>
               ) : (
@@ -782,6 +801,17 @@ export const AdminDashboard: React.FC = () => {
                   ))
                 )}
               </div>
+            </div>
+
+            {/* Exportação Oficial de Relatórios da Mediação em Word (.DOCX) */}
+            <div className="mb-5">
+              <MediationReportButtons 
+                report={{
+                  ...selectedReportModal,
+                  status: newStatusValue,
+                  adminNotes: adminNotesValue
+                }} 
+              />
             </div>
 
             {/* Form to Update Status & Send Message */}

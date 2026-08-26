@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { EducationalQuiz, QuizOption, QuizOptionLetter } from './types';
 import { useApp } from './AppContext';
+import { smoothScrollToElement } from './utils/scrollHelper';
 
 interface QuizPlayerProps {
   quiz: EducationalQuiz;
@@ -76,6 +77,8 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
         explanation: option.explanation
       }
     }));
+
+    smoothScrollToElement('#quiz-feedback-box', { position: 'auto', delay: 50 });
   };
 
   const handleNextQuestion = () => {
@@ -83,6 +86,7 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
       setCurrentQuestionIndex(prev => prev + 1);
       setSelectedOption(null);
       setHasSubmittedAnswer(false);
+      smoothScrollToElement('#quiz-card-container', { position: 'top', delay: 40 });
     } else {
       // Calculate final score
       const finalAnswers = { ...answersHistory };
@@ -99,6 +103,7 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
       
       setIsNewRecordEarned(isNewRecord);
       setIsCompleted(true);
+      smoothScrollToElement('#quiz-completed-card', { position: 'center', delay: 50 });
     }
   };
 
@@ -109,6 +114,7 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
     setAnswersHistory({});
     setIsCompleted(false);
     setIsNewRecordEarned(false);
+    smoothScrollToElement('#quiz-card-container', { position: 'top', delay: 40 });
   };
 
   // Completed State View
@@ -135,7 +141,7 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
     }
 
     return (
-      <div className="max-w-2xl mx-auto bg-white border border-purple-200/90 rounded-3xl p-6 sm:p-8 shadow-xs animate-fade-in text-slate-800">
+      <div id="quiz-completed-card" className="max-w-2xl mx-auto bg-white border border-purple-200/90 rounded-3xl p-6 sm:p-8 shadow-xs animate-fade-in text-slate-800">
         
         {/* Completion Icon */}
         <div className="text-center mb-6">
@@ -288,7 +294,7 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
 
   // Active Quiz Question View
   return (
-    <div className="max-w-2xl mx-auto bg-white border border-purple-200/90 rounded-3xl p-6 sm:p-8 shadow-xs animate-fade-in text-slate-800">
+    <div id="quiz-card-container" className="max-w-2xl mx-auto bg-white border border-purple-200/90 rounded-3xl p-6 sm:p-8 shadow-xs animate-fade-in text-slate-800">
       
       {/* Top Header Navigation & Progress Bar */}
       <div className="mb-6 pb-4 border-b border-purple-100">
@@ -389,7 +395,7 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
 
       {/* Pedagogical Feedback Box upon Answering */}
       {hasSubmittedAnswer && selectedOption && (
-        <div className="mb-6 animate-fade-in">
+        <div id="quiz-feedback-box" className="mb-6 animate-fade-in">
           {selectedOption.isCorrect ? (
             <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950">
               <div className="flex items-center gap-2 font-black text-xs sm:text-sm mb-1 text-emerald-900">
