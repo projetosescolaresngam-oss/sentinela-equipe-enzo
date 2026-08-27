@@ -194,13 +194,22 @@ export const HomeHero: React.FC = () => {
           </div>
         </div>
 
-        <button
-          onClick={() => setActiveTab('achievements')}
-          className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-950 font-bold text-xs flex items-center justify-center gap-2 shrink-0 border border-purple-300 transition-all active:scale-95 cursor-pointer"
-        >
-          <Award className="w-4 h-4 text-purple-800" />
-          <span>Ver Minhas Conquistas</span>
-        </button>
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <button
+            onClick={() => setActiveTab('ranking')}
+            className="flex-1 md:flex-none px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+          >
+            <Trophy className="w-4 h-4 text-amber-300" />
+            <span>Ranking 🏆</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('achievements')}
+            className="flex-1 md:flex-none px-4 py-2.5 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-950 font-bold text-xs flex items-center justify-center gap-1.5 border border-purple-300 transition-all active:scale-95 cursor-pointer"
+          >
+            <Award className="w-4 h-4 text-purple-800" />
+            <span>Conquistas</span>
+          </button>
+        </div>
       </div>
 
       {/* Quick Protocol Lookup Strip */}

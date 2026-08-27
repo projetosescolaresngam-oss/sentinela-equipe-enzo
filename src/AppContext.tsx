@@ -15,10 +15,23 @@ import {
   UserQuizProgress,
   AppTab,
   SimulationChoiceTone,
-  OutcomeType
+  OutcomeType,
+  AnonymousRankingUser,
+  RankingSummary
 } from './types';
 import { INITIAL_REPORTS, INITIAL_NOTIFICATIONS } from './initialData';
-import { INITIAL_ACHIEVEMENTS, INITIAL_EDUCATIONAL_PROGRESS } from './achievementsData';
+import { INITIAL_ACHIEVEMENTS, INITIAL_EDUCATIONAL_PROGRESS, getRankInfo } from './achievementsData';
+import { 
+  getOrCreateAnonymousIdentity, 
+  saveAssignedAnonymousNumber, 
+  updateStoredMilestone, 
+  getStoredMilestones, 
+  computeRankingSummary, 
+  INITIAL_COMMUNITY_PARTICIPANTS, 
+  getCachedRanking, 
+  setCachedRanking,
+  formatAnonymousName
+} from './rankingService';
 
 interface AppContextType {
   reports: IncidentReport[];
@@ -37,6 +50,14 @@ interface AppContextType {
   isLoadingScreen: boolean;
   setIsLoadingScreen: (loading: boolean) => void;
   
+  // Anonymous Ranking System
+  rankingSummary: RankingSummary | null;
+  anonymousIdentity: { id: string; anonymousNumber: number; displayName: string };
+  userRankPosition: number;
+  syncUserRanking: (targetAchievements?: Achievement[]) => Promise<void>;
+  rankingToast: { show: boolean; title: string; subtitle: string; oldRank?: number; newRank?: number } | null;
+  dismissRankingToast: () => void;
+
   // Achievements & Educational Progress
   achievements: Achievement[];
   educationalProgress: EducationalActivityProgress;
@@ -200,6 +221,123 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     ];
   });
+
+  // Anonymous Ranking Identity & State
+  const [anonymousIdentity, setAnonymousIdentity] = useState<{ id: string; anonymousNumber: number; displayName: string }>(() => {
+    return getOrCreateAnonymousIdentity();
+  });
+
+  const [rankingSummary, setRankingSummary] = useState<RankingSummary | null>(() => {
+    const cached = getCachedRanking();
+    const identity = getOrCreateAnonymousIdentity();
+    const baseList = cached && cached.length > 0 ? cached : INITIAL_COMMUNITY_PARTICIPANTS;
+    return computeRankingSummary(baseList, identity.id);
+  });
+
+  const [userRankPosition, setUserRankPosition] = useState<number>(() => {
+    const cached = getCachedRanking();
+    const identity = getOrCreateAnonymousIdentity();
+    const baseList = cached && cached.length > 0 ? cached : INITIAL_COMMUNITY_PARTICIPANTS;
+    const summary = computeRankingSummary(baseList, identity.id);
+    return summary.currentUserPosition;
+  });
+
+  const [rankingToast, setRankingToast] = useState<{ show: boolean; title: string; subtitle: string; oldRank?: number; newRank?: number } | null>(null);
+
+  const dismissRankingToast = useCallback(() => {
+    setRankingToast(null);
+  }, []);
+
+  // Sync User Ranking with Backend API or fallback local store
+  const syncUserRanking = useCallback(async (targetAchievements?: Achievement[]) => {
+    const currentAchievements = targetAchievements || achievements;
+    const unlockedList = currentAchievements.filter(a => a.isUnlocked);
+    const count = unlockedList.length;
+    const { milestones, lastCountTime } = getStoredMilestones();
+    const rankInfo = getRankInfo(count);
+
+    const payload = {
+      userId: anonymousIdentity.id,
+      anonymousNumber: anonymousIdentity.anonymousNumber,
+      unlockedCount: count,
+      totalPossible: currentAchievements.length,
+      unlockedAchievements: unlockedList.map(a => ({ id: a.id, unlockedAt: a.unlockedAt || lastCountTime })),
+      lastCountReachedAt: milestones[count] || lastCountTime,
+      countMilestones: milestones,
+      rankTierTitle: rankInfo.title,
+      rankTierEmoji: rankInfo.badgeEmoji
+    };
+
+    try {
+      const response = await fetch('/api/ranking/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.assignedIdentity) {
+          setAnonymousIdentity(data.assignedIdentity);
+          saveAssignedAnonymousNumber(data.assignedIdentity.anonymousNumber);
+        }
+
+        const summary: RankingSummary = {
+          totalParticipants: data.totalParticipants,
+          currentUserPosition: data.currentUserPosition,
+          topTen: data.topTen,
+          currentUser: {
+            id: anonymousIdentity.id,
+            displayName: data.assignedIdentity?.displayName || anonymousIdentity.displayName,
+            anonymousNumber: data.assignedIdentity?.anonymousNumber || anonymousIdentity.anonymousNumber,
+            unlockedCount: count,
+            totalPossible: currentAchievements.length,
+            unlockedAchievements: payload.unlockedAchievements,
+            lastCountReachedAt: payload.lastCountReachedAt,
+            rankPosition: data.currentUserPosition,
+            rankTierTitle: rankInfo.title,
+            rankTierEmoji: rankInfo.badgeEmoji,
+            isCurrentUser: true
+          },
+          allRankings: data.allRankings,
+          lastUpdated: data.lastUpdated || new Date().toISOString()
+        };
+
+        setRankingSummary(summary);
+        setUserRankPosition(data.currentUserPosition);
+        setCachedRanking(data.allRankings);
+        return;
+      }
+    } catch {
+      // Offline fallback
+    }
+
+    // Fallback compute locally
+    const cached = getCachedRanking() || INITIAL_COMMUNITY_PARTICIPANTS;
+    const updatedList = cached.filter(u => u.id !== anonymousIdentity.id);
+    updatedList.push({
+      id: anonymousIdentity.id,
+      displayName: anonymousIdentity.displayName,
+      anonymousNumber: anonymousIdentity.anonymousNumber,
+      unlockedCount: count,
+      totalPossible: currentAchievements.length,
+      unlockedAchievements: payload.unlockedAchievements,
+      lastCountReachedAt: payload.lastCountReachedAt,
+      rankTierTitle: rankInfo.title,
+      rankTierEmoji: rankInfo.badgeEmoji,
+      isCurrentUser: true
+    });
+
+    const localSummary = computeRankingSummary(updatedList, anonymousIdentity.id);
+    setRankingSummary(localSummary);
+    setUserRankPosition(localSummary.currentUserPosition);
+    setCachedRanking(localSummary.allRankings);
+  }, [achievements, anonymousIdentity]);
+
+  // Initial sync on mount
+  useEffect(() => {
+    syncUserRanking();
+  }, []);
 
   // Sync to LocalStorage
   useEffect(() => {
@@ -457,11 +595,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       if (newlyUnlocked) {
         setLatestUnlockedAchievement(newlyUnlocked);
+        const unlockedCount = updated.filter(a => a.isUnlocked).length;
+        updateStoredMilestone(unlockedCount);
+        // Trigger rank sync asynchronously
+        setTimeout(() => {
+          syncUserRanking(updated);
+        }, 100);
       }
 
       return updated;
     });
-  }, []);
+  }, [syncUserRanking]);
 
   // Action to record quiz completion with score calculation & best score tracking
   const recordQuizCompletion = (
@@ -886,6 +1030,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setIsBreathingModalOpen,
       isLoadingScreen,
       setIsLoadingScreen,
+      rankingSummary,
+      anonymousIdentity,
+      userRankPosition,
+      syncUserRanking,
+      rankingToast,
+      dismissRankingToast,
       achievements,
       educationalProgress,
       latestUnlockedAchievement,

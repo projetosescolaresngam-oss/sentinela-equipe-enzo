@@ -92,7 +92,34 @@ export interface AdminNotification {
   read: boolean;
 }
 
-export type AppTab = 'home' | 'education' | 'simulations' | 'achievements' | 'report' | 'tracker' | 'support' | 'admin' | 'guide';
+export type AppTab = 'home' | 'education' | 'simulations' | 'achievements' | 'ranking' | 'report' | 'tracker' | 'support' | 'admin' | 'guide';
+
+export interface AnonymousRankingUser {
+  id: string; // internal stable technical identifier (uuid/hash)
+  displayName: string; // "Anônimo 001", "Anônimo 014", etc.
+  anonymousNumber: number; // 1, 14, etc.
+  unlockedCount: number; // e.g. 18
+  totalPossible: number; // 23
+  unlockedAchievements: {
+    id: string;
+    unlockedAt: string; // ISO string
+  }[];
+  lastCountReachedAt: string; // ISO string of when current unlockedCount was reached
+  countMilestones?: Record<number, string>; // count -> ISO string
+  rankTierTitle?: string;
+  rankTierEmoji?: string;
+  isCurrentUser?: boolean;
+  rankPosition?: number; // 1, 2, 3...
+}
+
+export interface RankingSummary {
+  totalParticipants: number;
+  currentUserPosition: number;
+  topTen: AnonymousRankingUser[];
+  currentUser: AnonymousRankingUser;
+  allRankings: AnonymousRankingUser[];
+  lastUpdated: string;
+}
 
 export type AchievementId = 
   | 'conhecedor_direitos'

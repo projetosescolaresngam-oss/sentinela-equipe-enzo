@@ -66,6 +66,13 @@ export const Navbar: React.FC = () => {
       icon: Trophy
     },
     { 
+      id: 'ranking', 
+      label: 'Ranking 🏆', 
+      shortLabel: 'Ranking', 
+      description: 'Ranking anônimo de conquistas', 
+      icon: Trophy
+    },
+    { 
       id: 'simulations', 
       label: 'Simulações 🎭', 
       shortLabel: 'Simulações', 

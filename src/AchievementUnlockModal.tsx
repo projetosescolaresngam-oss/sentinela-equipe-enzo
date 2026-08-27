@@ -2,18 +2,38 @@ import React from 'react';
 import { 
   X, 
   CheckCircle2,
-  PartyPopper
+  PartyPopper,
+  Trophy,
+  ArrowRight
 } from 'lucide-react';
 import { Achievement } from './types';
 import { AchievementBadgeFrame } from './AchievementBadgeFrame';
+import { useApp } from './AppContext';
 
 interface AchievementUnlockModalProps {
-  achievement: Achievement | null;
-  onClose: () => void;
+  achievement?: Achievement | null;
+  onClose?: () => void;
 }
 
-export const AchievementUnlockModal: React.FC<AchievementUnlockModalProps> = ({ achievement, onClose }) => {
+export const AchievementUnlockModal: React.FC<AchievementUnlockModalProps> = ({ 
+  achievement: propAchievement, 
+  onClose: propOnClose 
+}) => {
+  const { 
+    latestUnlockedAchievement, 
+    dismissAchievementModal, 
+    userRankPosition, 
+    anonymousIdentity,
+    setActiveTab,
+    achievements
+  } = useApp();
+
+  const achievement = propAchievement !== undefined ? propAchievement : latestUnlockedAchievement;
+  const handleClose = propOnClose || dismissAchievementModal;
+
   if (!achievement) return null;
+
+  const totalUnlocked = achievements.filter(a => a.isUnlocked).length;
 
   const getTierBadge = () => {
     switch (achievement.tier) {
@@ -44,6 +64,11 @@ export const AchievementUnlockModal: React.FC<AchievementUnlockModalProps> = ({ 
     }
   };
 
+  const handleGoToRanking = () => {
+    handleClose();
+    setActiveTab('ranking');
+  };
+
   return (
     <div 
       role="dialog"
@@ -59,7 +84,7 @@ export const AchievementUnlockModal: React.FC<AchievementUnlockModalProps> = ({ 
 
         {/* Close Button */}
         <button
-          onClick={onClose}
+          onClick={handleClose}
           aria-label="Fechar aviso de conquista desbloqueada"
           className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-slate-700 hover:bg-purple-50 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400 cursor-pointer"
         >
@@ -109,19 +134,43 @@ export const AchievementUnlockModal: React.FC<AchievementUnlockModalProps> = ({ 
         )}
 
         {/* Description */}
-        <p id="achievement-modal-desc" className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4 px-2">
+        <p id="achievement-modal-desc" className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-3 px-2">
           {achievement.unlockedDescription || achievement.description}
         </p>
 
+        {/* Anonymous Ranking & Performance Pill */}
+        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-2xl p-2.5 mb-3 flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2 text-left">
+            <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+              <Trophy className="w-4 h-4 text-amber-300" />
+            </div>
+            <div>
+              <div className="font-extrabold text-purple-950">
+                {anonymousIdentity.displayName} (Você)
+              </div>
+              <div className="text-[11px] text-purple-700 font-medium">
+                {totalUnlocked} conquistas • {userRankPosition}º lugar no Ranking
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={handleGoToRanking}
+            className="text-[11px] font-bold text-purple-700 hover:text-purple-950 flex items-center gap-0.5 bg-white px-2.5 py-1 rounded-xl border border-purple-200 shadow-2xs hover:bg-purple-50 transition-colors cursor-pointer"
+          >
+            <span>Ver Ranking</span>
+            <ArrowRight className="w-3 h-3" />
+          </button>
+        </div>
+
         {/* Funny Quote Box */}
         {achievement.funnyQuote && (
-          <div className="bg-purple-50/90 border border-purple-200/90 rounded-2xl p-3 text-xs text-purple-950 font-medium italic mb-5 text-center shadow-2xs">
+          <div className="bg-purple-50/90 border border-purple-200/90 rounded-2xl p-3 text-xs text-purple-950 font-medium italic mb-4 text-center shadow-2xs">
             {achievement.funnyQuote}
           </div>
         )}
 
         {/* Badge Status indicator */}
-        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-black mb-5 shadow-2xs">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-black mb-4 shadow-2xs">
           <CheckCircle2 className="w-4 h-4 text-emerald-700" aria-hidden="true" />
           <span>Gravado no seu distintivo de honra escolar</span>
         </div>
@@ -129,7 +178,7 @@ export const AchievementUnlockModal: React.FC<AchievementUnlockModalProps> = ({ 
         {/* Action Button */}
         <div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black text-sm py-3.5 px-6 rounded-2xl shadow-sm transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-400 cursor-pointer"
           >
             Sensacional! Continuar Explorando 🎉
@@ -139,3 +188,4 @@ export const AchievementUnlockModal: React.FC<AchievementUnlockModalProps> = ({ 
     </div>
   );
 };
+

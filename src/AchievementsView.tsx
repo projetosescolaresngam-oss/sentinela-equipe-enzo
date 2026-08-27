@@ -51,7 +51,7 @@ const FUNNY_TIPS = [
 ];
 
 export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateToTab }) => {
-  const { achievements, setActiveTab } = useApp();
+  const { achievements, setActiveTab, anonymousIdentity, userRankPosition } = useApp();
   const { center } = useScrollIntoView({ topOffset: 80, behavior: 'smooth' });
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -242,6 +242,14 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
               <Sparkles className="w-3.5 h-3.5 text-amber-700" />
               <span>{unlockedCount}/{totalAchievements} Conquistas ({progressPercent}%)</span>
             </span>
+
+            <button
+              onClick={() => setActiveTab('ranking')}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-black shadow-2xs hover:from-purple-700 hover:to-indigo-700 transition-all cursor-pointer"
+            >
+              <Trophy className="w-3.5 h-3.5 text-amber-300" />
+              <span>{anonymousIdentity.displayName}: {userRankPosition}º no Ranking Geral</span>
+            </button>
           </div>
 
           <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-3">
@@ -275,6 +283,13 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
 
             {/* Quick Action Buttons */}
             <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                onClick={() => setActiveTab('ranking')}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-extrabold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+              >
+                <Trophy className="w-4 h-4 text-amber-300" />
+                <span>Ranking 🏆</span>
+              </button>
               <button
                 onClick={() => setActiveTab('simulations')}
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-extrabold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"

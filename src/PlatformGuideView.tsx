@@ -101,6 +101,10 @@ export const PlatformGuideView: React.FC = () => {
       a: "Não. A Sentinela é uma assistente socioemocional preventiva e acolhedora, ótima para desabafar, organizar pensamentos e fazer exercícios de respiração. Em situações de sofrimento intenso, crise ou emergência, a plataforma sempre recomenda buscar ajuda profissional e disponibiliza canais gratuitos como o CVV (188) e o Disque 100."
     },
     {
+      q: "Como funciona o Ranking Anônimo de Conquistas?",
+      a: "O Ranking Anônimo exibe os estudantes com mais conquistas na escola de forma 100% sigilosa (ex: 'Anônimo 001'). O critério principal é o total de conquistas desbloqueadas; em caso de empate, o segundo critério é a data e hora exata em que o usuário atingiu aquela marca (quem completou primeiro fica à frente). Nenhum dado pessoal é exigido."
+    },
+    {
       q: "Como o professor ou coordenador responde à minha denúncia sem saber quem sou eu?",
       a: "Quando a equipe escolar envia uma mensagem de resposta no painel administrativo, ela é vinculada exclusivamente ao código do protocolo. Ao acessar a aba 'Acompanhar Protocolo' e digitar o seu código, você lê as mensagens e pode responder em tempo real sem nunca expor seu nome."
     }
