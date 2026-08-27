@@ -544,8 +544,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [userGamificationProfile]);
 
   // 🎁 Check & Award Cosmetic Rewards
-  const checkAndAwardCosmetics = useCallback((currentLevel: number, currentAchievements: Achievement[], isInitialSilentCheck = false) => {
-    const eligibleUnlockedIds = computeUnlockedCosmeticIds(currentLevel, currentAchievements);
+  const checkAndAwardCosmetics = useCallback((
+    currentLevel: number, 
+    currentAchievements: Achievement[], 
+    isInitialSilentCheck = false,
+    progressOverride?: EducationalActivityProgress
+  ) => {
+    const activeProgress = progressOverride || educationalProgress;
+    const eligibleUnlockedIds = computeUnlockedCosmeticIds(currentLevel, currentAchievements, activeProgress);
     
     setCosmeticsProfile(prev => {
       const alreadyUnlocked = new Set(prev.unlockedRewardIds || []);
@@ -572,11 +578,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
       return prev;
     });
-  }, []);
+  }, [educationalProgress]);
 
   // Run initial silent check on mount to ensure user has all eligible cosmetics unlocked
   useEffect(() => {
-    checkAndAwardCosmetics(userGamificationProfile.currentLevel, achievements, true);
+    checkAndAwardCosmetics(userGamificationProfile.currentLevel, achievements, true, educationalProgress);
   }, []);
 
   // Equip a cosmetic item
@@ -940,7 +946,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         awardXp(50, 'achievement_unlocked', newlyUnlocked.id);
         // Check for newly unlocked cosmetic items linked to this achievement
         setTimeout(() => {
-          checkAndAwardCosmetics(userGamificationProfile.currentLevel, updated);
+          checkAndAwardCosmetics(userGamificationProfile.currentLevel, updated, false, progress);
         }, 300);
         // Trigger rank sync asynchronously
         setTimeout(() => {

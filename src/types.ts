@@ -433,14 +433,27 @@ export interface UserGamificationProfile {
 // 🎁 RECOMPENSAS VIRTUAIS & COSMÉTICOS
 // ==========================================
 export type CosmeticCategory = 'frame' | 'icon' | 'title' | 'badge' | 'effect' | 'theme';
-export type CosmeticRarity = 'comum' | 'raro' | 'epico' | 'lendario';
+export type CosmeticRarity = 'comum' | 'incomum' | 'raro' | 'epico' | 'lendario' | 'mitico' | 'supremo';
 
 export interface CosmeticUnlockCondition {
-  type: 'default' | 'level' | 'achievement' | 'quiz_count' | 'simulation_count';
+  type: 'default' | 'level' | 'achievement' | 'quiz_count' | 'simulation_count' | 'perfect_quiz_count' | 'breathing_count' | 'total_achievements' | 'secret';
   minLevel?: number;
   achievementId?: AchievementId;
   minCount?: number;
   description: string;
+}
+
+export interface CosmeticUnlockRequirement {
+  label: string;
+  currentProgressKey: 'level' | 'achievements' | 'quizzes' | 'simulations' | 'breathing' | 'perfect_quizzes' | 'days';
+  target: number;
+  icon?: string;
+}
+
+export interface CosmeticLoreDetail {
+  icon: string;
+  title: string;
+  desc: string;
 }
 
 export interface CosmeticRewardItem {
@@ -454,7 +467,12 @@ export interface CosmeticRewardItem {
   isEquipped?: boolean;
   isUnlocked?: boolean;
   unlockedAt?: string;
+  isSecret?: boolean;
+  secretClue?: string;
   customTitleText?: string;
+  loreQuote?: string;
+  loreDetails?: CosmeticLoreDetail[];
+  unlockRequirementsList?: CosmeticUnlockRequirement[];
   themeStyle?: {
     cardGradient: string;
     borderHighlight: string;
@@ -467,6 +485,14 @@ export interface CosmeticRewardItem {
     glowClass?: string;
     outerRingClass?: string;
     badgeAccent?: string;
+    svgOverlay?: 'cosmic' | 'fenix' | 'sombrio' | 'ondas' | 'eco' | 'palhacada' | 'gamer' | 'portal_vortex' | 'espartano' | 'caos_meme' | 'comida_delicia' | 'dragao_fogo' | 'dragao_gelo' | 'coroa_suprema' | 'electric' | 'fire' | 'stars' | 'ice' | 'eclipse' | 'imperial' | 'owl' | 'ninja' | 'shades' | 'cyber' | 'rainbow' | 'runic' | 'supreme' | 'aurora' | 'none';
+  };
+  badgeStyle?: {
+    badgeGradient: string;
+    badgeBorder: string;
+    badgeShadow?: string;
+    ribbonText?: string;
+    crestType?: 'shield' | 'wings' | 'star' | 'crown' | 'hexagon' | 'flame' | 'diamond' | 'owl' | 'ninja' | 'infinity' | 'trophy' | 'orb' | 'sparkle' | 'sword' | 'feather' | 'book' | 'compass' | 'leaf' | 'water' | 'phoenix';
   };
   effectStyle?: {
     animationClass: string;
