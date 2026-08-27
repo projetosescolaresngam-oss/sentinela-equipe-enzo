@@ -17,10 +17,24 @@ import {
   SimulationChoiceTone,
   OutcomeType,
   AnonymousRankingUser,
-  RankingSummary
+  RankingSummary,
+  UserGamificationProfile,
+  LevelInfo,
+  DailyMission,
+  WeeklyMission,
+  XpActivityType,
+  UserCosmeticsProfile,
+  CosmeticRewardItem,
+  CosmeticCategory
 } from './types';
 import { INITIAL_REPORTS, INITIAL_NOTIFICATIONS } from './initialData';
 import { INITIAL_ACHIEVEMENTS, INITIAL_EDUCATIONAL_PROGRESS, getRankInfo } from './achievementsData';
+import { 
+  DEFAULT_USER_COSMETICS, 
+  computeUnlockedCosmeticIds, 
+  getCosmeticById, 
+  ALL_COSMETIC_REWARDS 
+} from './cosmeticsRewards';
 import { 
   getOrCreateAnonymousIdentity, 
   saveAssignedAnonymousNumber, 
@@ -32,6 +46,15 @@ import {
   setCachedRanking,
   formatAnonymousName
 } from './rankingService';
+import {
+  getLevelDetails,
+  getTodayDateString,
+  getCurrentWeekKey,
+  generateDefaultDailyMissions,
+  generateDefaultWeeklyMissions,
+  computeBaselineXp,
+  MAX_LEVEL
+} from './levelProgression';
 
 interface AppContextType {
   reports: IncidentReport[];
@@ -50,6 +73,24 @@ interface AppContextType {
   isLoadingScreen: boolean;
   setIsLoadingScreen: (loading: boolean) => void;
   
+  // Anonymous Profile & Gamification
+  userGamificationProfile: UserGamificationProfile;
+  isProfileModalOpen: boolean;
+  setIsProfileModalOpen: (open: boolean) => void;
+  profileModalInitialTab: 'overview' | 'daily' | 'weekly' | 'ladder' | 'collection' | 'customize';
+  setProfileModalInitialTab: (tab: 'overview' | 'daily' | 'weekly' | 'ladder' | 'collection' | 'customize') => void;
+  openProfileWithTab: (tab: 'overview' | 'daily' | 'weekly' | 'ladder' | 'collection' | 'customize') => void;
+  newLevelUnlocked: LevelInfo | null;
+  dismissLevelUpModal: () => void;
+  awardXp: (amount: number, activity: XpActivityType, detail?: string) => void;
+
+  // 🎁 Virtual Rewards & Cosmetics System
+  cosmeticsProfile: UserCosmeticsProfile;
+  equipCosmetic: (category: CosmeticCategory, itemId: string) => void;
+  rewardNotificationQueue: CosmeticRewardItem[];
+  dismissRewardNotification: () => void;
+  equipRewardFromNotification: (reward: CosmeticRewardItem) => void;
+
   // Anonymous Ranking System
   rankingSummary: RankingSummary | null;
   anonymousIdentity: { id: string; anonymousNumber: number; displayName: string };
@@ -125,6 +166,8 @@ const STORAGE_KEY_NOTIFS = 'sentinela_notifs_v3';
 const STORAGE_KEY_CHAT = 'sentinela_chat_v3';
 const STORAGE_KEY_ACHIEVEMENTS = 'sentinela_achievements_v1';
 const STORAGE_KEY_PROGRESS = 'sentinela_edu_progress_v1';
+const STORAGE_KEY_GAMIFICATION = 'sentinela_gamification_profile_v2';
+const STORAGE_KEY_COSMETICS = 'sentinela_cosmetics_profile_v2';
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeTab, setActiveTab] = useState<AppTab>('home');
@@ -133,6 +176,52 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(false);
   const [isBreathingModalOpen, setIsBreathingModalOpen] = useState<boolean>(false);
   const [isLoadingScreen, setIsLoadingScreen] = useState<boolean>(true);
+
+  // Profile modal and Level Up celebration
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
+  const [profileModalInitialTab, setProfileModalInitialTab] = useState<'overview' | 'daily' | 'weekly' | 'ladder' | 'collection' | 'customize'>('overview');
+  const [newLevelUnlocked, setNewLevelUnlocked] = useState<LevelInfo | null>(null);
+
+  const openProfileWithTab = useCallback((tab: 'overview' | 'daily' | 'weekly' | 'ladder' | 'collection' | 'customize') => {
+    setProfileModalInitialTab(tab);
+    setIsProfileModalOpen(true);
+  }, []);
+
+  const dismissLevelUpModal = useCallback(() => {
+    setNewLevelUnlocked(null);
+  }, []);
+
+  // 🎁 Cosmetics & Virtual Rewards Profile
+  const [cosmeticsProfile, setCosmeticsProfile] = useState<UserCosmeticsProfile>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_COSMETICS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return {
+          ...DEFAULT_USER_COSMETICS,
+          ...parsed,
+          unlockedRewardIds: Array.from(new Set([
+            ...(DEFAULT_USER_COSMETICS.unlockedRewardIds || []),
+            ...(parsed.unlockedRewardIds || [])
+          ]))
+        };
+      }
+    } catch {
+      // ignore
+    }
+    return DEFAULT_USER_COSMETICS;
+  });
+
+  const [rewardNotificationQueue, setRewardNotificationQueue] = useState<CosmeticRewardItem[]>([]);
+
+  // Persist cosmetics
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY_COSMETICS, JSON.stringify(cosmeticsProfile));
+    } catch {
+      // ignore
+    }
+  }, [cosmeticsProfile]);
 
   // Initialize Achievements from LocalStorage or Default
   const [achievements, setAchievements] = useState<Achievement[]>(() => {
@@ -161,6 +250,72 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // ignore
     }
     return INITIAL_EDUCATIONAL_PROGRESS;
+  });
+
+  // Gamification Profile (XP, 20 Levels, Daily and Weekly Missions)
+  const [userGamificationProfile, setUserGamificationProfile] = useState<UserGamificationProfile>(() => {
+    const today = getTodayDateString();
+    const currentWeek = getCurrentWeekKey();
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_GAMIFICATION);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        let dailyMissions = parsed.dailyMissions || [];
+        let weeklyMissions = parsed.weeklyMissions || [];
+
+        // Daily reset
+        if (parsed.lastDailyResetDate !== today || !dailyMissions.length) {
+          dailyMissions = generateDefaultDailyMissions(today);
+        }
+
+        // Weekly reset
+        if (parsed.lastWeeklyResetKey !== currentWeek || !weeklyMissions.length) {
+          weeklyMissions = generateDefaultWeeklyMissions(currentWeek);
+        }
+
+        const totalXp = Math.max(0, parsed.totalXp || 0);
+        const levelDetails = getLevelDetails(totalXp);
+
+        return {
+          totalXp,
+          currentLevel: levelDetails.level,
+          currentLevelTitle: levelDetails.levelInfo.title,
+          currentLevelBadgeEmoji: levelDetails.levelInfo.badgeEmoji,
+          xpInCurrentLevel: levelDetails.xpInLevel,
+          xpNeededForNextLevel: levelDetails.xpNeededForNext,
+          progressPercentInLevel: levelDetails.progressPercent,
+          isMaxLevel: levelDetails.isMaxLevel,
+          dailyMissions,
+          weeklyMissions,
+          lastDailyResetDate: today,
+          lastWeeklyResetKey: currentWeek,
+          xpHistoryCount: parsed.xpHistoryCount || {}
+        };
+      }
+    } catch {
+      // ignore
+    }
+
+    // Baseline calculation from existing progress so user keeps prior efforts
+    const initialBaselineXp = computeBaselineXp(INITIAL_ACHIEVEMENTS, INITIAL_EDUCATIONAL_PROGRESS);
+    const initialDetails = getLevelDetails(initialBaselineXp);
+
+    return {
+      totalXp: initialBaselineXp,
+      currentLevel: initialDetails.level,
+      currentLevelTitle: initialDetails.levelInfo.title,
+      currentLevelBadgeEmoji: initialDetails.levelInfo.badgeEmoji,
+      xpInCurrentLevel: initialDetails.xpInLevel,
+      xpNeededForNextLevel: initialDetails.xpNeededForNext,
+      progressPercentInLevel: initialDetails.progressPercent,
+      isMaxLevel: initialDetails.isMaxLevel,
+      dailyMissions: generateDefaultDailyMissions(today),
+      weeklyMissions: generateDefaultWeeklyMissions(currentWeek),
+      lastDailyResetDate: today,
+      lastWeeklyResetKey: currentWeek,
+      xpHistoryCount: {}
+    };
   });
 
   // Modal for celebrating latest unlocked badge
@@ -380,6 +535,190 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [chatMessages]);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY_GAMIFICATION, JSON.stringify(userGamificationProfile));
+    } catch {
+      // ignore
+    }
+  }, [userGamificationProfile]);
+
+  // 🎁 Check & Award Cosmetic Rewards
+  const checkAndAwardCosmetics = useCallback((currentLevel: number, currentAchievements: Achievement[], isInitialSilentCheck = false) => {
+    const eligibleUnlockedIds = computeUnlockedCosmeticIds(currentLevel, currentAchievements);
+    
+    setCosmeticsProfile(prev => {
+      const alreadyUnlocked = new Set(prev.unlockedRewardIds || []);
+      const newItemsToUnlock: CosmeticRewardItem[] = [];
+
+      eligibleUnlockedIds.forEach(id => {
+        if (!alreadyUnlocked.has(id)) {
+          alreadyUnlocked.add(id);
+          const item = getCosmeticById(id);
+          if (item) {
+            newItemsToUnlock.push(item);
+          }
+        }
+      });
+
+      if (newItemsToUnlock.length > 0) {
+        if (!isInitialSilentCheck) {
+          setRewardNotificationQueue(q => [...q, ...newItemsToUnlock]);
+        }
+        return {
+          ...prev,
+          unlockedRewardIds: Array.from(alreadyUnlocked)
+        };
+      }
+      return prev;
+    });
+  }, []);
+
+  // Run initial silent check on mount to ensure user has all eligible cosmetics unlocked
+  useEffect(() => {
+    checkAndAwardCosmetics(userGamificationProfile.currentLevel, achievements, true);
+  }, []);
+
+  // Equip a cosmetic item
+  const equipCosmetic = useCallback((category: CosmeticCategory, itemId: string) => {
+    setCosmeticsProfile(prev => {
+      if (!prev.unlockedRewardIds.includes(itemId)) return prev;
+      
+      switch (category) {
+        case 'frame':
+          return { ...prev, equippedFrameId: itemId };
+        case 'icon':
+          return { ...prev, equippedIconId: itemId };
+        case 'title':
+          return { ...prev, equippedTitleId: itemId };
+        case 'badge':
+          return { ...prev, equippedBadgeId: itemId };
+        case 'effect':
+          return { ...prev, equippedEffectId: itemId };
+        case 'theme':
+          return { ...prev, equippedThemeId: itemId };
+        default:
+          return prev;
+      }
+    });
+  }, []);
+
+  // Dismiss reward notification from queue
+  const dismissRewardNotification = useCallback(() => {
+    setRewardNotificationQueue(prev => prev.slice(1));
+  }, []);
+
+  // Equip directly from reward popup and advance queue
+  const equipRewardFromNotification = useCallback((reward: CosmeticRewardItem) => {
+    equipCosmetic(reward.category, reward.id);
+    dismissRewardNotification();
+  }, [equipCosmetic, dismissRewardNotification]);
+
+  // Award XP and advance missions + check level ups
+  const awardXp = useCallback((amount: number, activity: XpActivityType, _detail?: string) => {
+    if (amount <= 0) return;
+
+    setUserGamificationProfile(prev => {
+      const oldLevel = prev.currentLevel;
+      const today = getTodayDateString();
+      const currentWeek = getCurrentWeekKey();
+
+      let dailyMissions = prev.dailyMissions;
+      if (prev.lastDailyResetDate !== today || !dailyMissions.length) {
+        dailyMissions = generateDefaultDailyMissions(today);
+      }
+
+      let weeklyMissions = prev.weeklyMissions;
+      if (prev.lastWeeklyResetKey !== currentWeek || !weeklyMissions.length) {
+        weeklyMissions = generateDefaultWeeklyMissions(currentWeek);
+      }
+
+      let missionBonusXp = 0;
+
+      const updatedDaily = dailyMissions.map(m => {
+        if (m.isCompleted) return m;
+
+        let matches = false;
+        if (activity === 'quiz_completed' && m.category === 'quiz') matches = true;
+        else if (activity === 'simulation_completed' && m.category === 'simulation') matches = true;
+        else if (activity === 'education_explored' && m.category === 'education') matches = true;
+        else if (activity === 'breathing_session' && m.category === 'breathing') matches = true;
+
+        if (matches) {
+          const nextCount = m.currentCount + 1;
+          const isNowCompleted = nextCount >= m.targetCount;
+          if (isNowCompleted) {
+            missionBonusXp += m.rewardXp;
+          }
+          return {
+            ...m,
+            currentCount: nextCount,
+            isCompleted: isNowCompleted,
+            completedAt: isNowCompleted ? new Date().toISOString() : undefined
+          };
+        }
+        return m;
+      });
+
+      const updatedWeekly = weeklyMissions.map(wm => {
+        if (wm.isCompleted) return wm;
+
+        let matches = false;
+        if (activity === 'quiz_completed' && wm.category === 'quiz') matches = true;
+        else if (activity === 'simulation_completed' && wm.category === 'simulation') matches = true;
+        else if (activity === 'achievement_unlocked' && wm.category === 'achievement') matches = true;
+
+        if (matches) {
+          const nextCount = wm.currentCount + 1;
+          const isNowCompleted = nextCount >= wm.targetCount;
+          if (isNowCompleted) {
+            missionBonusXp += wm.rewardXp;
+          }
+          return {
+            ...wm,
+            currentCount: nextCount,
+            isCompleted: isNowCompleted,
+            completedAt: isNowCompleted ? new Date().toISOString() : undefined
+          };
+        }
+        return wm;
+      });
+
+      const finalTotalXp = prev.totalXp + amount + missionBonusXp;
+      const finalLevelDetails = getLevelDetails(finalTotalXp);
+
+      // Trigger level-up celebratory modal if user stepped up to a higher level
+      if (finalLevelDetails.level > oldLevel) {
+        setNewLevelUnlocked(finalLevelDetails.levelInfo);
+        // Check for newly unlocked cosmetics for this level
+        setTimeout(() => {
+          checkAndAwardCosmetics(finalLevelDetails.level, achievements);
+        }, 300);
+      }
+
+      const updatedHistory = {
+        ...(prev.xpHistoryCount || {}),
+        [activity]: (prev.xpHistoryCount?.[activity] || 0) + 1
+      };
+
+      return {
+        totalXp: finalTotalXp,
+        currentLevel: finalLevelDetails.level,
+        currentLevelTitle: finalLevelDetails.levelInfo.title,
+        currentLevelBadgeEmoji: finalLevelDetails.levelInfo.badgeEmoji,
+        xpInCurrentLevel: finalLevelDetails.xpInLevel,
+        xpNeededForNextLevel: finalLevelDetails.xpNeededForNext,
+        progressPercentInLevel: finalLevelDetails.progressPercent,
+        isMaxLevel: finalLevelDetails.isMaxLevel,
+        dailyMissions: updatedDaily,
+        weeklyMissions: updatedWeekly,
+        lastDailyResetDate: today,
+        lastWeeklyResetKey: currentWeek,
+        xpHistoryCount: updatedHistory
+      };
+    });
+  }, [achievements, checkAndAwardCosmetics]);
+
   // Recalculate Achievements Progress and Trigger Unlocks
   const evaluateAchievements = useCallback((progress: EducationalActivityProgress) => {
     setAchievements(prevAchievements => {
@@ -597,6 +936,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setLatestUnlockedAchievement(newlyUnlocked);
         const unlockedCount = updated.filter(a => a.isUnlocked).length;
         updateStoredMilestone(unlockedCount);
+        // Award XP for badge unlock (+50 XP)
+        awardXp(50, 'achievement_unlocked', newlyUnlocked.id);
+        // Check for newly unlocked cosmetic items linked to this achievement
+        setTimeout(() => {
+          checkAndAwardCosmetics(userGamificationProfile.currentLevel, updated);
+        }, 300);
         // Trigger rank sync asynchronously
         setTimeout(() => {
           syncUserRanking(updated);
@@ -605,7 +950,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       return updated;
     });
-  }, [syncUserRanking]);
+  }, [syncUserRanking, awardXp, checkAndAwardCosmetics, userGamificationProfile.currentLevel]);
 
   // Action to record quiz completion with score calculation & best score tracking
   const recordQuizCompletion = (
@@ -650,6 +995,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return nextProgress;
     });
 
+    // Award +50 XP for quiz completion
+    awardXp(50, 'quiz_completed', quizId);
+
     return { isNewRecord, percentage };
   };
 
@@ -670,23 +1018,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       let next = { ...prev };
       if (activity === 'viewedLaws') {
         next.viewedLaws = true;
+        awardXp(30, 'education_explored', 'laws');
       } else if (activity === 'completedQuiz') {
         next.completedQuiz = true;
       } else if (activity === 'exploredBullyingType' && param) {
         if (!next.exploredBullyingTypes.includes(param)) {
           next.exploredBullyingTypes = [...next.exploredBullyingTypes, param];
+          awardXp(30, 'education_explored', param);
         }
       } else if (activity === 'completedRespectModule') {
         next.completedRespectModule = true;
+        awardXp(30, 'education_explored', 'respect_module');
       } else if (activity === 'completedBreathingSession') {
         next.completedBreathingSession = true;
         next.breathingSessionsCount = (next.breathingSessionsCount || 0) + 1;
+        awardXp(30, 'breathing_session', 'breathing');
       } else if (activity === 'interactedWithChat') {
         next.interactedWithChat = true;
+        awardXp(10, 'chat_reflection', 'chat');
       } else if (activity === 'checkedOrCopiedProtocol') {
         next.checkedOrCopiedProtocol = true;
       } else if (activity === 'submittedOrViewedReport') {
         next.submittedOrViewedReport = true;
+        awardXp(20, 'report_drafted', 'report');
       }
       
       evaluateAchievements(next);
@@ -756,6 +1110,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       evaluateAchievements(next);
       return next;
     });
+
+    // Award +40 XP for simulation completion
+    awardXp(40, 'simulation_completed', scenarioId);
   };
 
   // Submit anonymous report
@@ -1030,6 +1387,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setIsBreathingModalOpen,
       isLoadingScreen,
       setIsLoadingScreen,
+      userGamificationProfile,
+      isProfileModalOpen,
+      setIsProfileModalOpen,
+      profileModalInitialTab,
+      setProfileModalInitialTab,
+      openProfileWithTab,
+      newLevelUnlocked,
+      dismissLevelUpModal,
+      awardXp,
+      cosmeticsProfile,
+      equipCosmetic,
+      rewardNotificationQueue,
+      dismissRewardNotification,
+      equipRewardFromNotification,
       rankingSummary,
       anonymousIdentity,
       userRankPosition,

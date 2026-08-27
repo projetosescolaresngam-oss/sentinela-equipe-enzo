@@ -51,7 +51,7 @@ const FUNNY_TIPS = [
 ];
 
 export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateToTab }) => {
-  const { achievements, setActiveTab, anonymousIdentity, userRankPosition } = useApp();
+  const { achievements, setActiveTab, anonymousIdentity, userRankPosition, openProfileWithTab } = useApp();
   const { center } = useScrollIntoView({ topOffset: 80, behavior: 'smooth' });
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -283,6 +283,13 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ onNavigateTo
 
             {/* Quick Action Buttons */}
             <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                onClick={() => openProfileWithTab('customize')}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-purple-950 font-black text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+              >
+                <span>🎁</span>
+                <span>Recompensas Cosméticas</span>
+              </button>
               <button
                 onClick={() => setActiveTab('ranking')}
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-extrabold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"

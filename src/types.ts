@@ -364,4 +364,127 @@ export interface RankTierInfo {
   levelNumber: number;
 }
 
+// 20-Level Progression System
+export interface LevelInfo {
+  level: number;
+  title: string;
+  badgeEmoji: string;
+  minXp: number;
+  maxXp: number; // XP threshold for next level
+  description: string;
+  cardColor: string;
+  gradientBadge: string;
+}
+
+export type XpActivityType = 
+  | 'quiz_completed'
+  | 'simulation_completed'
+  | 'education_explored'
+  | 'breathing_session'
+  | 'achievement_unlocked'
+  | 'daily_mission'
+  | 'weekly_mission'
+  | 'report_drafted'
+  | 'chat_reflection';
+
+export interface DailyMission {
+  id: string;
+  title: string;
+  description: string;
+  rewardXp: number;
+  iconName: string;
+  category: 'quiz' | 'simulation' | 'education' | 'breathing';
+  targetCount: number;
+  currentCount: number;
+  isCompleted: boolean;
+  completedAt?: string;
+}
+
+export interface WeeklyMission {
+  id: string;
+  title: string;
+  description: string;
+  rewardXp: number;
+  iconName: string;
+  category: 'quiz' | 'simulation' | 'achievement' | 'general';
+  targetCount: number;
+  currentCount: number;
+  isCompleted: boolean;
+  completedAt?: string;
+}
+
+export interface UserGamificationProfile {
+  totalXp: number;
+  currentLevel: number;
+  currentLevelTitle: string;
+  currentLevelBadgeEmoji: string;
+  xpInCurrentLevel: number;
+  xpNeededForNextLevel: number;
+  progressPercentInLevel: number;
+  isMaxLevel: boolean;
+  dailyMissions: DailyMission[];
+  weeklyMissions: WeeklyMission[];
+  lastDailyResetDate: string; // YYYY-MM-DD
+  lastWeeklyResetKey: string; // YYYY-Wxx
+  xpHistoryCount: Record<string, number>;
+}
+
+// ==========================================
+// 🎁 RECOMPENSAS VIRTUAIS & COSMÉTICOS
+// ==========================================
+export type CosmeticCategory = 'frame' | 'icon' | 'title' | 'badge' | 'effect' | 'theme';
+export type CosmeticRarity = 'comum' | 'raro' | 'epico' | 'lendario';
+
+export interface CosmeticUnlockCondition {
+  type: 'default' | 'level' | 'achievement' | 'quiz_count' | 'simulation_count';
+  minLevel?: number;
+  achievementId?: AchievementId;
+  minCount?: number;
+  description: string;
+}
+
+export interface CosmeticRewardItem {
+  id: string;
+  category: CosmeticCategory;
+  name: string;
+  description: string;
+  rarity: CosmeticRarity;
+  iconPreview: string; // emoji or identifier
+  unlockCondition: CosmeticUnlockCondition;
+  isEquipped?: boolean;
+  isUnlocked?: boolean;
+  unlockedAt?: string;
+  customTitleText?: string;
+  themeStyle?: {
+    cardGradient: string;
+    borderHighlight: string;
+    glowColor: string;
+    accentBadge: string;
+    textColor?: string;
+  };
+  frameStyle?: {
+    borderClass: string;
+    glowClass?: string;
+    outerRingClass?: string;
+    badgeAccent?: string;
+  };
+  effectStyle?: {
+    animationClass: string;
+    glowClass: string;
+    particleEmoji?: string;
+  };
+}
+
+export interface UserCosmeticsProfile {
+  equippedFrameId: string;
+  equippedIconId: string;
+  equippedTitleId: string;
+  equippedBadgeId: string;
+  equippedEffectId: string;
+  equippedThemeId: string;
+  unlockedRewardIds: string[];
+}
+
+
+
 

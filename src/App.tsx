@@ -20,7 +20,10 @@ import { AdminDashboard } from './AdminDashboard';
 import { BreathingModal } from './BreathingModal';
 import { LoadingScreen } from './LoadingScreen';
 import { AchievementUnlockModal } from './AchievementUnlockModal';
-import { ShieldCheck, Heart, Sparkles, Compass, Trophy } from 'lucide-react';
+import { UserProfileModal } from './UserProfileModal';
+import { LevelUpModal } from './LevelUpModal';
+import { RewardUnlockModal } from './RewardUnlockModal';
+import { ShieldCheck, Heart, Sparkles, Compass, Trophy, Palette } from 'lucide-react';
 
 const MainContent: React.FC = () => {
   const { activeTab } = useApp();
@@ -42,7 +45,7 @@ const MainContent: React.FC = () => {
 };
 
 const Footer: React.FC = () => {
-  const { setActiveTab, setIsLoadingScreen } = useApp();
+  const { setActiveTab, setIsLoadingScreen, openProfileWithTab } = useApp();
 
   return (
     <footer className="bg-purple-100/60 border-t border-purple-200/80 text-slate-600 text-xs py-8 transition-colors w-full max-w-full overflow-hidden">
@@ -68,6 +71,10 @@ const Footer: React.FC = () => {
             <button onClick={() => setActiveTab('achievements')} className="text-purple-900 font-bold hover:text-purple-700 transition-colors inline-flex items-center gap-1">
               <Trophy className="w-3.5 h-3.5 text-amber-600" />
               <span>Conquistas</span>
+            </button>
+            <button onClick={() => openProfileWithTab('customize')} className="text-purple-900 font-bold hover:text-purple-700 transition-colors inline-flex items-center gap-1">
+              <Palette className="w-3.5 h-3.5 text-purple-600" />
+              <span>Recompensas 🎁</span>
             </button>
             <button onClick={() => setActiveTab('ranking')} className="text-purple-900 font-bold hover:text-purple-700 transition-colors inline-flex items-center gap-1">
               <Trophy className="w-3.5 h-3.5 text-purple-600" />
@@ -114,7 +121,19 @@ const Footer: React.FC = () => {
 };
 
 const AppInner: React.FC = () => {
-  const { isLoadingScreen, setIsLoadingScreen } = useApp();
+  const { 
+    isLoadingScreen, 
+    setIsLoadingScreen,
+    isProfileModalOpen,
+    setIsProfileModalOpen,
+    newLevelUnlocked,
+    dismissLevelUpModal,
+    rewardNotificationQueue,
+    dismissRewardNotification,
+    equipRewardFromNotification,
+    userGamificationProfile,
+    openProfileWithTab
+  } = useApp();
 
   return (
     <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#f8f6fc] text-slate-800 flex flex-col font-sans selection:bg-purple-200 selection:text-purple-950">
@@ -127,6 +146,22 @@ const AppInner: React.FC = () => {
       <Footer />
       <BreathingModal />
       <AchievementUnlockModal />
+      <UserProfileModal 
+        isOpen={isProfileModalOpen} 
+        onClose={() => setIsProfileModalOpen(false)} 
+      />
+      <LevelUpModal 
+        levelInfo={newLevelUnlocked} 
+        onClose={dismissLevelUpModal} 
+      />
+      <RewardUnlockModal
+        rewardQueue={rewardNotificationQueue}
+        currentLevel={userGamificationProfile.currentLevel}
+        currentLevelBadgeEmoji={userGamificationProfile.currentLevelBadgeEmoji}
+        onEquip={equipRewardFromNotification}
+        onDismiss={dismissRewardNotification}
+        onOpenCollection={() => openProfileWithTab('collection')}
+      />
     </div>
   );
 };
