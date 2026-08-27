@@ -60,163 +60,8 @@ export function saveAssignedAnonymousNumber(num: number) {
   }
 }
 
-// Initial community participants for realistic school-wide ranking
-export const INITIAL_COMMUNITY_PARTICIPANTS: AnonymousRankingUser[] = [
-  {
-    id: 'usr_seed_014',
-    anonymousNumber: 14,
-    displayName: 'Anônimo 014',
-    unlockedCount: 20,
-    totalPossible: 23,
-    unlockedAchievements: [],
-    lastCountReachedAt: '2026-08-15T14:22:10.000Z',
-    rankTierTitle: '💎 Mestre Supremo do Bom Senso',
-    rankTierEmoji: '💎'
-  },
-  {
-    id: 'usr_seed_027',
-    anonymousNumber: 27,
-    displayName: 'Anônimo 027',
-    unlockedCount: 19,
-    totalPossible: 23,
-    unlockedAchievements: [],
-    lastCountReachedAt: '2026-08-16T09:45:00.000Z',
-    rankTierTitle: '🔥 Senhor da Proteção & Respeito',
-    rankTierEmoji: '🔥'
-  },
-  {
-    id: 'usr_seed_003',
-    anonymousNumber: 3,
-    displayName: 'Anônimo 003',
-    unlockedCount: 18,
-    totalPossible: 23,
-    unlockedAchievements: [],
-    lastCountReachedAt: '2026-08-17T11:15:30.000Z',
-    rankTierTitle: '💎 Mestre Supremo do Bom Senso',
-    rankTierEmoji: '💎'
-  },
-  {
-    id: 'usr_seed_021',
-    anonymousNumber: 21,
-    displayName: 'Anônimo 021',
-    unlockedCount: 16,
-    totalPossible: 23,
-    unlockedAchievements: [],
-    lastCountReachedAt: '2026-08-18T16:30:00.000Z',
-    rankTierTitle: '💎 Mestre Supremo do Bom Senso',
-    rankTierEmoji: '💎'
-  },
-  {
-    id: 'usr_seed_008',
-    anonymousNumber: 8,
-    displayName: 'Anônimo 008',
-    unlockedCount: 15,
-    totalPossible: 23,
-    unlockedAchievements: [],
-    lastCountReachedAt: '2026-08-19T08:12:00.000Z',
-    rankTierTitle: '💎 Mestre Supremo do Bom Senso',
-    rankTierEmoji: '💎'
-  },
-  {
-    id: 'usr_seed_019',
-    anonymousNumber: 19,
-    displayName: 'Anônimo 019',
-    unlockedCount: 15,
-    totalPossible: 23,
-    unlockedAchievements: [],
-    lastCountReachedAt: '2026-08-20T10:40:00.000Z', // Later than 008, so ranks after 008
-    rankTierTitle: '💎 Mestre Supremo do Bom Senso',
-    rankTierEmoji: '💎'
-  },
-  {
-    id: 'usr_seed_005',
-    anonymousNumber: 5,
-    displayName: 'Anônimo 005',
-    unlockedCount: 14,
-    totalPossible: 23,
-    unlockedAchievements: [],
-    lastCountReachedAt: '2026-08-21T13:25:00.000Z',
-    rankTierTitle: '👑 Lorde Sentinela da Mediação',
-    rankTierEmoji: '👑'
-  },
-  {
-    id: 'usr_seed_031',
-    anonymousNumber: 31,
-    displayName: 'Anônimo 031',
-    unlockedCount: 13,
-    totalPossible: 23,
-    unlockedAchievements: [],
-    lastCountReachedAt: '2026-08-22T17:05:00.000Z',
-    rankTierTitle: '👑 Lorde Sentinela da Mediação',
-    rankTierEmoji: '👑'
-  },
-  {
-    id: 'usr_seed_011',
-    anonymousNumber: 11,
-    displayName: 'Anônimo 011',
-    unlockedCount: 12,
-    totalPossible: 23,
-    unlockedAchievements: [],
-    lastCountReachedAt: '2026-08-23T14:50:00.000Z',
-    rankTierTitle: '👑 Lorde Sentinela da Mediação',
-    rankTierEmoji: '👑'
-  },
-  {
-    id: 'usr_seed_022',
-    anonymousNumber: 22,
-    displayName: 'Anônimo 022',
-    unlockedCount: 11,
-    totalPossible: 23,
-    unlockedAchievements: [],
-    lastCountReachedAt: '2026-08-24T11:20:00.000Z',
-    rankTierTitle: '👑 Lorde Sentinela da Mediação',
-    rankTierEmoji: '👑'
-  },
-  {
-    id: 'usr_seed_002',
-    anonymousNumber: 2,
-    displayName: 'Anônimo 002',
-    unlockedCount: 9,
-    totalPossible: 23,
-    unlockedAchievements: [],
-    lastCountReachedAt: '2026-08-24T15:10:00.000Z',
-    rankTierTitle: '🏆 Guardião da Convivência',
-    rankTierEmoji: '🏆'
-  },
-  {
-    id: 'usr_seed_037',
-    anonymousNumber: 37,
-    displayName: 'Anônimo 037',
-    unlockedCount: 7,
-    totalPossible: 23,
-    unlockedAchievements: [],
-    lastCountReachedAt: '2026-08-25T09:30:00.000Z',
-    rankTierTitle: '🏆 Guardião da Convivência',
-    rankTierEmoji: '🏆'
-  },
-  {
-    id: 'usr_seed_042',
-    anonymousNumber: 42,
-    displayName: 'Anônimo 042',
-    unlockedCount: 5,
-    totalPossible: 23,
-    unlockedAchievements: [],
-    lastCountReachedAt: '2026-08-25T16:45:00.000Z',
-    rankTierTitle: '⚡ Sentinela em Treinamento',
-    rankTierEmoji: '⚡'
-  },
-  {
-    id: 'usr_seed_050',
-    anonymousNumber: 50,
-    displayName: 'Anônimo 050',
-    unlockedCount: 3,
-    totalPossible: 23,
-    unlockedAchievements: [],
-    lastCountReachedAt: '2026-08-26T10:00:00.000Z',
-    rankTierTitle: '⚡ Sentinela em Treinamento',
-    rankTierEmoji: '⚡'
-  }
-];
+// Initial community participants - empty list for real user-only tracking
+export const INITIAL_COMMUNITY_PARTICIPANTS: AnonymousRankingUser[] = [];
 
 /**
  * GOLDEN RULE DETERMINISTIC RANKING ALGORITHM
@@ -323,7 +168,11 @@ export function getCachedRanking(): AnonymousRankingUser[] | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_RANKING_CACHE);
     if (raw) {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        const realUsersOnly = parsed.filter(u => u && u.id && !u.id.startsWith('usr_seed_'));
+        return realUsersOnly;
+      }
     }
   } catch {
     // ignore

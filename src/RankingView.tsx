@@ -266,7 +266,7 @@ export const RankingView: React.FC = () => {
             secondPlace?.isCurrentUser 
               ? 'border-purple-500 ring-4 ring-purple-200' 
               : 'border-slate-300'
-          }`}>
+          } ${!secondPlace ? 'opacity-80 border-dashed' : ''}`}>
             <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-slate-200 border-2 border-slate-400 flex items-center justify-center text-slate-800 font-black text-sm shadow-sm">
               🥈 2º
             </div>
@@ -277,7 +277,7 @@ export const RankingView: React.FC = () => {
               </div>
 
               <div className="font-black text-base sm:text-lg text-slate-900 flex items-center justify-center gap-1.5">
-                <span>{secondPlace?.displayName || 'Anônimo ---'}</span>
+                <span>{secondPlace ? secondPlace.displayName : 'Vaga Aberta'}</span>
                 {secondPlace?.isCurrentUser && (
                   <span className="px-2 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-black uppercase">
                     Você
@@ -285,18 +285,26 @@ export const RankingView: React.FC = () => {
                 )}
               </div>
 
-              <div className="text-xs font-bold text-slate-600">
-                <span className="text-slate-900 font-black text-base">{secondPlace?.unlockedCount || 0}</span> / {totalPossible} conquistas
-              </div>
+              {secondPlace ? (
+                <>
+                  <div className="text-xs font-bold text-slate-600">
+                    <span className="text-slate-900 font-black text-base">{secondPlace.unlockedCount}</span> / {totalPossible} conquistas
+                  </div>
 
-              <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-200/80 text-slate-800 text-[11px] font-extrabold">
-                <span>{secondPlace?.rankTierTitle || 'Sentinela'}</span>
-              </div>
+                  <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-200/80 text-slate-800 text-[11px] font-extrabold">
+                    <span>{secondPlace.rankTierTitle || 'Sentinela'}</span>
+                  </div>
 
-              <div className="text-[11px] text-slate-500 font-medium pt-1 flex items-center justify-center gap-1">
-                <Clock className="w-3 h-3 text-slate-400" />
-                <span>Marco: {formatDate(secondPlace?.lastCountReachedAt)}</span>
-              </div>
+                  <div className="text-[11px] text-slate-500 font-medium pt-1 flex items-center justify-center gap-1">
+                    <Clock className="w-3 h-3 text-slate-400" />
+                    <span>Marco: {formatDate(secondPlace.lastCountReachedAt)}</span>
+                  </div>
+                </>
+              ) : (
+                <div className="py-2 text-xs text-slate-500 font-medium">
+                  Aguardando novo estudante da escola desbloquear conquistas
+                </div>
+              )}
             </div>
           </div>
 
@@ -305,7 +313,7 @@ export const RankingView: React.FC = () => {
             firstPlace?.isCurrentUser 
               ? 'border-amber-500 ring-4 ring-amber-300' 
               : 'border-amber-400'
-          }`}>
+          } ${!firstPlace ? 'opacity-80 border-dashed' : ''}`}>
             <div className="absolute -top-5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 border-2 border-white text-white font-black text-sm shadow-md flex items-center gap-1">
               <Crown className="w-4 h-4 text-white fill-white" />
               <span>🥇 1º LUGAR</span>
@@ -317,7 +325,7 @@ export const RankingView: React.FC = () => {
               </div>
 
               <div className="font-black text-lg sm:text-xl text-amber-950 flex items-center justify-center gap-1.5">
-                <span>{firstPlace?.displayName || 'Anônimo ---'}</span>
+                <span>{firstPlace ? firstPlace.displayName : 'Vaga Aberta'}</span>
                 {firstPlace?.isCurrentUser && (
                   <span className="px-2 py-0.5 rounded-full bg-amber-600 text-white text-[10px] font-black uppercase">
                     Você
@@ -325,18 +333,26 @@ export const RankingView: React.FC = () => {
                 )}
               </div>
 
-              <div className="text-xs font-extrabold text-amber-900">
-                <span className="text-amber-950 font-black text-xl">{firstPlace?.unlockedCount || 0}</span> / {totalPossible} conquistas
-              </div>
+              {firstPlace ? (
+                <>
+                  <div className="text-xs font-extrabold text-amber-900">
+                    <span className="text-amber-950 font-black text-xl">{firstPlace.unlockedCount}</span> / {totalPossible} conquistas
+                  </div>
 
-              <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-200 text-amber-950 text-xs font-black border border-amber-300">
-                <span>{firstPlace?.rankTierTitle || 'Lenda da Escola'}</span>
-              </div>
+                  <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-200 text-amber-950 text-xs font-black border border-amber-300">
+                    <span>{firstPlace.rankTierTitle || 'Lenda da Escola'}</span>
+                  </div>
 
-              <div className="text-[11px] text-amber-800/90 font-bold pt-1 flex items-center justify-center gap-1">
-                <Clock className="w-3 h-3 text-amber-600" />
-                <span>Alcançado em: {formatDate(firstPlace?.lastCountReachedAt)}</span>
-              </div>
+                  <div className="text-[11px] text-amber-800/90 font-bold pt-1 flex items-center justify-center gap-1">
+                    <Clock className="w-3 h-3 text-amber-600" />
+                    <span>Alcançado em: {formatDate(firstPlace.lastCountReachedAt)}</span>
+                  </div>
+                </>
+              ) : (
+                <div className="py-2 text-xs text-amber-800/80 font-medium">
+                  Seja o primeiro a conquistar o topo da liderança escolar!
+                </div>
+              )}
             </div>
           </div>
 
@@ -345,7 +361,7 @@ export const RankingView: React.FC = () => {
             thirdPlace?.isCurrentUser 
               ? 'border-purple-500 ring-4 ring-purple-200' 
               : 'border-orange-300'
-          }`}>
+          } ${!thirdPlace ? 'opacity-80 border-dashed' : ''}`}>
             <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-orange-200 border-2 border-orange-400 flex items-center justify-center text-orange-950 font-black text-sm shadow-sm">
               🥉 3º
             </div>
@@ -356,7 +372,7 @@ export const RankingView: React.FC = () => {
               </div>
 
               <div className="font-black text-base sm:text-lg text-slate-900 flex items-center justify-center gap-1.5">
-                <span>{thirdPlace?.displayName || 'Anônimo ---'}</span>
+                <span>{thirdPlace ? thirdPlace.displayName : 'Vaga Aberta'}</span>
                 {thirdPlace?.isCurrentUser && (
                   <span className="px-2 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-black uppercase">
                     Você
@@ -364,18 +380,26 @@ export const RankingView: React.FC = () => {
                 )}
               </div>
 
-              <div className="text-xs font-bold text-slate-600">
-                <span className="text-slate-900 font-black text-base">{thirdPlace?.unlockedCount || 0}</span> / {totalPossible} conquistas
-              </div>
+              {thirdPlace ? (
+                <>
+                  <div className="text-xs font-bold text-slate-600">
+                    <span className="text-slate-900 font-black text-base">{thirdPlace.unlockedCount}</span> / {totalPossible} conquistas
+                  </div>
 
-              <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-orange-100 text-orange-950 text-[11px] font-extrabold border border-orange-200">
-                <span>{thirdPlace?.rankTierTitle || 'Guardião'}</span>
-              </div>
+                  <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-orange-100 text-orange-950 text-[11px] font-extrabold border border-orange-200">
+                    <span>{thirdPlace.rankTierTitle || 'Guardião'}</span>
+                  </div>
 
-              <div className="text-[11px] text-slate-500 font-medium pt-1 flex items-center justify-center gap-1">
-                <Clock className="w-3 h-3 text-slate-400" />
-                <span>Marco: {formatDate(thirdPlace?.lastCountReachedAt)}</span>
-              </div>
+                  <div className="text-[11px] text-slate-500 font-medium pt-1 flex items-center justify-center gap-1">
+                    <Clock className="w-3 h-3 text-slate-400" />
+                    <span>Marco: {formatDate(thirdPlace.lastCountReachedAt)}</span>
+                  </div>
+                </>
+              ) : (
+                <div className="py-2 text-xs text-slate-500 font-medium">
+                  Aguardando novo estudante da escola desbloquear conquistas
+                </div>
+              )}
             </div>
           </div>
 
@@ -445,98 +469,110 @@ export const RankingView: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-purple-100 text-xs font-medium">
-              {displayList.map((user, idx) => {
-                const position = user.rankPosition || idx + 1;
-                const isUser = user.isCurrentUser || user.id === anonymousIdentity.id;
+              {displayList.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-slate-500 font-medium bg-white">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <Trophy className="w-8 h-8 text-purple-300 animate-bounce" />
+                      <p className="font-bold text-slate-700 text-sm">Nenhum participante registrado ainda</p>
+                      <p className="text-xs text-slate-500">Conclua quizzes e simulações para registrar sua pontuação no ranking real!</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                displayList.map((user, idx) => {
+                  const position = user.rankPosition || idx + 1;
+                  const isUser = user.isCurrentUser || user.id === anonymousIdentity.id;
 
-                return (
-                  <tr 
-                    key={user.id || `rank-${idx}`}
-                    className={`transition-colors ${
-                      isUser 
-                        ? 'bg-purple-100/80 font-bold border-l-4 border-l-purple-600 text-purple-950' 
-                        : idx % 2 === 0 
-                        ? 'bg-white hover:bg-purple-50/40' 
-                        : 'bg-purple-50/20 hover:bg-purple-50/60'
-                    }`}
-                  >
-                    {/* Position */}
-                    <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-2">
-                        {position === 1 && (
-                          <span className="w-7 h-7 rounded-xl bg-amber-100 border border-amber-300 text-amber-900 flex items-center justify-center font-black text-xs shadow-2xs">
-                            🥇 1º
-                          </span>
-                        )}
-                        {position === 2 && (
-                          <span className="w-7 h-7 rounded-xl bg-slate-100 border border-slate-300 text-slate-800 flex items-center justify-center font-black text-xs shadow-2xs">
-                            🥈 2º
-                          </span>
-                        )}
-                        {position === 3 && (
-                          <span className="w-7 h-7 rounded-xl bg-orange-100 border border-orange-300 text-orange-900 flex items-center justify-center font-black text-xs shadow-2xs">
-                            🥉 3º
-                          </span>
-                        )}
-                        {position > 3 && (
-                          <span className="w-7 h-7 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 flex items-center justify-center font-black text-xs">
-                            #{position}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-
-                    {/* Anonymous Name */}
-                    <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-2">
-                        <span className={`font-black text-sm ${isUser ? 'text-purple-950' : 'text-slate-900'}`}>
-                          {user.displayName}
-                        </span>
-                        {isUser && (
-                          <span className="px-2 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-black uppercase tracking-wider shadow-2xs">
-                            Você
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[10px] text-slate-400 font-normal">
-                        ID: {user.id ? user.id.substring(0, 10) + '...' : 'anon'}
-                      </span>
-                    </td>
-
-                    {/* Achievements Count & Mini Progress */}
-                    <td className="py-3.5 px-4 text-center">
-                      <div className="flex flex-col items-center justify-center gap-1">
-                        <span className="font-black text-slate-900 text-sm">
-                          {user.unlockedCount} <span className="text-slate-500 font-normal text-xs">/ {totalPossible}</span>
-                        </span>
-                        <div className="w-24 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-purple-600 rounded-full"
-                            style={{ width: `${(user.unlockedCount / totalPossible) * 100}%` }}
-                          />
+                  return (
+                    <tr 
+                      key={user.id || `rank-${idx}`}
+                      className={`transition-colors ${
+                        isUser 
+                          ? 'bg-purple-100/80 font-bold border-l-4 border-l-purple-600 text-purple-950' 
+                          : idx % 2 === 0 
+                          ? 'bg-white hover:bg-purple-50/40' 
+                          : 'bg-purple-50/20 hover:bg-purple-50/60'
+                      }`}
+                    >
+                      {/* Position */}
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-2">
+                          {position === 1 && (
+                            <span className="w-7 h-7 rounded-xl bg-amber-100 border border-amber-300 text-amber-900 flex items-center justify-center font-black text-xs shadow-2xs">
+                              🥇 1º
+                            </span>
+                          )}
+                          {position === 2 && (
+                            <span className="w-7 h-7 rounded-xl bg-slate-100 border border-slate-300 text-slate-800 flex items-center justify-center font-black text-xs shadow-2xs">
+                              🥈 2º
+                            </span>
+                          )}
+                          {position === 3 && (
+                            <span className="w-7 h-7 rounded-xl bg-orange-100 border border-orange-300 text-orange-900 flex items-center justify-center font-black text-xs shadow-2xs">
+                              🥉 3º
+                            </span>
+                          )}
+                          {position > 3 && (
+                            <span className="w-7 h-7 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 flex items-center justify-center font-black text-xs">
+                              #{position}
+                            </span>
+                          )}
                         </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    {/* Rank Tier */}
-                    <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 text-xs font-bold">
-                        <span>{user.rankTierTitle || 'Aprendiz'}</span>
-                      </span>
-                    </td>
+                      {/* Anonymous Name */}
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-2">
+                          <span className={`font-black text-sm ${isUser ? 'text-purple-950' : 'text-slate-900'}`}>
+                            {user.displayName}
+                          </span>
+                          {isUser && (
+                            <span className="px-2 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-black uppercase tracking-wider shadow-2xs">
+                              Você
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-normal">
+                          ID: {user.id ? user.id.substring(0, 10) + '...' : 'anon'}
+                        </span>
+                      </td>
 
-                    {/* Timestamp Reached */}
-                    <td className="py-3.5 px-4 text-right">
-                      <div className="text-xs font-semibold text-slate-700">
-                        {formatDate(user.lastCountReachedAt)}
-                      </div>
-                      <span className="text-[10px] text-slate-400 font-normal">
-                        data da conquista
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
+                      {/* Achievements Count & Mini Progress */}
+                      <td className="py-3.5 px-4 text-center">
+                        <div className="flex flex-col items-center justify-center gap-1">
+                          <span className="font-black text-slate-900 text-sm">
+                            {user.unlockedCount} <span className="text-slate-500 font-normal text-xs">/ {totalPossible}</span>
+                          </span>
+                          <div className="w-24 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-purple-600 rounded-full"
+                              style={{ width: `${(user.unlockedCount / totalPossible) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Rank Tier */}
+                      <td className="py-3.5 px-4">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 text-xs font-bold">
+                          <span>{user.rankTierTitle || 'Aprendiz'}</span>
+                        </span>
+                      </td>
+
+                      {/* Timestamp Reached */}
+                      <td className="py-3.5 px-4 text-right">
+                        <div className="text-xs font-semibold text-slate-700">
+                          {formatDate(user.lastCountReachedAt)}
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-normal">
+                          data da conquista
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
