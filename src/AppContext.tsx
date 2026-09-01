@@ -551,7 +551,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     progressOverride?: EducationalActivityProgress
   ) => {
     const activeProgress = progressOverride || educationalProgress;
-    const eligibleUnlockedIds = computeUnlockedCosmeticIds(currentLevel, currentAchievements, activeProgress);
+    const eligibleUnlockedIds = computeUnlockedCosmeticIds(
+      currentLevel, 
+      currentAchievements, 
+      activeProgress, 
+      userGamificationProfile.streakDays || 1
+    );
     
     setCosmeticsProfile(prev => {
       const alreadyUnlocked = new Set(prev.unlockedRewardIds || []);
@@ -913,6 +918,263 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             if (currentProgress >= 10 && !isUnlocked) isUnlocked = true;
             break;
           }
+
+          // =========================================================================
+          // 🌟 NOVAS CONQUISTAS AVANÇADAS & LENDÁRIAS (Avaliação Automática)
+          // =========================================================================
+          case 'veterano_questoes': {
+            // Ás da Sabedoria Escolar: 40 questões respondidas
+            currentProgress = Math.min(40, totalQuestionsAnswered);
+            if (currentProgress >= 40 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'oraculo_cinco_estrelas': {
+            // Mestre da Precisão Total: 3 quizzes com 100%
+            const perfectScoreCount = quizzesList.filter(
+              q => q.completed && q.totalQuestions > 0 && q.bestScore === q.totalQuestions
+            ).length;
+            currentProgress = Math.min(3, perfectScoreCount);
+            if (currentProgress >= 3 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'explorador_total_matriz': {
+            // Especialista em Tipologia: 8 categorias exploradas
+            currentProgress = Math.min(8, exploredTypesCount);
+            if (currentProgress >= 8 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'combo_iniciante_sentinela': {
+            // Guardião Multifacetado: Leis + Respeito + 2 Quizzes + 2 Simulações
+            const simCount = progress.completedSimulations?.length || 0;
+            let pillarsCompleted = 0;
+            if (progress.viewedLaws) pillarsCompleted++;
+            if (progress.completedRespectModule) pillarsCompleted++;
+            if (completedQuizzesCount >= 2) pillarsCompleted++;
+            if (simCount >= 2) pillarsCompleted++;
+            currentProgress = pillarsCompleted;
+            if (pillarsCompleted >= 4 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'empatia_inabalavel': {
+            // Farol do Acolhimento Escolar: 8 escolhas de empatia
+            const empCount = progress.empathyChoicesCount || 0;
+            currentProgress = Math.min(8, empCount);
+            if (empCount >= 8 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'mente_inabalavel': {
+            // Santuário da Calma Interior: 6 sessões de respiração
+            currentProgress = Math.min(6, breathingCount);
+            if (breathingCount >= 6 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'escudo_de_ouro_decisao': {
+            // Muralha da Mediação Segura: 8 escolhas de segurança
+            const safeCount = progress.safetyChoicesCount || 0;
+            currentProgress = Math.min(8, safeCount);
+            if (safeCount >= 8 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'nivel_cinco_guardiao': {
+            // Patente de Sentinela Veterano: Nível 5
+            const currentLvl = userGamificationProfile.currentLevel || 1;
+            currentProgress = Math.min(5, currentLvl);
+            if (currentLvl >= 5 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'conhecedor_total_quizzes': {
+            // Gabaritador Implacável: 5 quizzes com 100%
+            const allPerfectCount = quizzesList.filter(
+              q => q.completed && q.totalQuestions > 0 && q.bestScore === q.totalQuestions
+            ).length;
+            currentProgress = Math.min(5, allPerfectCount);
+            if (allPerfectCount >= 5 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'arquiteto_do_destino': {
+            // Arquiteto de Rotas & Desfechos: 5 simulações com 2+ finais explorados
+            const multiEndingsCount = Object.values(progress.exploredSimulationOutcomes || {}).filter(
+              outcomes => (outcomes || []).length >= 2
+            ).length;
+            const multiCount = Math.max(multiEndingsCount, progress.strategicExplorationsCount || 0);
+            currentProgress = Math.min(5, multiCount);
+            if (multiCount >= 5 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'explorador_segredos_sim': {
+            // Caçador de Finais Secretos: 2 desfechos secretos
+            const secrets = progress.discoveredSecretOutcomesCount || 0;
+            currentProgress = Math.min(2, secrets);
+            if (secrets >= 2 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'missao_cumprida_maratonista': {
+            // Sentinela Comprometido: 60 questões respondidas
+            currentProgress = Math.min(60, totalQuestionsAnswered);
+            if (currentProgress >= 60 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'harmonia_plena': {
+            // Mestre da Autoregulação: 10 respirações + chat de apoio
+            const hasChatSupport = progress.interactedWithChat;
+            currentProgress = Math.min(10, breathingCount);
+            if (breathingCount >= 10 && hasChatSupport && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'nivel_dez_comandante': {
+            // Comandante da Cultura Escolar: Nível 10
+            const currentLvl = userGamificationProfile.currentLevel || 1;
+            currentProgress = Math.min(10, currentLvl);
+            if (currentLvl >= 10 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'diplomata_da_paz': {
+            // Diplomata Supremo: 10 simulações zeradas + 15 escolhas de empatia
+            const totalSims = progress.completedSimulations?.length || 0;
+            const empChoices = progress.empathyChoicesCount || 0;
+            currentProgress = Math.min(15, empChoices);
+            if (totalSims >= 10 && empChoices >= 15 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'guardiao_blindado_escola': {
+            // Bastião Inviolável: 10 simulações + 15 escolhas de segurança
+            const totalSims = progress.completedSimulations?.length || 0;
+            const safeChoices = progress.safetyChoicesCount || 0;
+            currentProgress = Math.min(15, safeChoices);
+            if (totalSims >= 10 && safeChoices >= 15 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'grande_colecionador': {
+            // Grão-Mestre dos Distintivos: 25 conquistas
+            const unlockedTotal = prevAchievements.filter(b => b.id !== 'grande_colecionador' && b.id !== 'lenda_viva_sentinela' && b.isUnlocked).length;
+            currentProgress = Math.min(25, unlockedTotal);
+            if (unlockedTotal >= 25 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'nivel_quinze_lorde': {
+            // Lorde Sentinela Honorário: Nível 15
+            const currentLvl = userGamificationProfile.currentLevel || 1;
+            currentProgress = Math.min(15, currentLvl);
+            if (currentLvl >= 15 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'mestre_absoluto_sentinela': {
+            // Mestre Supremo da Cultura de Paz: Nível 12+, 5 quizzes 100%, 10 simulações, Leis e Respeito
+            const currentLvl = userGamificationProfile.currentLevel || 1;
+            const perfectCount = quizzesList.filter(
+              q => q.completed && q.totalQuestions > 0 && q.bestScore === q.totalQuestions
+            ).length;
+            const totalSims = progress.completedSimulations?.length || 0;
+            let masterCriteria = 0;
+            if (currentLvl >= 12) masterCriteria++;
+            if (perfectCount >= 5) masterCriteria++;
+            if (totalSims >= 10) masterCriteria++;
+            if (progress.viewedLaws) masterCriteria++;
+            if (progress.completedRespectModule) masterCriteria++;
+            currentProgress = masterCriteria;
+            if (masterCriteria >= 5 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'lenda_viva_sentinela': {
+            // Lenda Imortal do Sentinela: Nível 18+, 2.500+ XP, 35+ conquistas
+            const unlockedTotal = prevAchievements.filter(b => b.id !== 'lenda_viva_sentinela' && b.isUnlocked).length;
+            const currentLvl = userGamificationProfile.currentLevel || 1;
+            const currentXp = userGamificationProfile.totalXp || 0;
+            currentProgress = Math.min(35, unlockedTotal);
+            if (unlockedTotal >= 35 && currentLvl >= 18 && currentXp >= 2500 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+
+          // =========================================================================
+          // 🔒 CONQUISTAS SECRETAS (Avaliação Automática e Descoberta)
+          // =========================================================================
+          case 'secret_detetive_sentinela': {
+            // Detetive do Sentinela: Leis + Matriz (4+ tipos) + 1 Quiz + 1 Simulação
+            const totalSims = progress.completedSimulations?.length || 0;
+            let detetivePillars = 0;
+            if (progress.viewedLaws) detetivePillars++;
+            if (exploredTypesCount >= 4) detetivePillars++;
+            if (completedQuizzesCount >= 1) detetivePillars++;
+            if (totalSims >= 1) detetivePillars++;
+            currentProgress = detetivePillars;
+            if (detetivePillars >= 4 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'secret_combo_conhecimento': {
+            // Combo do Conhecimento: 3 quizzes + Módulo Respeito + 3 simulações
+            const totalSims = progress.completedSimulations?.length || 0;
+            let comboPillars = 0;
+            if (completedQuizzesCount >= 3) comboPillars++;
+            if (progress.completedRespectModule) comboPillars++;
+            if (totalSims >= 3) comboPillars++;
+            currentProgress = comboPillars;
+            if (comboPillars >= 3 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'secret_mente_atenta': {
+            // Mente Atenta: 25 questões respondidas em quizzes
+            currentProgress = Math.min(25, totalQuestionsAnswered);
+            if (totalQuestionsAnswered >= 25 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'secret_codigo_secreto': {
+            // Código Secreto: Matriz (6+ tipos) + 2 Sessões de Respiração + Espaço de Apoio Emocional
+            let codeKeys = 0;
+            if (exploredTypesCount >= 6) codeKeys++;
+            if (breathingCount >= 2) codeKeys++;
+            if (progress.interactedWithChat) codeKeys++;
+            currentProgress = codeKeys;
+            if (codeKeys >= 3 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'secret_sentinela_empatia': {
+            // Sentinela da Empatia: Módulo Respeito + 6 Escolhas de Empatia + Interação de Apoio
+            const empChoices = progress.empathyChoicesCount || 0;
+            let empathyPillars = 0;
+            if (progress.completedRespectModule) empathyPillars++;
+            if (empChoices >= 6) empathyPillars++;
+            if (progress.interactedWithChat) empathyPillars++;
+            currentProgress = empathyPillars;
+            if (empathyPillars >= 3 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'secret_precisao_absoluta': {
+            // Precisão Absoluta: 2 quizzes gabaritados (100%) + 3 simulações concluídas
+            const perfectQuizzes = quizzesList.filter(
+              q => q.completed && q.totalQuestions > 0 && q.bestScore === q.totalQuestions
+            ).length;
+            const totalSims = progress.completedSimulations?.length || 0;
+            currentProgress = Math.min(2, perfectQuizzes);
+            if (perfectQuizzes >= 2 && totalSims >= 3 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'secret_explorador_noturno_areas': {
+            // Explorador Oculto: Leis + Respeito + Matriz + Respiração + Simulações + Chat
+            const totalSims = progress.completedSimulations?.length || 0;
+            let exploredAreas = 0;
+            if (progress.viewedLaws) exploredAreas++;
+            if (progress.completedRespectModule) exploredAreas++;
+            if (exploredTypesCount >= 4) exploredAreas++;
+            if (breathingCount >= 1) exploredAreas++;
+            if (totalSims >= 1) exploredAreas++;
+            if (progress.interactedWithChat) exploredAreas++;
+            currentProgress = exploredAreas;
+            if (exploredAreas >= 6 && !isUnlocked) isUnlocked = true;
+            break;
+          }
+          case 'secret_lenda_oculta': {
+            // Lenda Oculta: Nível 8+ + 15+ conquistas + 4 quizzes + 5 simulações
+            const currentLvl = userGamificationProfile.currentLevel || 1;
+            const totalSims = progress.completedSimulations?.length || 0;
+            let legendPillars = 0;
+            if (currentLvl >= 8) legendPillars++;
+            if (alreadyUnlockedCount >= 15) legendPillars++;
+            if (completedQuizzesCount >= 4) legendPillars++;
+            if (totalSims >= 5) legendPillars++;
+            currentProgress = legendPillars;
+            if (legendPillars >= 4 && !isUnlocked) isUnlocked = true;
+            break;
+          }
           default:
             break;
         }
@@ -942,8 +1204,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setLatestUnlockedAchievement(newlyUnlocked);
         const unlockedCount = updated.filter(a => a.isUnlocked).length;
         updateStoredMilestone(unlockedCount);
-        // Award XP for badge unlock (+50 XP)
-        awardXp(50, 'achievement_unlocked', newlyUnlocked.id);
+        // Award XP for badge unlock (supports specific secret achievement XP values)
+        const xpAmount = newlyUnlocked.xpReward || 50;
+        awardXp(xpAmount, 'achievement_unlocked', newlyUnlocked.id);
         // Check for newly unlocked cosmetic items linked to this achievement
         setTimeout(() => {
           checkAndAwardCosmetics(userGamificationProfile.currentLevel, updated, false, progress);

@@ -92,18 +92,30 @@ export const AchievementUnlockModal: React.FC<AchievementUnlockModalProps> = ({
         </button>
 
         {/* Celebration Header */}
-        <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-100 to-indigo-100 border border-purple-300 text-purple-950 text-xs font-black uppercase tracking-wider mb-4 shadow-2xs">
-          <PartyPopper className="w-4 h-4 text-purple-700 animate-bounce" aria-hidden="true" />
-          <span>Nova Conquista Desbloqueada!</span>
-        </div>
+        {achievement.isSecret ? (
+          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-amber-500 text-white text-xs font-black uppercase tracking-wider mb-4 shadow-lg animate-pulse">
+            <span className="text-sm">🔒✨</span>
+            <span>CONQUISTA SECRETA DESCOBERTA!</span>
+          </div>
+        ) : (
+          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-100 to-indigo-100 border border-purple-300 text-purple-950 text-xs font-black uppercase tracking-wider mb-4 shadow-2xs">
+            <PartyPopper className="w-4 h-4 text-purple-700 animate-bounce" aria-hidden="true" />
+            <span>Nova Conquista Desbloqueada!</span>
+          </div>
+        )}
 
         {/* Big Retro Framed Badge Showcase */}
         <div className="relative my-3 flex justify-center items-center">
-          <div className="p-2 rounded-3xl bg-gradient-to-b from-slate-900/5 to-slate-900/10 border border-purple-200/70 shadow-inner">
+          <div className={`p-2 rounded-3xl border shadow-inner ${
+            achievement.isSecret 
+              ? 'bg-gradient-to-b from-purple-950/20 to-amber-950/20 border-amber-400/80 ring-4 ring-purple-400/30' 
+              : 'bg-gradient-to-b from-slate-900/5 to-slate-900/10 border-purple-200/70'
+          }`}>
             <AchievementBadgeFrame
               achievementId={achievement.id}
               tier={achievement.tier}
               isUnlocked={true}
+              isSecret={achievement.isSecret}
               size={110}
               showGlow={true}
               animate={true}
@@ -116,10 +128,20 @@ export const AchievementUnlockModal: React.FC<AchievementUnlockModalProps> = ({
           </div>
         </div>
 
-        {/* Tier Indicator */}
-        <div className="mb-2">
+        {/* Tier & XP Indicator */}
+        <div className="mb-2 flex items-center justify-center gap-2 flex-wrap">
           {getTierBadge()}
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500 text-white text-xs font-black uppercase tracking-wider shadow-sm">
+            ⚡ +{achievement.xpReward || 50} XP
+          </span>
         </div>
+
+        {/* Secret Discovery Announcement */}
+        {achievement.isSecret && (
+          <div className="mb-2 bg-gradient-to-r from-purple-50 via-indigo-50 to-amber-50 border border-purple-300 rounded-2xl p-2.5 text-xs text-purple-900 font-bold shadow-2xs">
+            🎉 Você desvendou uma conquista que estava escondida na plataforma!
+          </div>
+        )}
 
         {/* Title */}
         <h2 id="achievement-modal-title" className="text-xl sm:text-2xl font-black text-slate-900 mb-1">
@@ -137,6 +159,32 @@ export const AchievementUnlockModal: React.FC<AchievementUnlockModalProps> = ({
         <p id="achievement-modal-desc" className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-3 px-2">
           {achievement.unlockedDescription || achievement.description}
         </p>
+
+        {/* Cosmetic Reward Alert if present */}
+        {achievement.secretRewardCosmeticId && (
+          <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-2.5 mb-3 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2 text-left">
+              <span className="text-xl">🎁</span>
+              <div>
+                <div className="font-black text-amber-950">
+                  Nova Recompensa Cosmética!
+                </div>
+                <div className="text-[11px] text-amber-800 font-medium">
+                  Item exclusivo desbloqueado para o seu perfil.
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                handleClose();
+                setActiveTab('profile');
+              }}
+              className="text-[11px] font-black text-purple-900 bg-white hover:bg-amber-100 px-2.5 py-1 rounded-xl border border-amber-300 shadow-2xs transition-colors cursor-pointer"
+            >
+              Equipar
+            </button>
+          </div>
+        )}
 
         {/* Anonymous Ranking & Performance Pill */}
         <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-2xl p-2.5 mb-3 flex items-center justify-between text-xs">

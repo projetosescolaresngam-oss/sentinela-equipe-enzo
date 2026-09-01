@@ -77,7 +77,10 @@ export const ItemInspectionModal: React.FC<ItemInspectionModalProps> = ({
             current = currentLevel;
             break;
           case 'achievements':
-            current = achievements.filter(a => a.unlocked).length;
+            current = achievements.filter(a => a.unlocked || (a as any).isUnlocked).length;
+            break;
+          case 'epic_achievements':
+            current = achievements.filter(a => (a.unlocked || (a as any).isUnlocked) && (a.tier === 'ouro' || a.tier === 'lendario' || (a as any).rarity === 'epico')).length;
             break;
           case 'quizzes':
             current = educationalProgress.totalQuizzesCompleted || 0;
@@ -282,7 +285,7 @@ export const ItemInspectionModal: React.FC<ItemInspectionModalProps> = ({
             </div>
 
             {/* Giant Avatar & Frame Renderer */}
-            <div className="relative z-10 scale-110 sm:scale-125 my-4">
+            <div className="relative z-10 my-6 flex items-center justify-center">
               {item.category === 'frame' && (
                 <AvatarRenderer 
                   frameId={item.id}

@@ -14,6 +14,42 @@ export const ALL_COSMETIC_REWARDS: CosmeticRewardItem[] = [
   
   // COMUNS & INCOMUNS
   {
+    id: 'frame_codigo_secreto',
+    category: 'frame',
+    name: 'Moldura Matriz do Código Secreto',
+    description: 'Moldura cibernética com glifos decodificados e runas luminosas douradas e violetas.',
+    rarity: 'lendario',
+    iconPreview: '🔐',
+    unlockCondition: {
+      type: 'achievement',
+      achievementId: 'secret_codigo_secreto',
+      description: 'Desbloqueie a conquista secreta "Código Secreto"'
+    },
+    frameStyle: {
+      borderClass: 'p-1 bg-gradient-to-tr from-amber-400 via-purple-600 to-indigo-700',
+      glowClass: 'shadow-amber-500/50 shadow-xl ring-2 ring-amber-400/70',
+      outerRingClass: 'border-2 border-amber-300'
+    }
+  },
+  {
+    id: 'frame_aura_empatia_secreta',
+    category: 'frame',
+    name: 'Moldura Aura da Empatia',
+    description: 'Aura fluida em violeta e rubi radiante que envolve o perfil em acolhimento e proteção fraterna.',
+    rarity: 'epico',
+    iconPreview: '💜',
+    unlockCondition: {
+      type: 'achievement',
+      achievementId: 'secret_sentinela_empatia',
+      description: 'Desbloqueie a conquista secreta "Sentinela da Empatia"'
+    },
+    frameStyle: {
+      borderClass: 'p-1 bg-gradient-to-tr from-purple-500 via-pink-500 to-rose-400',
+      glowClass: 'shadow-pink-500/40 shadow-lg ring-1 ring-pink-300',
+      outerRingClass: 'border-2 border-pink-300'
+    }
+  },
+  {
     id: 'frame_sentinela_classica',
     category: 'frame',
     name: 'Moldura Sentinela Clássica',
@@ -180,60 +216,61 @@ export const ALL_COSMETIC_REWARDS: CosmeticRewardItem[] = [
 
   // ÉPICOS
   {
-    id: 'frame_guardiao_cosmico',
+    id: 'guardiao-cosmico',
     category: 'frame',
-    name: 'Moldura Guardião Cósmico',
+    name: 'Guardião Cósmico',
     description: 'Forjada com energia cósmica, essa moldura representa aqueles que protegem, acolhem e iluminam o caminho dos outros.',
     rarity: 'epico',
     iconPreview: '🌌',
     unlockCondition: {
-      type: 'level',
+      type: 'guardiao_cosmico',
       minLevel: 20,
-      description: 'Alcance o Nível 20 e conquiste feitos notáveis na comunidade escolar'
+      minEpicAchievements: 8,
+      minStreakDays: 30,
+      description: 'Alcance o Nível 20, 8 Conquistas Épicas e Sequência de 30 Dias'
     },
-    loreQuote: '"Um verdadeiro guardião não usa poder para dominar, mas para proteger."',
+    loreQuote: '"Forjada com energia cósmica, essa moldura representa aqueles que protegem, acolhem e iluminam o caminho dos outros."',
     loreDetails: [
       {
         icon: '🔮',
-        title: 'Cristal de Ametista Cósmica',
-        desc: 'Engastado em ouro puro no topo, canaliza foco, clareza mental e serenidade.'
+        title: 'Cristal Estelar Superior',
+        desc: 'Lapidado em ametista viva com facetas radiantes que canalizam sabedoria, foco e discernimento ético.'
       },
       {
         icon: '🛡️',
-        title: 'Brasão Guardião & Louros',
-        desc: 'Simboliza as mãos unidas da turma acolhendo e blindando quem sofre injustiças.'
+        title: 'Emblema Guardião Sagrado',
+        desc: 'Escudo inferior forjado em ouro cósmico e ladeado por asas, honrando a proteção e união da comunidade.'
       },
       {
-        icon: '💫',
-        title: 'Anéis Orbitais Estelares',
-        desc: 'Trajetórias douradas com esferas astrais que giram em harmonia protetora.'
+        icon: '🪐',
+        title: 'Órbitas & Energia Cósmica',
+        desc: 'Planetas astrais e órbitas celestes luminosas que giram em torno do sentinela em perfeita harmonia.'
       }
     ],
     unlockRequirementsList: [
       {
-        label: 'Alcance o Nível 20',
+        label: 'Alcançar o Nível 20',
         currentProgressKey: 'level',
         target: 20,
-        icon: '🎯'
+        icon: '👑'
       },
       {
-        label: 'Conquistas Desbloqueadas',
-        currentProgressKey: 'achievements',
+        label: '8 Conquistas Épicas',
+        currentProgressKey: 'epic_achievements',
         target: 8,
         icon: '🏆'
       },
       {
-        label: 'Atividades / Quizzes',
-        currentProgressKey: 'quizzes',
-        target: 5,
-        icon: '📚'
+        label: 'Sequência de 30 Dias',
+        currentProgressKey: 'days',
+        target: 30,
+        icon: '🔥'
       }
     ],
     frameStyle: {
-      borderClass: 'p-2 bg-gradient-to-tr from-amber-300 via-purple-600 to-indigo-700',
-      glowClass: 'shadow-purple-500/70 shadow-2xl ring-2 ring-amber-300',
-      outerRingClass: 'border-2 border-amber-400',
-      svgOverlay: 'cosmic'
+      borderClass: 'p-0 bg-transparent',
+      glowClass: 'shadow-purple-500/60 shadow-2xl',
+      svgOverlay: 'guardiao_cosmico'
     }
   },
   {
@@ -605,6 +642,423 @@ export const ALL_COSMETIC_REWARDS: CosmeticRewardItem[] = [
     }
   },
 
+  // NOVIDADES EXPANSÃO: MOLDURAS TEMÁTICAS DE ALTO NÍVEL
+  {
+    id: 'frame_fenix_dourada',
+    category: 'frame',
+    name: 'Moldura Fênix Dourada',
+    description: 'Renascida das cinzas, representa a força de quem nunca desiste e sempre volta ainda mais forte.',
+    rarity: 'lendario',
+    iconPreview: '🔥',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 18,
+      description: 'Alcance o Nível 18 e complete os módulos educativos'
+    },
+    loreQuote: '"Das cinzas da adversidade ergue-se o guardião inquebrantável que jamais recua diante do ódio."',
+    loreDetails: [
+      {
+        icon: '🪽',
+        title: 'Asas da Fênix em Ouro Solar',
+        desc: 'Penas forjadas em ouro ardente que envolvem as laterais com proteção incondicional.'
+      },
+      {
+        icon: '💎',
+        title: 'Gema Rubi Solar Lapidada',
+        desc: 'No ápice da coroa, reflete determinação e coragem para intervir em momentos críticos.'
+      },
+      {
+        icon: '🛡️',
+        title: 'Brasão Alado do Renascimento',
+        desc: 'Coração de fogo eterno que simboliza superação e acolhimento perene.'
+      }
+    ],
+    unlockRequirementsList: [
+      {
+        label: 'Alcance o Nível 18',
+        currentProgressKey: 'level',
+        target: 18,
+        icon: '🎯'
+      },
+      {
+        label: 'Quizzes Concluídos',
+        currentProgressKey: 'quizzes',
+        target: 5,
+        icon: '📚'
+      },
+      {
+        label: 'Conquistas Desbloqueadas',
+        currentProgressKey: 'achievements',
+        target: 6,
+        icon: '🏆'
+      }
+    ],
+    frameStyle: {
+      borderClass: 'p-2 bg-gradient-to-tr from-amber-400 via-orange-500 to-red-600',
+      glowClass: 'shadow-orange-500/70 shadow-2xl ring-2 ring-amber-300',
+      outerRingClass: 'border-2 border-amber-400',
+      svgOverlay: 'fenix'
+    }
+  },
+  {
+    id: 'frame_guardiao_sombrio',
+    category: 'frame',
+    name: 'Moldura Guardião Sombrio',
+    description: 'Poucos alcançam essa moldura. A energia sombria a torna símbolo de mistério, estratégia e poder incomparável.',
+    rarity: 'mitico',
+    iconPreview: '🔮',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 19,
+      description: 'Alcance o Nível 19 e conquiste 8 insígnias lendárias'
+    },
+    loreQuote: '"Nas sombras do anonimato seguro, a sentinela vigia com paciência de predador e coração de protetor."',
+    loreDetails: [
+      {
+        icon: '⚡',
+        title: 'Espigões de Cristal Obsidiana',
+        desc: 'Estruturas pontiagudas de quartzo negro e violeta que interceptam ataques virtuais.'
+      },
+      {
+        icon: '👑',
+        title: 'Coroa Lapidada das Sombras',
+        desc: 'Cristal ametista escuro engastado em ferro negro temperado.'
+      },
+      {
+        icon: '🧭',
+        title: 'Bússola Estelar da Noite',
+        desc: 'Estrela de quatro pontas que aponta a rota ética mesmo na escuridão.'
+      }
+    ],
+    unlockRequirementsList: [
+      {
+        label: 'Alcance o Nível 19',
+        currentProgressKey: 'level',
+        target: 19,
+        icon: '🎯'
+      },
+      {
+        label: 'Conquistas Desbloqueadas',
+        currentProgressKey: 'achievements',
+        target: 8,
+        icon: '🏆'
+      },
+      {
+        label: 'Simulações Interativas',
+        currentProgressKey: 'simulations',
+        target: 6,
+        icon: '🎭'
+      }
+    ],
+    frameStyle: {
+      borderClass: 'p-2 bg-gradient-to-tr from-purple-900 via-fuchsia-800 to-indigo-950',
+      glowClass: 'shadow-purple-700/80 shadow-2xl ring-2 ring-purple-400',
+      outerRingClass: 'border-2 border-purple-500',
+      svgOverlay: 'sombrio'
+    }
+  },
+  {
+    id: 'frame_ondas_amizade',
+    category: 'frame',
+    name: 'Moldura Ondas da Amizade',
+    description: 'Inspirada no mar da empatia, essa moldura celebra laços verdadeiros e atitudes que fazem a diferença na vida dos outros.',
+    rarity: 'raro',
+    iconPreview: '🌊',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 10,
+      description: 'Alcance o Nível 10 e pratique exercícios de serenidade'
+    },
+    loreQuote: '"Como o oceano que abraça a praia suavemente, acolha quem precisa com calmaria e respeito."',
+    loreDetails: [
+      {
+        icon: '🌊',
+        title: 'Cristas Oceânicas de Espuma',
+        desc: 'Ondas em azul safira e ciano que circundam o avatar com fluidez contínua.'
+      },
+      {
+        icon: '⭐',
+        title: 'Estrela-do-Mar da Concórdia',
+        desc: 'Adorno náutico dourado que representa união entre diferentes personalidades.'
+      },
+      {
+        icon: '💧',
+        title: 'Lágrima de Safira das Profundezas',
+        desc: 'Gema líquida lapidada que limpa preconceitos e desentendimentos.'
+      }
+    ],
+    unlockRequirementsList: [
+      {
+        label: 'Alcance o Nível 10',
+        currentProgressKey: 'level',
+        target: 10,
+        icon: '🎯'
+      },
+      {
+        label: 'Sessões de Respiração',
+        currentProgressKey: 'breathing',
+        target: 2,
+        icon: '🫁'
+      }
+    ],
+    frameStyle: {
+      borderClass: 'p-1.5 bg-gradient-to-tr from-cyan-400 via-sky-500 to-blue-600',
+      glowClass: 'shadow-cyan-400/60 shadow-xl ring-2 ring-cyan-200',
+      outerRingClass: 'border-2 border-sky-300',
+      svgOverlay: 'ondas'
+    }
+  },
+  {
+    id: 'frame_eco_sentinela',
+    category: 'frame',
+    name: 'Moldura Eco Sentinela',
+    description: 'Tecnologia e natureza juntas para lembrar que pequenas atitudes podem transformar o mundo.',
+    rarity: 'incomum',
+    iconPreview: '🌱',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 6,
+      description: 'Desbloqueado ao atingir o Nível 6'
+    },
+    loreQuote: '"Grandes florestas nascem de pequenas mudas; grandes culturas de paz nascem de gestos gentis diários."',
+    loreDetails: [
+      {
+        icon: '🪨',
+        title: 'Aro em Pedra Rúnica Antiga',
+        desc: 'Base sólida entalhada com rebites de bronze e sulcos ancestrais.'
+      },
+      {
+        icon: '🌿',
+        title: 'Hera da Regeneração',
+        desc: 'Folhas verde-esmeralda vivas que crescem contornando o aro de proteção.'
+      },
+      {
+        icon: '🤖',
+        title: 'Robô Mascote Eco',
+        desc: 'Amigo cibernético sustentável segurando um broto de esperança no canto inferior.'
+      }
+    ],
+    unlockRequirementsList: [
+      {
+        label: 'Alcance o Nível 6',
+        currentProgressKey: 'level',
+        target: 6,
+        icon: '🎯'
+      },
+      {
+        label: 'Dias de Sequência',
+        currentProgressKey: 'days',
+        target: 2,
+        icon: '🔥'
+      }
+    ],
+    frameStyle: {
+      borderClass: 'p-1 bg-gradient-to-tr from-emerald-500 via-teal-400 to-green-600',
+      glowClass: 'shadow-emerald-500/40 shadow-lg ring-1 ring-emerald-300',
+      outerRingClass: 'border-2 border-emerald-300',
+      svgOverlay: 'eco'
+    }
+  },
+  {
+    id: 'frame_palhacada_divertida',
+    category: 'frame',
+    name: 'Moldura Palhaçada Divertida',
+    description: 'Para quem usa o humor como arma do bem! Espalhe alegria, respeito e boas risadas.',
+    rarity: 'lendario',
+    iconPreview: '🤡',
+    unlockCondition: {
+      type: 'simulation_count',
+      minCount: 3,
+      minLevel: 13,
+      description: 'Conclua 3 simulações interativas e alcance o Nível 13'
+    },
+    loreQuote: '"O riso sincero desarma os conflitos mais difíceis e une quem parecia distante."',
+    loreDetails: [
+      {
+        icon: '🎩',
+        title: 'Gorro Tricolor de Bobo da Corte',
+        desc: 'Chapéu festivo com guizos dourados de circo que tilintam a cada vitória.'
+      },
+      {
+        icon: '🕶️',
+        title: 'Disfarce Clássico de Meme',
+        desc: 'Óculos escuros 8-bit com nariz de batata e bigodinho cômico inconfundível.'
+      },
+      {
+        icon: '🐔',
+        title: 'Galinha de Borracha Estratégica',
+        desc: 'A sentinela mais ruidosa e carismática de todos os tempos.'
+      }
+    ],
+    unlockRequirementsList: [
+      {
+        label: 'Alcance o Nível 13',
+        currentProgressKey: 'level',
+        target: 13,
+        icon: '🎯'
+      },
+      {
+        label: 'Simulações Concluídas',
+        currentProgressKey: 'simulations',
+        target: 3,
+        icon: '🎭'
+      }
+    ],
+    frameStyle: {
+      borderClass: 'p-2 bg-gradient-to-tr from-amber-400 via-yellow-300 to-rose-500',
+      glowClass: 'shadow-amber-400/60 shadow-2xl ring-2 ring-yellow-200',
+      outerRingClass: 'border-2 border-amber-400',
+      svgOverlay: 'palhacada'
+    }
+  },
+  {
+    id: 'frame_gamer_sentinela',
+    category: 'frame',
+    name: 'Moldura Gamer Sentinela',
+    description: 'Play, evolua e seja um herói dentro e fora das telas. Cada missão conta!',
+    rarity: 'epico',
+    iconPreview: '🎮',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 14,
+      description: 'Alcance o Nível 14 e conclua 4 quizzes educativos'
+    },
+    loreQuote: '"Um verdadeiro pro player sabe que o fair play e o respeito à equipe valem mais que qualquer vitória."',
+    loreDetails: [
+      {
+        icon: '🎧',
+        title: 'Headset Pro com Orelhas de Gato Neon',
+        desc: 'Acabamento em magenta e ciano luminoso com microfone retrátil de comando.'
+      },
+      {
+        icon: '👾',
+        title: 'Corações & Controles 8-Bit',
+        desc: 'Partículas retro-pixel flutuando ao redor das laterais do perfil.'
+      },
+      {
+        icon: '⭐',
+        title: 'Estrela Dourada do Arcade',
+        desc: 'Medalha central retro que certifica o status de jogador exemplar.'
+      }
+    ],
+    unlockRequirementsList: [
+      {
+        label: 'Alcance o Nível 14',
+        currentProgressKey: 'level',
+        target: 14,
+        icon: '🎯'
+      },
+      {
+        label: 'Quizzes Completados',
+        currentProgressKey: 'quizzes',
+        target: 4,
+        icon: '🕹️'
+      }
+    ],
+    frameStyle: {
+      borderClass: 'p-1.5 bg-gradient-to-tr from-fuchsia-500 via-purple-600 to-cyan-400',
+      glowClass: 'shadow-fuchsia-500/60 shadow-xl ring-2 ring-cyan-300',
+      outerRingClass: 'border-2 border-fuchsia-400',
+      svgOverlay: 'gamer'
+    }
+  },
+  {
+    id: 'frame_coroa_sentinela',
+    category: 'frame',
+    name: 'Moldura Coroa do Sentinela',
+    description: 'A majestade absoluta da liderança escolar. Apenas os sentinelas mais lendários usam essa coroa imperial.',
+    rarity: 'supremo',
+    iconPreview: '👑',
+    unlockCondition: {
+      type: 'total_achievements',
+      minCount: 10,
+      minLevel: 20,
+      description: 'Alcance o Nível 20 e conquiste 10 insígnias'
+    },
+    frameStyle: {
+      borderClass: 'p-2.5 bg-gradient-to-tr from-amber-300 via-yellow-200 to-amber-600',
+      glowClass: 'shadow-amber-400/80 shadow-2xl ring-3 ring-amber-300',
+      outerRingClass: 'border-2 border-yellow-300',
+      svgOverlay: 'coroa_suprema'
+    }
+  },
+  {
+    id: 'frame_guardiao_dragao',
+    category: 'frame',
+    name: 'Moldura Guardião Dragão',
+    description: 'Escamas de dragão ancestral e chamas que incineram bullying e intolerância.',
+    rarity: 'mitico',
+    iconPreview: '🐉',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 18,
+      description: 'Alcance o Nível 18'
+    },
+    frameStyle: {
+      borderClass: 'p-2 bg-gradient-to-tr from-red-700 via-amber-500 to-orange-800',
+      glowClass: 'shadow-orange-600/70 shadow-2xl ring-2 ring-amber-400',
+      outerRingClass: 'border-2 border-red-500',
+      svgOverlay: 'dragao_fogo'
+    }
+  },
+  {
+    id: 'frame_vortice_dimensional',
+    category: 'frame',
+    name: 'Moldura Vórtice Dimensional',
+    description: 'Energia quântica em espiral que viaja através das dimensões da sabedoria.',
+    rarity: 'epico',
+    iconPreview: '🌀',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 11,
+      description: 'Alcance o Nível 11'
+    },
+    frameStyle: {
+      borderClass: 'p-1.5 bg-gradient-to-tr from-teal-400 via-indigo-600 to-purple-700',
+      glowClass: 'shadow-teal-400/50 shadow-xl ring-2 ring-purple-300',
+      outerRingClass: 'border-2 border-teal-300',
+      svgOverlay: 'portal_vortex'
+    }
+  },
+  {
+    id: 'frame_lanche_lendario',
+    category: 'frame',
+    name: 'Moldura Lanche Lendário',
+    description: 'Porque ninguém salva o colégio de estômago vazio! Pizza, taco e lanches da cantina.',
+    rarity: 'raro',
+    iconPreview: '🍕',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 7,
+      description: 'Alcance o Nível 7'
+    },
+    frameStyle: {
+      borderClass: 'p-1 bg-gradient-to-tr from-amber-400 via-orange-400 to-yellow-500',
+      glowClass: 'shadow-amber-400/40 shadow-md ring-1 ring-amber-300',
+      outerRingClass: 'border-2 border-amber-400',
+      svgOverlay: 'comida_delicia'
+    }
+  },
+  {
+    id: 'frame_caos_meme',
+    category: 'frame',
+    name: 'Moldura 100% Sem Paciência',
+    description: 'Para aqueles dias de provas consecutivas e grupos de trabalho que não entregam nada no prazo!',
+    rarity: 'epico',
+    iconPreview: '💢',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 12,
+      description: 'Alcance o Nível 12'
+    },
+    frameStyle: {
+      borderClass: 'p-1.5 bg-gradient-to-tr from-rose-600 via-amber-500 to-red-700',
+      glowClass: 'shadow-rose-500/60 shadow-xl ring-2 ring-amber-300',
+      outerRingClass: 'border-2 border-rose-500',
+      svgOverlay: 'caos_meme'
+    }
+  },
+
   // =========================================================================
   // 🛡️ 2. EMBLEMAS & BADGES DE VIDEOGAME
   // =========================================================================
@@ -732,6 +1186,44 @@ export const ALL_COSMETIC_REWARDS: CosmeticRewardItem[] = [
       badgeBorder: 'border-rose-400',
       ribbonText: 'EMPATIA',
       crestType: 'shield'
+    }
+  },
+  {
+    id: 'badge_detetive_sentinela',
+    category: 'badge',
+    name: 'Emblema Lupa Dourada do Detetive',
+    description: 'Insígnia de ouro reluzente concedida a quem desvendou a trilha investigativa e preventiva.',
+    rarity: 'raro',
+    iconPreview: '🕵️',
+    unlockCondition: {
+      type: 'achievement',
+      achievementId: 'secret_detetive_sentinela',
+      description: 'Desbloqueie a conquista secreta "Detetive do Sentinela"'
+    },
+    badgeStyle: {
+      badgeGradient: 'from-amber-600 via-yellow-700 to-amber-950',
+      badgeBorder: 'border-amber-300',
+      ribbonText: 'DETETIVE',
+      crestType: 'shield'
+    }
+  },
+  {
+    id: 'badge_precisao_absoluta',
+    category: 'badge',
+    name: 'Emblema Alvo Radiante Cósmico',
+    description: 'Comenda de precisão máxima por gabaritar múltiplos quizzes e decisões com excelência.',
+    rarity: 'lendario',
+    iconPreview: '🎯',
+    unlockCondition: {
+      type: 'achievement',
+      achievementId: 'secret_precisao_absoluta',
+      description: 'Desbloqueie a conquista secreta "Precisão Absoluta"'
+    },
+    badgeStyle: {
+      badgeGradient: 'from-purple-800 via-rose-700 to-amber-600',
+      badgeBorder: 'border-amber-300',
+      ribbonText: 'PRECISÃO',
+      crestType: 'star'
     }
   },
   {
@@ -949,9 +1441,286 @@ export const ALL_COSMETIC_REWARDS: CosmeticRewardItem[] = [
     }
   },
 
+  // NOVIDADES EXPANSÃO: EMBLEMAS TEMÁTICOS DE VIDEOGAME
+  {
+    id: 'badge_escudo_guardiao',
+    category: 'badge',
+    name: 'Escudo do Guardião da Honra',
+    description: 'Forjado em prata reluzente e safira, concedido a quem sempre defende os colegas.',
+    rarity: 'raro',
+    iconPreview: '🛡️',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 7,
+      description: 'Alcance o Nível 7'
+    },
+    badgeStyle: {
+      badgeGradient: 'from-blue-700 via-indigo-800 to-slate-900',
+      badgeBorder: 'border-cyan-300',
+      ribbonText: 'HONRA',
+      crestType: 'shield'
+    }
+  },
+  {
+    id: 'badge_nucleo_energia',
+    category: 'badge',
+    name: 'Núcleo de Plasma da Sentinela',
+    description: 'Orbe pulsar de alta voltagem que irradia energia e proatividade.',
+    rarity: 'epico',
+    iconPreview: '🔮',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 11,
+      description: 'Alcance o Nível 11'
+    },
+    badgeStyle: {
+      badgeGradient: 'from-fuchsia-700 via-purple-800 to-indigo-950',
+      badgeBorder: 'border-fuchsia-400',
+      ribbonText: 'ENERGIA',
+      crestType: 'orb'
+    }
+  },
+  {
+    id: 'badge_coroa_suprema',
+    category: 'badge',
+    name: 'Coroa Soberana dos Campeões',
+    description: 'A mais alta comenda estudantil, conferida à nobreza do caráter e da integridade.',
+    rarity: 'supremo',
+    iconPreview: '👑',
+    unlockCondition: {
+      type: 'total_achievements',
+      minCount: 10,
+      minLevel: 20,
+      description: 'Alcance o Nível 20 e conquiste 10 insígnias'
+    },
+    badgeStyle: {
+      badgeGradient: 'from-amber-400 via-yellow-500 to-amber-700',
+      badgeBorder: 'border-yellow-200',
+      ribbonText: 'SOBERANO',
+      crestType: 'crown'
+    }
+  },
+  {
+    id: 'badge_fragmento_cosmico',
+    category: 'badge',
+    name: 'Fragmento Astral Cósmico',
+    description: 'Estrela cadente cristalizada que brilha com a imensidão da sabedoria escolar.',
+    rarity: 'lendario',
+    iconPreview: '⭐',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 16,
+      description: 'Alcance o Nível 16'
+    },
+    badgeStyle: {
+      badgeGradient: 'from-indigo-800 via-purple-900 to-slate-950',
+      badgeBorder: 'border-cyan-300',
+      ribbonText: 'COSMOS',
+      crestType: 'star'
+    }
+  },
+  {
+    id: 'badge_chama_fenix',
+    category: 'badge',
+    name: 'Brasão da Fênix Ardente',
+    description: 'Símbolo do renascimento e da coragem indomável em superar qualquer adversidade.',
+    rarity: 'lendario',
+    iconPreview: '🔥',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 17,
+      description: 'Alcance o Nível 17'
+    },
+    badgeStyle: {
+      badgeGradient: 'from-orange-600 via-amber-600 to-red-800',
+      badgeBorder: 'border-amber-300',
+      ribbonText: 'FÊNIX',
+      crestType: 'phoenix'
+    }
+  },
+  {
+    id: 'badge_cristal_serenidade',
+    category: 'badge',
+    name: 'Cristal da Serenidade Viva',
+    description: 'Gema translúcida lapidada que traz clareza mental e tranquilidade em momentos tensos.',
+    rarity: 'raro',
+    iconPreview: '💎',
+    unlockCondition: {
+      type: 'breathing_count',
+      minCount: 3,
+      description: 'Complete 3 sessões de respiração'
+    },
+    badgeStyle: {
+      badgeGradient: 'from-teal-600 via-cyan-700 to-emerald-900',
+      badgeBorder: 'border-teal-300',
+      ribbonText: 'SERENO',
+      crestType: 'gem'
+    }
+  },
+  {
+    id: 'badge_mente_estrategica',
+    category: 'badge',
+    name: 'Coruja Tática dos Quizzes',
+    description: 'Insígnia heráldica para quem analisa situações com lógica afiada e discernimento.',
+    rarity: 'epico',
+    iconPreview: '🦉',
+    unlockCondition: {
+      type: 'quiz_count',
+      minCount: 4,
+      minLevel: 10,
+      description: 'Complete 4 quizzes e atinja o Nível 10'
+    },
+    badgeStyle: {
+      badgeGradient: 'from-purple-800 via-indigo-900 to-slate-950',
+      badgeBorder: 'border-indigo-300',
+      ribbonText: 'TÁTICA',
+      crestType: 'owl'
+    }
+  },
+  {
+    id: 'badge_trofeu_excelencia',
+    category: 'badge',
+    name: 'Taça da Excelência Ética',
+    description: 'Troféu áureo concedido aos maiores exemplos de conduta, cidadania e coleguismo.',
+    rarity: 'lendario',
+    iconPreview: '🏆',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 19,
+      description: 'Alcance o Nível 19'
+    },
+    badgeStyle: {
+      badgeGradient: 'from-amber-500 via-yellow-600 to-amber-800',
+      badgeBorder: 'border-yellow-200',
+      ribbonText: 'GLÓRIA',
+      crestType: 'trophy'
+    }
+  },
+  {
+    id: 'badge_mascara_teatral',
+    category: 'badge',
+    name: 'Máscara Teatral da Empatia',
+    description: 'Para quem sabe se colocar no lugar do outro e compreender seus sentimentos.',
+    rarity: 'raro',
+    iconPreview: '🎭',
+    unlockCondition: {
+      type: 'simulation_count',
+      minCount: 4,
+      description: 'Complete 4 simulações interativas'
+    },
+    badgeStyle: {
+      badgeGradient: 'from-rose-700 via-purple-800 to-indigo-900',
+      badgeBorder: 'border-rose-300',
+      ribbonText: 'EMPATIA',
+      crestType: 'mask'
+    }
+  },
+  {
+    id: 'badge_eco_natureza',
+    category: 'badge',
+    name: 'Broto Tecnológico Eco',
+    description: 'Medalha em bronze e esmeralda para os guardiões do bem-estar e da sustentabilidade.',
+    rarity: 'incomum',
+    iconPreview: '🌱',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 5,
+      description: 'Desbloqueado ao atingir o Nível 5'
+    },
+    badgeStyle: {
+      badgeGradient: 'from-emerald-700 via-green-800 to-teal-950',
+      badgeBorder: 'border-emerald-400',
+      ribbonText: 'ECO',
+      crestType: 'leaf'
+    }
+  },
+  {
+    id: 'badge_ondas_oceano',
+    category: 'badge',
+    name: 'Mar Profundo da Amizade',
+    description: 'Gotas e marés cristalinas que acolhem e integram todos na turma.',
+    rarity: 'raro',
+    iconPreview: '🌊',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 9,
+      description: 'Desbloqueado ao atingir o Nível 9'
+    },
+    badgeStyle: {
+      badgeGradient: 'from-cyan-700 via-sky-800 to-blue-950',
+      badgeBorder: 'border-sky-300',
+      ribbonText: 'AMIZADE',
+      crestType: 'water'
+    }
+  },
+  {
+    id: 'badge_gamer_retro',
+    category: 'badge',
+    name: 'Controle Dourado Arcade',
+    description: 'Certificado de honra para o gamer consciente que joga limpo e repele toxicidade.',
+    rarity: 'epico',
+    iconPreview: '🎮',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 13,
+      description: 'Desbloqueado ao atingir o Nível 13'
+    },
+    badgeStyle: {
+      badgeGradient: 'from-fuchsia-700 via-purple-800 to-indigo-900',
+      badgeBorder: 'border-fuchsia-300',
+      ribbonText: 'ARCADE',
+      crestType: 'sparkle'
+    }
+  },
+  {
+    id: 'badge_riso_dourado',
+    category: 'badge',
+    name: 'Guizo Dourado do Riso',
+    description: 'Para quem alegra o dia de todos com bom humor respeitoso e inteligência cómica.',
+    rarity: 'lendario',
+    iconPreview: '🤡',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 15,
+      description: 'Desbloqueado ao atingir o Nível 15'
+    },
+    badgeStyle: {
+      badgeGradient: 'from-amber-400 via-rose-500 to-yellow-600',
+      badgeBorder: 'border-amber-200',
+      ribbonText: 'ALEGRIA',
+      crestType: 'crown'
+    }
+  },
+
   // =========================================================================
   // 🔵 3. ÍCONES DE AVATAR (ICONS)
   // =========================================================================
+  {
+    id: 'icon_raio_sabedoria',
+    category: 'icon',
+    name: 'Raio Cósmico da Sabedoria',
+    description: 'Ícone elétrico dourado pulsante concedido pelo combo contínuo de aprendizado.',
+    rarity: 'epico',
+    iconPreview: '⚡',
+    unlockCondition: {
+      type: 'achievement',
+      achievementId: 'secret_combo_conhecimento',
+      description: 'Desbloqueie a conquista secreta "Combo do Conhecimento"'
+    }
+  },
+  {
+    id: 'icon_bussola_astral',
+    category: 'icon',
+    name: 'Bússola Astral do Explorador',
+    description: 'Instrumento náutico místico que guiou o desbravamento de todas as áreas pedagógicas.',
+    rarity: 'raro',
+    iconPreview: '🌙',
+    unlockCondition: {
+      type: 'achievement',
+      achievementId: 'secret_explorador_noturno_areas',
+      description: 'Desbloqueie a conquista secreta "Explorador Oculto"'
+    }
+  },
   {
     id: 'icon_anonimo_padrao',
     category: 'icon',
@@ -1200,9 +1969,184 @@ export const ALL_COSMETIC_REWARDS: CosmeticRewardItem[] = [
     }
   },
 
+  // NOVIDADES EXPANSÃO: ÍCONES EXCLUSIVOS DE VIDEOGAME
+  {
+    id: 'icon_robo_eco',
+    category: 'icon',
+    name: 'Robô Eco Sustentável',
+    description: 'Mascote cibernético que cultiva atitudes saudáveis e cuida do ambiente escolar.',
+    rarity: 'incomum',
+    iconPreview: '🤖',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 6,
+      description: 'Desbloqueado ao atingir o Nível 6'
+    }
+  },
+  {
+    id: 'icon_sentinela_radical',
+    category: 'icon',
+    name: 'Sentinela Radical da Atitude',
+    description: 'Óculos de sol pixelados para encarar desafios com estilo, confiança e respeito.',
+    rarity: 'incomum',
+    iconPreview: '🕶️',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 8,
+      description: 'Desbloqueado ao atingir o Nível 8'
+    }
+  },
+  {
+    id: 'icon_fatia_pizza',
+    category: 'icon',
+    name: 'Fatia Quente da Amizade',
+    description: 'Porque a melhor hora do intervalo é compartilhar o lanche sem deixar ninguém de fora!',
+    rarity: 'incomum',
+    iconPreview: '🍕',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 7,
+      description: 'Desbloqueado ao atingir o Nível 7'
+    }
+  },
+  {
+    id: 'icon_alien_amigavel',
+    category: 'icon',
+    name: 'Alienígena da Paz Cósmica',
+    description: 'Visitante interestelar com grandes olhos curiosos que celebra a diversidade de todas as espécies.',
+    rarity: 'raro',
+    iconPreview: '👽',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 10,
+      description: 'Desbloqueado ao atingir o Nível 10'
+    }
+  },
+  {
+    id: 'icon_controle_gamer',
+    category: 'icon',
+    name: 'Controle Retrô Gamer',
+    description: 'Game pad retrô com botões dourados que comanda a vitória do fair play.',
+    rarity: 'epico',
+    iconPreview: '🎮',
+    unlockCondition: {
+      type: 'quiz_count',
+      minCount: 3,
+      minLevel: 12,
+      description: 'Complete 3 quizzes e alcance o Nível 12'
+    }
+  },
+  {
+    id: 'icon_gato_gamer',
+    category: 'icon',
+    name: 'Gatinho Gamer Pro',
+    description: 'Felino streamer com headset de orelhinhas luminosas que não aceita grosserias no chat.',
+    rarity: 'epico',
+    iconPreview: '🐱',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 14,
+      description: 'Desbloqueado ao atingir o Nível 14'
+    }
+  },
+  {
+    id: 'icon_mago_arcano',
+    category: 'icon',
+    name: 'Mago Arcano da Sabedoria',
+    description: 'Capuz estrelado e cajado arcano com feitiços contra notícias falsas e boatos.',
+    rarity: 'epico',
+    iconPreview: '🧙',
+    unlockCondition: {
+      type: 'perfect_quiz_count',
+      minCount: 2,
+      description: 'Acerte 100% em pelo menos 2 quizzes'
+    }
+  },
+  {
+    id: 'icon_frango_comico',
+    category: 'icon',
+    name: 'Frango Cômico da Paz',
+    description: 'A sentinela de borracha que faz barulho estridente contra injustiças e faz a turma rir.',
+    rarity: 'lendario',
+    iconPreview: '🐔',
+    unlockCondition: {
+      type: 'simulation_count',
+      minCount: 5,
+      description: 'Complete 5 simulações interativas'
+    }
+  },
+  {
+    id: 'icon_elmo_espartano',
+    category: 'icon',
+    name: 'Elmo do Defensor Espartano',
+    description: 'Elmo de bronze dourado com crista escarlate de coragem inabalável.',
+    rarity: 'lendario',
+    iconPreview: '🪖',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 18,
+      description: 'Desbloqueado ao atingir o Nível 18'
+    }
+  },
+  {
+    id: 'icon_dragao_mistico',
+    category: 'icon',
+    name: 'Dragão Místico Protetor',
+    description: 'Criatura mítica de olhos incandescentes que protege o colégio com suas asas de fogo.',
+    rarity: 'mitico',
+    iconPreview: '🐉',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 19,
+      description: 'Desbloqueado ao atingir o Nível 19'
+    }
+  },
+  {
+    id: 'icon_ampulheta',
+    category: 'icon',
+    name: 'Ampulheta Cósmica do Tempo',
+    description: 'Artefato ancestral que flui areia estelar ensinando que a paciência resolve qualquer impasse.',
+    rarity: 'mitico',
+    iconPreview: '⏳',
+    unlockCondition: {
+      type: 'breathing_count',
+      minCount: 4,
+      minLevel: 16,
+      description: 'Complete 4 sessões de respiração e alcance o Nível 16'
+    }
+  },
+  {
+    id: 'icon_portal_dimensional',
+    category: 'icon',
+    name: 'Vórtice Dimensional Infinito',
+    description: 'Singularidade cósmica que conecta todas as dimensões da sabedoria e do conhecimento humano.',
+    rarity: 'supremo',
+    iconPreview: '🌀',
+    unlockCondition: {
+      type: 'total_achievements',
+      minCount: 10,
+      minLevel: 20,
+      description: 'Alcance o Nível 20 e conquiste 10 insígnias'
+    }
+  },
+
   // =========================================================================
   // 🏷️ 4. TÍTULOS COSMÉTICOS (TITLES)
   // =========================================================================
+  {
+    id: 'title_lenda_oculta',
+    category: 'title',
+    name: '✦ Lenda Oculta ✦',
+    customTitleText: '✦ Lenda Oculta ✦',
+    description: 'O título mais misterioso e respeitado de todo o ecossistema Sentinela Escolar.',
+    rarity: 'lendario',
+    iconPreview: '👑',
+    unlockCondition: {
+      type: 'achievement',
+      achievementId: 'secret_lenda_oculta',
+      description: 'Desbloqueie a conquista secreta "Lenda Oculta"'
+    }
+  },
   {
     id: 'title_nivel_dinamico',
     category: 'title',
@@ -1429,6 +2373,206 @@ export const ALL_COSMETIC_REWARDS: CosmeticRewardItem[] = [
     }
   },
 
+  // NOVIDADES EXPANSÃO: TÍTULOS DIVERTIDOS, GAMER E ÉPICOS
+  {
+    id: 'title_rei_do_quiz',
+    category: 'title',
+    name: 'Rei do Quiz',
+    customTitleText: 'Rei do Quiz',
+    description: 'Para quem domina as perguntas com rapidez cirúrgica e sem pestanejar.',
+    rarity: 'incomum',
+    iconPreview: '🎯',
+    unlockCondition: {
+      type: 'quiz_count',
+      minCount: 3,
+      description: 'Conclua 3 quizzes educativos'
+    }
+  },
+  {
+    id: 'title_lenda_wifi',
+    category: 'title',
+    name: 'Lenda do Wi-Fi Escolar',
+    customTitleText: 'Lenda do Wi-Fi',
+    description: 'Sempre conectado e o primeiro a saber das novidades da turma.',
+    rarity: 'incomum',
+    iconPreview: '📶',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 3,
+      description: 'Desbloqueado ao atingir o Nível 3'
+    }
+  },
+  {
+    id: 'title_eco_guardiao',
+    category: 'title',
+    name: 'Eco-Guardião da Terra',
+    customTitleText: 'Eco-Guardião',
+    description: 'Protetor fervoroso do meio ambiente e da sustentabilidade na escola.',
+    rarity: 'incomum',
+    iconPreview: '🌱',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 5,
+      description: 'Desbloqueado ao atingir o Nível 5'
+    }
+  },
+  {
+    id: 'title_so_mais_uma',
+    category: 'title',
+    name: 'Mestre do "Só Mais Uma"',
+    customTitleText: 'Só Mais Uma Partida',
+    description: 'A clássica promessa de quem nunca quer parar antes de fechar o desafio com perfeição.',
+    rarity: 'raro',
+    iconPreview: '🎮',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 8,
+      description: 'Desbloqueado ao atingir o Nível 8'
+    }
+  },
+  {
+    id: 'title_cacador_xp',
+    category: 'title',
+    name: 'Caçador Insaciável de XP',
+    customTitleText: 'Caçador de XP',
+    description: 'Ganha pontos em tudo o que faz e lidera o placar com orgulho.',
+    rarity: 'raro',
+    iconPreview: '⚡',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 9,
+      description: 'Desbloqueado ao atingir o Nível 9'
+    }
+  },
+  {
+    id: 'title_memeiro_oficial',
+    category: 'title',
+    name: 'Memeiro Oficial da Turma',
+    customTitleText: 'Memeiro Oficial',
+    description: 'Usa piadas saudáveis para aliviar o estresse da galera antes das provas.',
+    rarity: 'raro',
+    iconPreview: '🤡',
+    unlockCondition: {
+      type: 'simulation_count',
+      minCount: 3,
+      description: 'Conclua 3 simulações interativas'
+    }
+  },
+  {
+    id: 'title_comandante_amizade',
+    category: 'title',
+    name: 'Comandante da Amizade',
+    customTitleText: 'Comandante da Amizade',
+    description: 'Oceano de empatia que acolhe novos colegas e não deixa ninguém solitário.',
+    rarity: 'raro',
+    iconPreview: '🌊',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 10,
+      description: 'Desbloqueado ao atingir o Nível 10'
+    }
+  },
+  {
+    id: 'title_sem_sono',
+    category: 'title',
+    name: 'Sentinela Sem Sono',
+    customTitleText: 'Sentinela Sem Sono',
+    description: 'Movido a foco, dedicação e litros de entusiasmo para aprender.',
+    rarity: 'raro',
+    iconPreview: '☕',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 11,
+      description: 'Desbloqueado ao atingir o Nível 11'
+    }
+  },
+  {
+    id: 'title_sem_paciencia',
+    category: 'title',
+    name: '100% Sem Paciência para Bullying',
+    customTitleText: '100% Sem Paciência',
+    description: 'Tolerância zero absoluta para fofocas, injustiças e covardias!',
+    rarity: 'epico',
+    iconPreview: '💢',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 13,
+      description: 'Desbloqueado ao atingir o Nível 13'
+    }
+  },
+  {
+    id: 'title_devorador_quizzes',
+    category: 'title',
+    name: 'Devorador de Quizzes',
+    customTitleText: 'Devorador de Quizzes',
+    description: 'Completou todas as trilhas com sede inabalável de saber.',
+    rarity: 'epico',
+    iconPreview: '📚',
+    unlockCondition: {
+      type: 'quiz_count',
+      minCount: 5,
+      minLevel: 14,
+      description: 'Conclua todos os 5 quizzes e atinja o Nível 14'
+    }
+  },
+  {
+    id: 'title_fenix_imortal',
+    category: 'title',
+    name: 'Fênix Imortal das Cinzas',
+    customTitleText: 'Fênix Imortal',
+    description: 'A prova viva de que podemos recomeçar e nos tornar mais fortes a cada obstáculo.',
+    rarity: 'lendario',
+    iconPreview: '🔥',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 17,
+      description: 'Desbloqueado ao atingir o Nível 17'
+    }
+  },
+  {
+    id: 'title_guardiao_absoluto',
+    category: 'title',
+    name: 'Guardião Absoluto da Honra',
+    customTitleText: 'Guardião Absoluto',
+    description: 'Escudo inquebrantável respeitado por professores e colegas.',
+    rarity: 'lendario',
+    iconPreview: '🛡️',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 18,
+      description: 'Desbloqueado ao atingir o Nível 18'
+    }
+  },
+  {
+    id: 'title_entidade_conhecimento',
+    category: 'title',
+    name: 'Entidade do Conhecimento',
+    customTitleText: 'Entidade do Saber',
+    description: 'Nível mitológico de discernimento e lucidez ética.',
+    rarity: 'mitico',
+    iconPreview: '🔮',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 19,
+      description: 'Desbloqueado ao atingir o Nível 19'
+    }
+  },
+  {
+    id: 'title_soberano_cosmico',
+    category: 'title',
+    name: '✦ Soberano Cósmico ✦',
+    customTitleText: '✦ Soberano Cósmico ✦',
+    description: 'O universo da convivência e do respeito em sua expressão mais pura e magnífica.',
+    rarity: 'supremo',
+    iconPreview: '🌌',
+    unlockCondition: {
+      type: 'total_achievements',
+      minCount: 10,
+      minLevel: 20,
+      description: 'Alcance o Nível 20 e conquiste 10 insígnias'
+    }
+  },
+
   // =========================================================================
   // ✨ 5. EFEITOS VISUAIS & AURAS (EFFECTS)
   // =========================================================================
@@ -1442,6 +2586,24 @@ export const ALL_COSMETIC_REWARDS: CosmeticRewardItem[] = [
     unlockCondition: {
       type: 'default',
       description: 'Disponível desde o Nível 1'
+    }
+  },
+  {
+    id: 'effect_mente_atenta_aurora',
+    category: 'effect',
+    name: 'Aurora Boreal da Mente Atenta',
+    description: 'Ondas boreais em azul celeste e esmeralda emanando do avatar em foco pleno.',
+    rarity: 'epico',
+    iconPreview: '🧠',
+    unlockCondition: {
+      type: 'achievement',
+      achievementId: 'secret_mente_atenta',
+      description: 'Desbloqueie a conquista secreta "Mente Atenta"'
+    },
+    effectStyle: {
+      animationClass: 'animate-pulse duration-700',
+      glowClass: 'bg-gradient-to-tr from-cyan-400/40 via-teal-300/40 to-indigo-500/40 blur-lg',
+      particleEmoji: '✨'
     }
   },
   {
@@ -1586,6 +2748,174 @@ export const ALL_COSMETIC_REWARDS: CosmeticRewardItem[] = [
       animationClass: 'animate-pulse',
       glowClass: 'bg-gradient-to-r from-red-500/40 via-amber-400/40 via-cyan-400/40 to-purple-600/40 blur-xl',
       particleEmoji: '👑'
+    }
+  },
+
+  // NOVIDADES EXPANSÃO: EFEITOS VISUAIS E AURAS DINÂMICAS
+  {
+    id: 'effect_folhas_eco',
+    category: 'effect',
+    name: 'Espiral de Folhas Eco',
+    description: 'Folhas verdes suaves e brotos que giram ao redor do perfil trazendo frescor.',
+    rarity: 'incomum',
+    iconPreview: '🍃',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 4,
+      description: 'Desbloqueado ao atingir o Nível 4'
+    },
+    effectStyle: {
+      animationClass: 'animate-spin duration-3000',
+      glowClass: 'bg-emerald-500/25 blur-sm',
+      particleEmoji: '🍃'
+    }
+  },
+  {
+    id: 'effect_ondas_oceano',
+    category: 'effect',
+    name: 'Bolhas & Marés da Amizade',
+    description: 'Bolhas azuis translúcidas que sobem suavemente pelo avatar em clima de calmaria.',
+    rarity: 'raro',
+    iconPreview: '🫧',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 7,
+      description: 'Desbloqueado ao atingir o Nível 7'
+    },
+    effectStyle: {
+      animationClass: 'animate-bounce duration-1000',
+      glowClass: 'bg-cyan-400/30 blur-md',
+      particleEmoji: '🫧'
+    }
+  },
+  {
+    id: 'effect_pixels_gamer',
+    category: 'effect',
+    name: 'Pixels Flutuantes Retrô Gamer',
+    description: 'Partículas 8-bit e coraçõezinhos pixelados que sobem com estilo arcade.',
+    rarity: 'epico',
+    iconPreview: '👾',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 11,
+      description: 'Desbloqueado ao atingir o Nível 11'
+    },
+    effectStyle: {
+      animationClass: 'animate-pulse',
+      glowClass: 'bg-fuchsia-500/40 blur-md',
+      particleEmoji: '👾'
+    }
+  },
+  {
+    id: 'effect_raios_trovao',
+    category: 'effect',
+    name: 'Arcos de Plasma do Trovão',
+    description: 'Descargas de energia ciano e violeta que pulsam em alta velocidade.',
+    rarity: 'epico',
+    iconPreview: '⚡',
+    unlockCondition: {
+      type: 'quiz_count',
+      minCount: 3,
+      minLevel: 13,
+      description: 'Complete 3 quizzes e alcance o Nível 13'
+    },
+    effectStyle: {
+      animationClass: 'animate-ping duration-700',
+      glowClass: 'bg-sky-400/45 blur-lg',
+      particleEmoji: '⚡'
+    }
+  },
+  {
+    id: 'effect_labaredas_fenix',
+    category: 'effect',
+    name: 'Labaredas da Fênix Solar',
+    description: 'Chamas douradas ardentes que emanam calor, coragem e renovação constante.',
+    rarity: 'lendario',
+    iconPreview: '🔥',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 16,
+      description: 'Desbloqueado ao atingir o Nível 16'
+    },
+    effectStyle: {
+      animationClass: 'animate-bounce duration-500',
+      glowClass: 'bg-amber-400/50 blur-lg',
+      particleEmoji: '🔥'
+    }
+  },
+  {
+    id: 'effect_confete_festivo',
+    category: 'effect',
+    name: 'Chuva de Confete & Risadas',
+    description: 'Festa de cores e alegria contagiante para quem espalha bom humor.',
+    rarity: 'lendario',
+    iconPreview: '🎉',
+    unlockCondition: {
+      type: 'simulation_count',
+      minCount: 4,
+      minLevel: 15,
+      description: 'Complete 4 simulações e atinja o Nível 15'
+    },
+    effectStyle: {
+      animationClass: 'animate-pulse',
+      glowClass: 'bg-yellow-400/40 blur-md',
+      particleEmoji: '🎉'
+    }
+  },
+  {
+    id: 'effect_nevoa_espectral',
+    category: 'effect',
+    name: 'Névoa Sombria Espectral',
+    description: 'Gases etéreos em violeta escuro e ametista que envolvem o avatar em mistério.',
+    rarity: 'mitico',
+    iconPreview: '🔮',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 19,
+      description: 'Desbloqueado ao atingir o Nível 19'
+    },
+    effectStyle: {
+      animationClass: 'animate-pulse duration-1000',
+      glowClass: 'bg-purple-800/60 blur-xl',
+      particleEmoji: '🔮'
+    }
+  },
+  {
+    id: 'effect_constelacao_cosmica',
+    category: 'effect',
+    name: 'Constelação Cósmica Giratória',
+    description: 'Órbitas estelares em espiral com poeira galáctica cintilante.',
+    rarity: 'mitico',
+    iconPreview: '🌌',
+    unlockCondition: {
+      type: 'achievement',
+      achievementId: 'speedrunner_sabedoria',
+      minLevel: 18,
+      description: 'Conquiste "Detetive Cibernético" e alcance Nível 18'
+    },
+    effectStyle: {
+      animationClass: 'animate-spin duration-[4000ms]',
+      glowClass: 'bg-indigo-500/50 blur-xl',
+      particleEmoji: '✨'
+    }
+  },
+  {
+    id: 'effect_brilho_diamante',
+    category: 'effect',
+    name: 'Resplendor Supremo de Diamante',
+    description: 'Feixes prismáticos de luz branca e dourada de pura majestade.',
+    rarity: 'supremo',
+    iconPreview: '💎',
+    unlockCondition: {
+      type: 'total_achievements',
+      minCount: 10,
+      minLevel: 20,
+      description: 'Alcance o Nível 20 e conquiste 10 insígnias'
+    },
+    effectStyle: {
+      animationClass: 'animate-pulse',
+      glowClass: 'bg-cyan-200/60 blur-xl ring-2 ring-white',
+      particleEmoji: '💎'
     }
   },
 
@@ -1763,6 +3093,143 @@ export const ALL_COSMETIC_REWARDS: CosmeticRewardItem[] = [
       glowColor: 'bg-cyan-500/20',
       accentBadge: 'bg-cyan-500/30 text-cyan-200'
     }
+  },
+
+  // NOVIDADES EXPANSÃO: TEMAS DE PERFIL COM TEMÁTICAS DE VIDEOGAME
+  {
+    id: 'theme_eco_natureza',
+    category: 'theme',
+    name: 'Eco Floresta Tecnológica',
+    description: 'Gradiente revigorante em verde musgo, esmeralda e detalhes em jade luminoso.',
+    rarity: 'incomum',
+    iconPreview: '🌱',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 5,
+      description: 'Desbloqueado ao atingir o Nível 5'
+    },
+    themeStyle: {
+      cardGradient: 'from-emerald-950 via-teal-900 to-green-950',
+      borderHighlight: 'border-emerald-400/60',
+      glowColor: 'bg-emerald-500/25',
+      accentBadge: 'bg-emerald-500/30 text-emerald-200'
+    }
+  },
+  {
+    id: 'theme_ondas_oceano',
+    category: 'theme',
+    name: 'Oceano Profundo da Amizade',
+    description: 'Tons marinhos de azul abissal, ciano turquesa e reflexos de madrepérola.',
+    rarity: 'raro',
+    iconPreview: '🌊',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 8,
+      description: 'Desbloqueado ao atingir o Nível 8'
+    },
+    themeStyle: {
+      cardGradient: 'from-sky-950 via-cyan-900 to-blue-950',
+      borderHighlight: 'border-cyan-400/60',
+      glowColor: 'bg-cyan-500/25',
+      accentBadge: 'bg-cyan-500/30 text-cyan-200'
+    }
+  },
+  {
+    id: 'theme_gamer_arcade',
+    category: 'theme',
+    name: 'Gamer Arcade Cyberpunk',
+    description: 'Fundo escuro tecnológico com realces neon em violeta, fúcsia e ciano elétrico.',
+    rarity: 'epico',
+    iconPreview: '🎮',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 13,
+      description: 'Desbloqueado ao atingir o Nível 13'
+    },
+    themeStyle: {
+      cardGradient: 'from-fuchsia-950 via-purple-950 to-indigo-950',
+      borderHighlight: 'border-fuchsia-400/70',
+      glowColor: 'bg-fuchsia-500/30',
+      accentBadge: 'bg-fuchsia-500/30 text-fuchsia-200'
+    }
+  },
+  {
+    id: 'theme_palhacada_carnaval',
+    category: 'theme',
+    name: 'Carnaval Dourado & Risos',
+    description: 'Gradiente festivo em ouro, rubi e âmbar quente que celebra o alto astral.',
+    rarity: 'lendario',
+    iconPreview: '🤡',
+    unlockCondition: {
+      type: 'simulation_count',
+      minCount: 4,
+      minLevel: 14,
+      description: 'Conclua 4 simulações e alcance o Nível 14'
+    },
+    themeStyle: {
+      cardGradient: 'from-amber-950 via-rose-950 to-yellow-950',
+      borderHighlight: 'border-amber-400/70',
+      glowColor: 'bg-amber-500/30',
+      accentBadge: 'bg-amber-500/30 text-amber-200'
+    }
+  },
+  {
+    id: 'theme_fenix_solar',
+    category: 'theme',
+    name: 'Fênix Solar & Fogo Eterno',
+    description: 'Gradiente incandescente em rubi solar, laranja magma e ouro brilhante.',
+    rarity: 'lendario',
+    iconPreview: '🔥',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 17,
+      description: 'Desbloqueado ao atingir o Nível 17'
+    },
+    themeStyle: {
+      cardGradient: 'from-red-950 via-orange-950 to-amber-950',
+      borderHighlight: 'border-orange-400/70',
+      glowColor: 'bg-orange-500/30',
+      accentBadge: 'bg-orange-500/30 text-orange-200'
+    }
+  },
+  {
+    id: 'theme_guardiao_sombrio',
+    category: 'theme',
+    name: 'Noite Eterna das Sombras',
+    description: 'Preto obsidiana profundo com linhas de força em ametista e névoa violeta.',
+    rarity: 'mitico',
+    iconPreview: '🔮',
+    unlockCondition: {
+      type: 'level',
+      minLevel: 19,
+      description: 'Desbloqueado ao atingir o Nível 19'
+    },
+    themeStyle: {
+      cardGradient: 'from-purple-950 via-slate-950 to-indigo-950',
+      borderHighlight: 'border-purple-400/70',
+      glowColor: 'bg-purple-600/30',
+      accentBadge: 'bg-purple-500/30 text-purple-200'
+    }
+  },
+  {
+    id: 'theme_coroa_suprema',
+    category: 'theme',
+    name: 'Suprema Majestade Imperial',
+    description: 'O ápice estético: gradiente em ouro imperial, platina e auréola cósmica.',
+    rarity: 'supremo',
+    iconPreview: '👑',
+    unlockCondition: {
+      type: 'total_achievements',
+      minCount: 10,
+      minLevel: 20,
+      description: 'Alcance o Nível 20 e conquiste 10 insígnias'
+    },
+    themeStyle: {
+      cardGradient: 'from-amber-950 via-purple-950 via-indigo-950 to-slate-950',
+      borderHighlight: 'border-amber-300',
+      glowColor: 'bg-amber-400/40',
+      accentBadge: 'bg-amber-400/30 text-amber-200'
+    }
   }
 ];
 
@@ -1794,10 +3261,24 @@ export function isCosmeticUnlocked(
   item: CosmeticRewardItem, 
   currentLevel: number, 
   achievements: Achievement[],
-  educationalProgress?: EducationalActivityProgress
+  educationalProgress?: EducationalActivityProgress,
+  streakDays: number = 1
 ): boolean {
   const cond = item.unlockCondition;
   if (cond.type === 'default') return true;
+
+  // Requisitos específicos de Guardião Cósmico
+  if (cond.type === 'guardiao_cosmico' || item.id === 'guardiao-cosmico' || item.id === 'frame_guardiao_cosmico') {
+    const minLevel = cond.minLevel ?? 20;
+    const minEpic = cond.minEpicAchievements ?? 8;
+    const minStreak = cond.minStreakDays ?? 30;
+
+    const epicCount = achievements.filter(
+      a => (a.isUnlocked || (a as any).unlocked) && (a.tier === 'ouro' || a.tier === 'lendario' || (a as any).rarity === 'epico')
+    ).length;
+
+    return currentLevel >= minLevel && epicCount >= minEpic && streakDays >= minStreak;
+  }
   
   if (cond.type === 'level') {
     return currentLevel >= (cond.minLevel || 1);
@@ -1885,11 +3366,12 @@ export function isCosmeticUnlocked(
 export function computeUnlockedCosmeticIds(
   currentLevel: number, 
   achievements: Achievement[],
-  educationalProgress?: EducationalActivityProgress
+  educationalProgress?: EducationalActivityProgress,
+  streakDays: number = 1
 ): string[] {
   const unlockedIds: string[] = [];
   for (const item of ALL_COSMETIC_REWARDS) {
-    if (isCosmeticUnlocked(item, currentLevel, achievements, educationalProgress)) {
+    if (isCosmeticUnlocked(item, currentLevel, achievements, educationalProgress, streakDays)) {
       unlockedIds.push(item.id);
     }
   }
@@ -1900,6 +3382,9 @@ export function computeUnlockedCosmeticIds(
  * Find cosmetic item by ID
  */
 export function getCosmeticById(id: string): CosmeticRewardItem | undefined {
+  if (id === 'guardiao-cosmico' || id === 'frame_guardiao_cosmico') {
+    return ALL_COSMETIC_REWARDS.find(item => item.id === 'guardiao-cosmico' || item.id === 'frame_guardiao_cosmico');
+  }
   return ALL_COSMETIC_REWARDS.find(item => item.id === id);
 }
 

@@ -408,12 +408,13 @@ export const PlatformGuideView: React.FC = () => {
                     achievementId={badge.id} 
                     tier={badge.tier} 
                     isUnlocked={badge.isUnlocked} 
+                    isSecret={badge.isSecret}
                     size={48} 
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
                       <strong className="text-slate-900 font-black truncate">
-                        {index + 1}. {badge.title}
+                        {index + 1}. {isSecret && !badge.isUnlocked ? '🔒 ???' : badge.title}
                       </strong>
                       <span className={`text-[10px] px-1.5 py-0.2 rounded font-black uppercase ${
                         badge.tier === 'lendario' ? 'bg-amber-100 text-amber-900 border border-amber-300' :
@@ -431,7 +432,7 @@ export const PlatformGuideView: React.FC = () => {
                     </div>
                     <p className="text-slate-600 text-[11px] leading-relaxed">
                       {isSecret && !badge.isUnlocked 
-                        ? '‘Descubra uma das sequências ocultas ou desfechos especiais da plataforma.’'
+                        ? '‘Requisito secreto. Continue explorando a plataforma para descobrir.’'
                         : badge.requirementHint}
                     </p>
                   </div>

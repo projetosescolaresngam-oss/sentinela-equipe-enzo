@@ -5,6 +5,7 @@ interface AchievementBadgeFrameProps {
   achievementId: AchievementId | string;
   tier?: AchievementTier;
   isUnlocked?: boolean;
+  isSecret?: boolean;
   size?: number | 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
   showGlow?: boolean;
@@ -15,6 +16,7 @@ export const AchievementBadgeFrame: React.FC<AchievementBadgeFrameProps> = ({
   achievementId,
   tier = 'bronze',
   isUnlocked = true,
+  isSecret = false,
   size = 'md',
   className = '',
   showGlow = true,
@@ -573,7 +575,6 @@ export const AchievementBadgeFrame: React.FC<AchievementBadgeFrameProps> = ({
 
       // 18. Lorde Supremo dos Distintivos / Colecionador Supremo (Imperial Crown with Rubies, Sapphires & Diamonds)
       case 'colecionador_supremo':
-      default:
         return (
           <g transform="translate(14, 14)">
             {/* Royal Velvet Cap under Crown */}
@@ -601,8 +602,451 @@ export const AchievementBadgeFrame: React.FC<AchievementBadgeFrameProps> = ({
             <rect x="30" y="6" width="2" height="2" fill="#fde047" />
           </g>
         );
+
+      // =========================================================================
+      // 🌟 NOVAS CONQUISTAS: ILUSTRAÇÕES EM PIXEL ART
+      // =========================================================================
+      
+      // 24. Ás da Sabedoria Escolar (Electric Lightning Thunderbolt on Blue Grimoire)
+      case 'veterano_questoes':
+        return (
+          <g transform="translate(14, 14)">
+            <rect x="4" y="4" width="28" height="28" fill="#1e3a8a" rx="3" />
+            <polygon points="19,5 10,18 17,18 13,31 26,16 19,16" fill="#fbbf24" />
+            <polygon points="19,7 12,17 17,17 15,27 23,16 19,16" fill="#fef08a" />
+            <rect x="6" y="8" width="2" height="2" fill="#93c5fd" />
+            <rect x="28" y="24" width="2" height="2" fill="#93c5fd" />
+          </g>
+        );
+
+      // 25. Mestre da Precisão Total (Archery Target with Bullseye Arrow)
+      case 'oraculo_cinco_estrelas':
+        return (
+          <g transform="translate(14, 14)">
+            <circle cx="18" cy="18" r="14" fill="#dc2626" />
+            <circle cx="18" cy="18" r="11" fill="#ffffff" />
+            <circle cx="18" cy="18" r="8" fill="#dc2626" />
+            <circle cx="18" cy="18" r="5" fill="#ffffff" />
+            <circle cx="18" cy="18" r="2.5" fill="#f59e0b" />
+            {/* Gold Arrow Shaft hitting center */}
+            <line x1="28" y1="8" x2="19" y2="17" stroke="#fde047" strokeWidth="2.5" />
+            <polygon points="31,5 29,8 27,6" fill="#f59e0b" />
+            <circle cx="18" cy="18" r="1" fill="#ffffff" />
+          </g>
+        );
+
+      // 26. Especialista em Tipologia de Bullying (Magnifying Glass over 8-Color Matrix)
+      case 'explorador_total_matriz':
+        return (
+          <g transform="translate(14, 14)">
+            {/* 8 colored mini-grid blocks */}
+            <rect x="5" y="5" width="6" height="6" fill="#ef4444" rx="1" />
+            <rect x="13" y="5" width="6" height="6" fill="#f97316" rx="1" />
+            <rect x="21" y="5" width="6" height="6" fill="#eab308" rx="1" />
+            <rect x="5" y="13" width="6" height="6" fill="#22c55e" rx="1" />
+            <rect x="21" y="13" width="6" height="6" fill="#06b6d4" rx="1" />
+            <rect x="5" y="21" width="6" height="6" fill="#3b82f6" rx="1" />
+            <rect x="13" y="21" width="6" height="6" fill="#8b5cf6" rx="1" />
+            <rect x="21" y="21" width="6" height="6" fill="#ec4899" rx="1" />
+            {/* Detective Lens in center */}
+            <circle cx="16" cy="16" r="8" fill="#0284c7" opacity="0.6" stroke="#fbbf24" strokeWidth="2" />
+            <line x1="22" y1="22" x2="30" y2="30" stroke="#b45309" strokeWidth="3" />
+          </g>
+        );
+
+      // 27. Guardião Multifacetado (Quad-Elemental Crest Shield)
+      case 'combo_iniciante_sentinela':
+        return (
+          <g transform="translate(14, 14)">
+            <path d="M5 4 H31 V20 L18 32 L5 20 Z" fill="#1e1b4b" />
+            <rect x="8" y="7" width="10" height="10" fill="#3b82f6" />
+            <rect x="18" y="7" width="10" height="10" fill="#10b981" />
+            <rect x="8" y="17" width="10" height="8" fill="#f59e0b" />
+            <rect x="18" y="17" width="10" height="8" fill="#8b5cf6" />
+            <line x1="18" y1="5" x2="18" y2="30" stroke="#fef08a" strokeWidth="1.5" />
+            <line x1="6" y1="17" x2="30" y2="17" stroke="#fef08a" strokeWidth="1.5" />
+            <circle cx="18" cy="17" r="3" fill="#ffffff" />
+          </g>
+        );
+
+      // 28. Farol do Acolhimento Escolar (Lighthouse with Radiating Warm Beams)
+      case 'empatia_inabalavel':
+        return (
+          <g transform="translate(14, 14)">
+            <polygon points="13,31 15,12 21,12 23,31" fill="#e11d48" />
+            <rect x="14" y="16" width="8" height="3" fill="#ffffff" />
+            <rect x="14" y="24" width="8" height="3" fill="#ffffff" />
+            <rect x="14" y="9" width="8" height="3" fill="#fbbf24" />
+            {/* Glowing lantern room */}
+            <circle cx="18" cy="8" r="4" fill="#fde047" />
+            <polygon points="18,8 33,2 33,14" fill="#fef08a" opacity="0.6" />
+            <polygon points="18,8 3,2 3,14" fill="#fef08a" opacity="0.6" />
+          </g>
+        );
+
+      // 29. Santuário da Calma Interior (Lotus Flower over Calm Water)
+      case 'mente_inabalavel':
+        return (
+          <g transform="translate(14, 14)">
+            <ellipse cx="18" cy="26" rx="14" ry="4" fill="#0369a1" />
+            <path d="M18 10 C15 16 13 22 18 25 C23 22 21 16 18 10 Z" fill="#f43f5e" />
+            <path d="M12 14 C10 18 11 23 16 24 C14 20 13 16 12 14 Z" fill="#fb7185" />
+            <path d="M24 14 C26 18 25 23 20 24 C22 20 23 16 24 14 Z" fill="#fb7185" />
+            <circle cx="18" cy="20" r="2" fill="#fef08a" />
+          </g>
+        );
+
+      // 30. Muralha da Mediação Segura (Golden Castle Wall with Gate of Peace)
+      case 'escudo_de_ouro_decisao':
+        return (
+          <g transform="translate(14, 14)">
+            <rect x="4" y="12" width="28" height="18" fill="#b45309" rx="1" />
+            <rect x="5" y="8" width="5" height="5" fill="#f59e0b" />
+            <rect x="12" y="8" width="5" height="5" fill="#f59e0b" />
+            <rect x="19" y="8" width="5" height="5" fill="#f59e0b" />
+            <rect x="26" y="8" width="5" height="5" fill="#f59e0b" />
+            {/* Gate */}
+            <path d="M13 30 V20 C13 17 15 15 18 15 C21 15 23 17 23 20 V30 Z" fill="#451a03" />
+            <circle cx="18" cy="18" r="2" fill="#fde047" />
+          </g>
+        );
+
+      // 31. Patente de Sentinela Veterano (Golden Star Chevron Insignia)
+      case 'nivel_cinco_guardiao':
+        return (
+          <g transform="translate(14, 14)">
+            <polygon points="6,6 18,14 30,6 30,12 18,20 6,12" fill="#f59e0b" />
+            <polygon points="6,15 18,23 30,15 30,21 18,29 6,21" fill="#f59e0b" />
+            <circle cx="18" cy="11" r="3" fill="#fef08a" />
+          </g>
+        );
+
+      // 32. Gabaritador Implacável dos 5 Quizzes (Five Golden Stars of Mastery)
+      case 'conhecedor_total_quizzes':
+        return (
+          <g transform="translate(14, 14)">
+            <circle cx="18" cy="18" r="14" fill="#581c87" stroke="#fbbf24" strokeWidth="2" />
+            <polygon points="18,6 20,11 25,11 21,14 23,19 18,16 13,19 15,14 11,11 16,11" fill="#fde047" />
+            <circle cx="8" cy="18" r="2" fill="#fde047" />
+            <circle cx="28" cy="18" r="2" fill="#fde047" />
+            <circle cx="12" cy="27" r="2" fill="#fde047" />
+            <circle cx="24" cy="27" r="2" fill="#fde047" />
+          </g>
+        );
+
+      // 33. Arquiteto de Rotas & Desfechos (Compass Rose & Multiverse Portal)
+      case 'arquiteto_do_destino':
+        return (
+          <g transform="translate(14, 14)">
+            <circle cx="18" cy="18" r="13" fill="#0f172a" stroke="#38bdf8" strokeWidth="1.5" />
+            <polygon points="18,6 21,15 30,18 21,21 18,30 15,21 6,18 15,15" fill="#f59e0b" />
+            <polygon points="18,6 21,15 18,18" fill="#ef4444" />
+            <polygon points="18,30 15,21 18,18" fill="#3b82f6" />
+            <circle cx="18" cy="18" r="2.5" fill="#ffffff" />
+          </g>
+        );
+
+      // 34. Caçador de Finais Secretos (Golden Key with Sparkles & Chest)
+      case 'explorador_segredos_sim':
+        return (
+          <g transform="translate(14, 14)">
+            <circle cx="13" cy="12" r="6" fill="none" stroke="#fbbf24" strokeWidth="3" />
+            <line x1="17" y1="16" x2="28" y2="27" stroke="#fbbf24" strokeWidth="3" />
+            <line x1="24" y1="23" x2="26" y2="21" stroke="#fbbf24" strokeWidth="2.5" />
+            <line x1="27" y1="26" x2="29" y2="24" stroke="#fbbf24" strokeWidth="2.5" />
+            <rect x="6" y="24" width="3" height="3" fill="#ffffff" />
+            <rect x="27" y="6" width="3" height="3" fill="#ffffff" />
+          </g>
+        );
+
+      // 35. Sentinela Comprometido (Endless Scroll of Knowledge with 60 Gems)
+      case 'missao_cumprida_maratonista':
+        return (
+          <g transform="translate(14, 14)">
+            <rect x="7" y="6" width="22" height="24" fill="#fef3c7" rx="2" />
+            <line x1="10" y1="11" x2="26" y2="11" stroke="#92400e" strokeWidth="1.5" />
+            <line x1="10" y1="16" x2="26" y2="16" stroke="#92400e" strokeWidth="1.5" />
+            <line x1="10" y1="21" x2="26" y2="21" stroke="#92400e" strokeWidth="1.5" />
+            <line x1="10" y1="26" x2="20" y2="26" stroke="#92400e" strokeWidth="1.5" />
+            <circle cx="25" cy="25" r="4" fill="#dc2626" />
+            <rect x="24" y="24" width="2" height="2" fill="#ffffff" />
+          </g>
+        );
+
+      // 36. Mestre da Autoregulação Emocional (Yin-Yang Calm Sphere with Glowing Wings)
+      case 'harmonia_plena':
+        return (
+          <g transform="translate(14, 14)">
+            <circle cx="18" cy="18" r="13" fill="#047857" />
+            <path d="M18 5 A13 13 0 0 0 18 31 A6.5 6.5 0 0 1 18 18 A6.5 6.5 0 0 0 18 5 Z" fill="#6ee7b7" />
+            <circle cx="18" cy="11.5" r="2.5" fill="#047857" />
+            <circle cx="18" cy="24.5" r="2.5" fill="#6ee7b7" />
+          </g>
+        );
+
+      // 37. Comandante da Cultura Escolar (Golden Eagle Crest)
+      case 'nivel_dez_comandante':
+        return (
+          <g transform="translate(14, 14)">
+            <polygon points="18,4 8,14 12,28 18,24 24,28 28,14" fill="#b45309" />
+            <polygon points="18,7 10,15 13,25 18,22 23,25 26,15" fill="#f59e0b" />
+            <circle cx="18" cy="14" r="3.5" fill="#ffffff" />
+            <rect x="17" y="13" width="2" height="2" fill="#dc2626" />
+          </g>
+        );
+
+      // 38. Diplomata Supremo da Convivência (Golden Olive Branch & Handshake)
+      case 'diplomata_da_paz':
+        return (
+          <g transform="translate(14, 14)">
+            <circle cx="18" cy="18" r="14" fill="#065f46" stroke="#fde047" strokeWidth="1.5" />
+            {/* Laurel branches */}
+            <path d="M8 24 C8 12 14 8 18 6 C22 8 28 12 28 24" fill="none" stroke="#34d399" strokeWidth="2" />
+            <rect x="12" y="16" width="12" height="6" fill="#fbbf24" rx="2" />
+            <circle cx="18" cy="19" r="1.5" fill="#ffffff" />
+          </g>
+        );
+
+      // 39. Bastião Inviolável de Proteção (Iron Citadel Shield with 4 Corner Rubies)
+      case 'guardiao_blindado_escola':
+        return (
+          <g transform="translate(14, 14)">
+            <path d="M4 4 H32 V20 L18 33 L4 20 Z" fill="#1e293b" stroke="#94a3b8" strokeWidth="2" />
+            <path d="M7 7 H29 V19 L18 29 L7 19 Z" fill="#334155" />
+            <polygon points="18,9 26,17 18,25 10,17" fill="#38bdf8" />
+            <circle cx="18" cy="17" r="2.5" fill="#ffffff" />
+          </g>
+        );
+
+      // 40. Grão-Mestre dos Distintivos (Grand Master Trophy Cup with Radiance)
+      case 'grande_colecionador':
+        return (
+          <g transform="translate(14, 14)">
+            <path d="M10 6 H26 V18 C26 23 22 25 18 25 C14 25 10 23 10 18 Z" fill="#f59e0b" />
+            <path d="M12 8 H24 V17 C24 21 21 23 18 23 C15 23 12 21 12 17 Z" fill="#fde047" />
+            {/* Cup handles */}
+            <path d="M10 9 H6 C6 15 10 16 10 16" stroke="#d97706" strokeWidth="2" fill="none" />
+            <path d="M26 9 H30 C30 15 26 16 26 16" stroke="#d97706" strokeWidth="2" fill="none" />
+            {/* Base */}
+            <rect x="16" y="25" width="4" height="4" fill="#b45309" />
+            <rect x="12" y="29" width="12" height="3" fill="#78350f" rx="1" />
+          </g>
+        );
+
+      // 41. Lorde Sentinela Honorário (Diamond Crown of Honor)
+      case 'nivel_quinze_lorde':
+        return (
+          <g transform="translate(14, 14)">
+            <polygon points="5,22 8,8 14,16 18,6 22,16 28,8 31,22" fill="#7c3aed" />
+            <polygon points="7,21 9,10 14,16 18,8 22,16 27,10 29,21" fill="#c084fc" />
+            <rect x="5" y="22" width="26" height="5" fill="#581c87" rx="1" />
+            <circle cx="18" cy="24.5" r="1.5" fill="#fef08a" />
+            <circle cx="10" cy="24.5" r="1.2" fill="#38bdf8" />
+            <circle cx="26" cy="24.5" r="1.2" fill="#38bdf8" />
+          </g>
+        );
+
+      // 42. Mestre Supremo da Cultura de Paz (Celestial Sunburst with Sovereign Seal)
+      case 'mestre_absoluto_sentinela':
+        return (
+          <g transform="translate(14, 14)">
+            {/* Sunburst rays */}
+            <line x1="18" y1="2" x2="18" y2="34" stroke="#fbbf24" strokeWidth="2" />
+            <line x1="2" y1="18" x2="34" y2="18" stroke="#fbbf24" strokeWidth="2" />
+            <line x1="6" y1="6" x2="30" y2="30" stroke="#fbbf24" strokeWidth="2" />
+            <line x1="6" y1="30" x2="30" y2="6" stroke="#fbbf24" strokeWidth="2" />
+            {/* Core medallion */}
+            <circle cx="18" cy="18" r="11" fill="#b91c1c" stroke="#fde047" strokeWidth="2" />
+            <polygon points="18,10 20,15 25,15 21,18 23,23 18,20 13,23 15,18 11,15 16,15" fill="#fef08a" />
+          </g>
+        );
+
+      // 43. Lenda Imortal do Sentinela Escolar (Eternal Cosmic Galaxy Core with Mythic Wings)
+      case 'lenda_viva_sentinela':
+        return (
+          <g transform="translate(14, 14)">
+            {/* Cosmic Ring */}
+            <circle cx="18" cy="18" r="14" fill="#180a2a" stroke="#ec4899" strokeWidth="2" />
+            <ellipse cx="18" cy="18" rx="14" ry="5" fill="none" stroke="#a855f7" strokeWidth="1.5" transform="rotate(-30 18 18)" />
+            {/* Core Pulsing Star */}
+            <polygon points="18,5 21,14 30,18 21,22 18,31 15,22 6,18 15,14" fill="#fbbf24" />
+            <circle cx="18" cy="18" r="4" fill="#ffffff" />
+            <circle cx="18" cy="18" r="2" fill="#f43f5e" />
+            {/* Starlight glints */}
+            <rect x="7" y="7" width="2" height="2" fill="#ffffff" />
+            <rect x="28" y="27" width="2" height="2" fill="#ffffff" />
+          </g>
+        );
+
+      // 🔒 44. Detetive do Sentinela (Golden Magnifying Glass & Detective Fedora)
+      case 'secret_detetive_sentinela':
+        return (
+          <g transform="translate(14, 14)">
+            {/* Magnifying Glass Lens */}
+            <circle cx="16" cy="16" r="10" fill="#0284c7" fillOpacity="0.4" stroke="#f59e0b" strokeWidth="3" />
+            <circle cx="16" cy="16" r="6" fill="#38bdf8" fillOpacity="0.6" />
+            <path d="M12 12 Q16 8 20 12" stroke="#ffffff" strokeWidth="1.5" fill="none" />
+            {/* Handle */}
+            <line x1="24" y1="24" x2="32" y2="32" stroke="#b45309" strokeWidth="4" strokeLinecap="round" />
+            <line x1="24" y1="24" x2="32" y2="32" stroke="#fde68a" strokeWidth="1.5" strokeLinecap="round" />
+            {/* Sparkles */}
+            <rect x="6" y="8" width="2" height="2" fill="#fbbf24" />
+            <rect x="24" y="6" width="2" height="2" fill="#ffffff" />
+          </g>
+        );
+
+      // 🔒 45. Combo do Conhecimento (Triple Lightning Bolt & Wisdom Crystal)
+      case 'secret_combo_conhecimento':
+        return (
+          <g transform="translate(14, 14)">
+            <polygon points="18,2 26,14 19,15 28,34 10,18 17,17" fill="#fbbf24" stroke="#b45309" strokeWidth="1.5" />
+            <polygon points="16,6 22,14 17,15 23,28 12,17 17,16" fill="#fef08a" />
+            <polygon points="8,4 12,12 9,13 13,22 6,14 9,13" fill="#38bdf8" />
+            <polygon points="26,16 30,22 28,23 31,30 25,24 28,23" fill="#ec4899" />
+          </g>
+        );
+
+      // 🔒 46. Mente Atenta (Neural Brain Core with Radiant Synapses)
+      case 'secret_mente_atenta':
+        return (
+          <g transform="translate(14, 14)">
+            <circle cx="18" cy="18" r="13" fill="#312e81" stroke="#818cf8" strokeWidth="2" />
+            {/* Brain hemisphere loops */}
+            <path d="M11 18 C11 12 15 10 18 10 C21 10 25 12 25 18 C25 24 21 26 18 26 C15 26 11 24 11 18 Z" fill="#ec4899" />
+            <path d="M14 15 C14 13 16 12 18 12 C20 12 22 13 22 15 C22 21 18 24 18 24" fill="none" stroke="#fbcfe8" strokeWidth="2" />
+            {/* Energy pulses */}
+            <line x1="18" y1="2" x2="18" y2="7" stroke="#38bdf8" strokeWidth="2" />
+            <line x1="18" y1="29" x2="18" y2="34" stroke="#38bdf8" strokeWidth="2" />
+            <line x1="2" y1="18" x2="7" y2="18" stroke="#38bdf8" strokeWidth="2" />
+            <line x1="29" y1="18" x2="34" y2="18" stroke="#38bdf8" strokeWidth="2" />
+          </g>
+        );
+
+      // 🔒 47. Código Secreto (Cyber Vault & Encrypted Golden Key)
+      case 'secret_codigo_secreto':
+        return (
+          <g transform="translate(14, 14)">
+            {/* Cyber Matrix Box */}
+            <rect x="5" y="6" width="26" height="24" fill="#0f172a" stroke="#a855f7" strokeWidth="2" rx="2" />
+            <rect x="8" y="9" width="20" height="18" fill="#1e1b4b" />
+            {/* Glowing Runes */}
+            <line x1="10" y1="12" x2="26" y2="12" stroke="#38bdf8" strokeWidth="1.5" strokeDasharray="2,2" />
+            <line x1="10" y1="18" x2="26" y2="18" stroke="#38bdf8" strokeWidth="1.5" strokeDasharray="3,1" />
+            <line x1="10" y1="24" x2="26" y2="24" stroke="#38bdf8" strokeWidth="1.5" strokeDasharray="1,2" />
+            {/* Golden Key overlaid */}
+            <circle cx="24" cy="14" r="4" fill="none" stroke="#fbbf24" strokeWidth="2" />
+            <line x1="21" y1="17" x2="13" y2="25" stroke="#fbbf24" strokeWidth="2" />
+            <line x1="15" y1="23" x2="17" y2="25" stroke="#fbbf24" strokeWidth="2" />
+          </g>
+        );
+
+      // 🔒 48. Sentinela da Empatia (Sacred Violet Heart with Golden Angel Wings)
+      case 'secret_sentinela_empatia':
+        return (
+          <g transform="translate(14, 14)">
+            {/* Wings */}
+            <path d="M4 16 C4 8 10 10 16 16 C10 18 6 22 4 16 Z" fill="#c084fc" />
+            <path d="M32 16 C32 8 26 10 20 16 C26 18 30 22 32 16 Z" fill="#c084fc" />
+            {/* Core Heart */}
+            <path d="M18 28 L10 20 C6 16 6 10 12 10 C15 10 17 12 18 14 C19 12 21 10 24 10 C30 10 30 16 26 20 Z" fill="#d946ef" stroke="#fdf4ff" strokeWidth="1.5" />
+            {/* Inner glow */}
+            <circle cx="15" cy="13" r="2" fill="#ffffff" />
+          </g>
+        );
+
+      // 🔒 49. Precisão Absoluta (Holographic Laser Target with Bullseye Arrow)
+      case 'secret_precisao_absoluta':
+        return (
+          <g transform="translate(14, 14)">
+            {/* Concentric rings */}
+            <circle cx="18" cy="18" r="14" fill="none" stroke="#ef4444" strokeWidth="2" />
+            <circle cx="18" cy="18" r="10" fill="none" stroke="#fbbf24" strokeWidth="2" />
+            <circle cx="18" cy="18" r="5" fill="#ef4444" stroke="#ffffff" strokeWidth="1.5" />
+            {/* Crosshairs */}
+            <line x1="18" y1="2" x2="18" y2="34" stroke="#38bdf8" strokeWidth="1.5" />
+            <line x1="2" y1="18" x2="34" y2="18" stroke="#38bdf8" strokeWidth="1.5" />
+            {/* Center flash */}
+            <polygon points="18,14 20,18 18,22 16,18" fill="#ffffff" />
+          </g>
+        );
+
+      // 🔒 50. Explorador Oculto (Mystic Astral Compass with Crescent Moon)
+      case 'secret_explorador_noturno_areas':
+        return (
+          <g transform="translate(14, 14)">
+            {/* Dark Celestial Disk */}
+            <circle cx="18" cy="18" r="14" fill="#0f172a" stroke="#38bdf8" strokeWidth="2" />
+            {/* Crescent Moon */}
+            <path d="M22 8 A12 12 0 0 0 22 28 A10 10 0 0 1 22 8 Z" fill="#fbbf24" />
+            {/* 4-point Compass Needle */}
+            <polygon points="18,6 21,18 18,16 15,18" fill="#ef4444" />
+            <polygon points="18,30 21,18 18,20 15,18" fill="#cbd5e1" />
+            <polygon points="6,18 18,15 16,18 18,21" fill="#cbd5e1" />
+            <polygon points="30,18 18,15 20,18 18,21" fill="#cbd5e1" />
+            <circle cx="18" cy="18" r="2.5" fill="#f8fafc" />
+          </g>
+        );
+
+      // 🔒 51. Lenda Oculta (Imperial Crown of Secret Mastery with Radiant Flame)
+      case 'secret_lenda_oculta':
+        return (
+          <g transform="translate(14, 14)">
+            {/* Aura fire */}
+            <path d="M18 2 C24 8 28 14 28 22 C28 28 23 32 18 32 C13 32 8 28 8 22 C8 14 12 8 18 2 Z" fill="#7c3aed" opacity="0.6" />
+            {/* Golden Imperial Crown */}
+            <polygon points="6,24 8,11 14,17 18,8 22,17 28,11 30,24" fill="#fbbf24" stroke="#92400e" strokeWidth="1.5" />
+            <polygon points="8,23 10,13 14,17 18,10 22,17 26,13 28,23" fill="#fef08a" />
+            <rect x="6" y="24" width="24" height="5" fill="#b45309" rx="1" />
+            {/* Center Purple Jewel */}
+            <polygon points="18,18 21,21 18,24 15,21" fill="#ec4899" />
+            <circle cx="9" cy="26.5" r="1.2" fill="#38bdf8" />
+            <circle cx="27" cy="26.5" r="1.2" fill="#38bdf8" />
+          </g>
+        );
+
+      default:
+        return (
+          <g transform="translate(14, 14)">
+            {/* Cosmic Ring */}
+            <circle cx="18" cy="18" r="14" fill="#180a2a" stroke="#ec4899" strokeWidth="2" />
+            <ellipse cx="18" cy="18" rx="14" ry="5" fill="none" stroke="#a855f7" strokeWidth="1.5" transform="rotate(-30 18 18)" />
+            {/* Core Pulsing Star */}
+            <polygon points="18,5 21,14 30,18 21,22 18,31 15,22 6,18 15,14" fill="#fbbf24" />
+            <circle cx="18" cy="18" r="4" fill="#ffffff" />
+            <circle cx="18" cy="18" r="2" fill="#f43f5e" />
+            {/* Starlight glints */}
+            <rect x="7" y="7" width="2" height="2" fill="#ffffff" />
+            <rect x="28" y="27" width="2" height="2" fill="#ffffff" />
+          </g>
+        );
     }
   };
+
+  // Render mysterious locked graphic for secret achievements that are not yet discovered
+  const renderMysterySecretGraphic = () => (
+    <g transform="translate(14, 14)">
+      {/* Dark Purple Arcane Nebula */}
+      <circle cx="18" cy="18" r="14" fill="#1e1035" stroke="#9333ea" strokeWidth="1.5" />
+      <circle cx="18" cy="18" r="10" fill="#2e1065" stroke="#c084fc" strokeWidth="1" strokeDasharray="3,2" />
+      {/* Question Marks / Runes */}
+      <text
+        x="18"
+        y="23"
+        fill="#fde047"
+        fontSize="16"
+        fontWeight="bold"
+        fontFamily="monospace"
+        textAnchor="middle"
+      >
+        ?
+      </text>
+      {/* Sparkles around question mark */}
+      <rect x="6" y="8" width="2" height="2" fill="#c084fc" />
+      <rect x="28" y="8" width="2" height="2" fill="#fde047" />
+      <rect x="8" y="26" width="2" height="2" fill="#38bdf8" />
+      <rect x="27" y="25" width="2" height="2" fill="#ec4899" />
+    </g>
+  );
 
   return (
     <div 
@@ -687,22 +1131,22 @@ export const AchievementBadgeFrame: React.FC<AchievementBadgeFrameProps> = ({
 
         {/* 5. INNER PIXEL ART SCENE */}
         <g filter={showGlow && isUnlocked ? 'url(#badge-glow)' : undefined}>
-          {renderPixelIllustration()}
+          {isSecret && !isUnlocked ? renderMysterySecretGraphic() : renderPixelIllustration()}
         </g>
 
         {/* 6. LOCKED OVERLAY (If locked) */}
         {!isUnlocked && (
           <g>
             {/* Semi-transparent dark vignette */}
-            <rect x="12" y="12" width="40" height="40" fill="#000000" opacity="0.35" />
+            <rect x="12" y="12" width="40" height="40" fill={isSecret ? "#2e1065" : "#000000"} opacity={isSecret ? "0.2" : "0.35"} />
             {/* Pixel Lock Shackle in center */}
-            <path d="M28 26 V22 C28 19 30 17 32 17 C34 17 36 19 36 22 V26" stroke="#e2e8f0" strokeWidth="2.5" fill="none" />
+            <path d="M28 26 V22 C28 19 30 17 32 17 C34 17 36 19 36 22 V26" stroke={isSecret ? "#c084fc" : "#e2e8f0"} strokeWidth="2.5" fill="none" />
             {/* Pixel Lock Body */}
-            <rect x="25" y="25" width="14" height="12" fill="#1e293b" rx="1" />
-            <rect x="26" y="26" width="12" height="10" fill="#475569" />
+            <rect x="25" y="25" width="14" height="12" fill={isSecret ? "#3b0764" : "#1e293b"} rx="1" />
+            <rect x="26" y="26" width="12" height="10" fill={isSecret ? "#7e22ce" : "#475569"} />
             {/* Keyhole */}
-            <circle cx="32" cy="30" r="1.5" fill="#f8fafc" />
-            <polygon points="31.5,30 32.5,30 33,33 31,33" fill="#f8fafc" />
+            <circle cx="32" cy="30" r="1.5" fill={isSecret ? "#fef08a" : "#f8fafc"} />
+            <polygon points="31.5,30 32.5,30 33,33 31,33" fill={isSecret ? "#fef08a" : "#f8fafc"} />
           </g>
         )}
       </svg>

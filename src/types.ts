@@ -140,12 +140,42 @@ export type AchievementId =
   | 'colecionador_supremo'
   | 'sentinela_noturno'
   | 'campeao_inclusao'
-  // Novas conquistas de Simulações Interativas:
+  // Simulações Interativas
   | 'primeiro_passo_simulacao'
   | 'olhar_empatico'
   | 'decisao_segura'
   | 'pensador_estrategico'
-  | 'guardiao_comunidade_sim';
+  | 'guardiao_comunidade_sim'
+  // Novas Conquistas Avançadas & Lendárias
+  | 'veterano_questoes'
+  | 'oraculo_cinco_estrelas'
+  | 'explorador_total_matriz'
+  | 'combo_iniciante_sentinela'
+  | 'empatia_inabalavel'
+  | 'mente_inabalavel'
+  | 'escudo_de_ouro_decisao'
+  | 'nivel_cinco_guardiao'
+  | 'conhecedor_total_quizzes'
+  | 'arquiteto_do_destino'
+  | 'explorador_segredos_sim'
+  | 'missao_cumprida_maratonista'
+  | 'harmonia_plena'
+  | 'nivel_dez_comandante'
+  | 'diplomata_da_paz'
+  | 'guardiao_blindado_escola'
+  | 'grande_colecionador'
+  | 'nivel_quinze_lorde'
+  | 'mestre_absoluto_sentinela'
+  | 'lenda_viva_sentinela'
+  // 🔒 Conquistas Secretas Iniciais
+  | 'secret_detetive_sentinela'
+  | 'secret_combo_conhecimento'
+  | 'secret_mente_atenta'
+  | 'secret_codigo_secreto'
+  | 'secret_sentinela_empatia'
+  | 'secret_precisao_absoluta'
+  | 'secret_explorador_noturno_areas'
+  | 'secret_lenda_oculta';
 
 export type AchievementCategory = 'sabedoria' | 'detetive' | 'empatia' | 'zen' | 'escudo';
 export type AchievementTier = 'bronze' | 'prata' | 'ouro' | 'lendario';
@@ -184,6 +214,8 @@ export interface Achievement {
   progressUnit?: string;
   requirementHint: string;
   isSecret?: boolean;
+  xpReward?: number;
+  secretRewardCosmeticId?: string;
 }
 
 export type QuizOptionLetter = 'A' | 'B' | 'C' | 'D';
@@ -436,16 +468,18 @@ export type CosmeticCategory = 'frame' | 'icon' | 'title' | 'badge' | 'effect' |
 export type CosmeticRarity = 'comum' | 'incomum' | 'raro' | 'epico' | 'lendario' | 'mitico' | 'supremo';
 
 export interface CosmeticUnlockCondition {
-  type: 'default' | 'level' | 'achievement' | 'quiz_count' | 'simulation_count' | 'perfect_quiz_count' | 'breathing_count' | 'total_achievements' | 'secret';
+  type: 'default' | 'level' | 'achievement' | 'quiz_count' | 'simulation_count' | 'perfect_quiz_count' | 'breathing_count' | 'total_achievements' | 'secret' | 'guardiao_cosmico';
   minLevel?: number;
   achievementId?: AchievementId;
   minCount?: number;
   description: string;
+  minStreakDays?: number;
+  minEpicAchievements?: number;
 }
 
 export interface CosmeticUnlockRequirement {
   label: string;
-  currentProgressKey: 'level' | 'achievements' | 'quizzes' | 'simulations' | 'breathing' | 'perfect_quizzes' | 'days';
+  currentProgressKey: 'level' | 'achievements' | 'quizzes' | 'simulations' | 'breathing' | 'perfect_quizzes' | 'days' | 'epic_achievements';
   target: number;
   icon?: string;
 }
@@ -485,14 +519,14 @@ export interface CosmeticRewardItem {
     glowClass?: string;
     outerRingClass?: string;
     badgeAccent?: string;
-    svgOverlay?: 'cosmic' | 'fenix' | 'sombrio' | 'ondas' | 'eco' | 'palhacada' | 'gamer' | 'portal_vortex' | 'espartano' | 'caos_meme' | 'comida_delicia' | 'dragao_fogo' | 'dragao_gelo' | 'coroa_suprema' | 'electric' | 'fire' | 'stars' | 'ice' | 'eclipse' | 'imperial' | 'owl' | 'ninja' | 'shades' | 'cyber' | 'rainbow' | 'runic' | 'supreme' | 'aurora' | 'none';
+    svgOverlay?: 'guardiao_cosmico' | 'cosmic' | 'fenix' | 'sombrio' | 'ondas' | 'eco' | 'palhacada' | 'gamer' | 'portal_vortex' | 'espartano' | 'caos_meme' | 'comida_delicia' | 'dragao_fogo' | 'dragao_gelo' | 'coroa_suprema' | 'electric' | 'fire' | 'stars' | 'ice' | 'eclipse' | 'imperial' | 'owl' | 'ninja' | 'shades' | 'cyber' | 'rainbow' | 'runic' | 'supreme' | 'aurora' | 'none';
   };
   badgeStyle?: {
     badgeGradient: string;
     badgeBorder: string;
     badgeShadow?: string;
     ribbonText?: string;
-    crestType?: 'shield' | 'wings' | 'star' | 'crown' | 'hexagon' | 'flame' | 'diamond' | 'owl' | 'ninja' | 'infinity' | 'trophy' | 'orb' | 'sparkle' | 'sword' | 'feather' | 'book' | 'compass' | 'leaf' | 'water' | 'phoenix';
+    crestType?: 'shield' | 'wings' | 'star' | 'crown' | 'hexagon' | 'flame' | 'diamond' | 'owl' | 'ninja' | 'infinity' | 'trophy' | 'orb' | 'sparkle' | 'sword' | 'feather' | 'book' | 'compass' | 'leaf' | 'water' | 'phoenix' | 'gem' | 'mask';
   };
   effectStyle?: {
     animationClass: string;

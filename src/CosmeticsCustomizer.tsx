@@ -38,7 +38,7 @@ import { ItemInspectionModal } from './ItemInspectionModal';
 import { soundEngine } from './relaxingAudio';
 
 interface CosmeticsCustomizerProps {
-  initialCategory?: CosmeticCategory;
+  initialCategory?: CosmeticCategory | 'special';
   initialFilter?: 'all' | 'unlocked' | 'locked';
   onNavigateToTab?: (tab: any) => void;
 }
@@ -55,7 +55,7 @@ export const CosmeticsCustomizer: React.FC<CosmeticsCustomizerProps> = ({
     userRankPosition
   } = useApp();
 
-  const [selectedCategory, setSelectedCategory] = useState<CosmeticCategory>(initialCategory);
+  const [selectedCategory, setSelectedCategory] = useState<CosmeticCategory | 'special'>(initialCategory);
   const [filterStatus, setFilterStatus] = useState<'all' | 'unlocked' | 'locked'>(initialFilter);
   const [selectedRarity, setSelectedRarity] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -74,28 +74,31 @@ export const CosmeticsCustomizer: React.FC<CosmeticsCustomizerProps> = ({
   const equippedTitle = getCosmeticById(cosmeticsProfile.equippedTitleId);
   const equippedBadge = getCosmeticById(cosmeticsProfile.equippedBadgeId);
 
-  const categories: { id: CosmeticCategory; label: string; icon: string }[] = [
+  const categories: { id: CosmeticCategory | 'special'; label: string; icon: string }[] = [
     { id: 'frame', label: 'Molduras', icon: '🖼️' },
-    { id: 'icon', label: 'Ícones', icon: '🛡️' },
+    { id: 'badge', label: 'Emblemas', icon: '🛡️' },
+    { id: 'icon', label: 'Ícones', icon: '👤' },
     { id: 'title', label: 'Títulos', icon: '🏷️' },
-    { id: 'badge', label: 'Emblemas', icon: '🏅' },
     { id: 'effect', label: 'Efeitos', icon: '✨' },
     { id: 'theme', label: 'Temas', icon: '🎨' },
+    { id: 'special', label: 'Especiais', icon: '🏆' },
   ];
 
   const rarityOptions = [
-    { id: 'all', label: 'Todas Raridades' },
+    { id: 'all', label: 'Todas' },
     { id: 'comum', label: '⚪ Comum' },
     { id: 'incomum', label: '🟢 Incomum' },
-    { id: 'raro', label: '🔵 Raro' },
-    { id: 'epico', label: '🟣 Épico' },
-    { id: 'lendario', label: '🟠 Lendário' },
-    { id: 'mitico', label: '🔴 Mítico' },
-    { id: 'supremo', label: '🌈 Supremo' },
+    { id: 'raro', label: '🔵 Rara' },
+    { id: 'epico', label: '🟣 Épica' },
+    { id: 'lendario', label: '🟠 Lendária' },
+    { id: 'mitico', label: '🔴 Mítica' },
+    { id: 'supremo', label: '🌈 Suprema' },
   ];
 
-  // Filter items
-  const categoryItems = ALL_COSMETIC_REWARDS.filter(item => item.category === selectedCategory);
+  // Filter items based on category
+  const categoryItems = selectedCategory === 'special'
+    ? ALL_COSMETIC_REWARDS.filter(item => item.isSecret || item.rarity === 'mitico' || item.rarity === 'supremo' || item.unlockCondition.type === 'guardiao_cosmico')
+    : ALL_COSMETIC_REWARDS.filter(item => item.category === selectedCategory);
   
   const filteredItems = categoryItems.filter(item => {
     const isUnlocked = cosmeticsProfile.unlockedRewardIds.includes(item.id);
@@ -243,19 +246,21 @@ export const CosmeticsCustomizer: React.FC<CosmeticsCustomizerProps> = ({
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. 🗂️ CATEGORY SWITCHER PILLS                                             */}
+      {/* 2. 🗂️ CATEGORY SWITCHER TABS (Organized Sections)                           */}
       {/* ========================================================================= */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
         {categories.map(cat => {
           const isSelected = selectedCategory === cat.id;
-          const catItems = ALL_COSMETIC_REWARDS.filter(i => i.category === cat.id);
+          const catItems = cat.id === 'special'
+            ? ALL_COSMETIC_REWARDS.filter(i => i.isSecret || i.rarity === 'mitico' || i.rarity === 'supremo' || i.unlockCondition.type === 'guardiao_cosmico')
+            : ALL_COSMETIC_REWARDS.filter(i => i.category === cat.id);
           const catUnlocked = catItems.filter(i => cosmeticsProfile.unlockedRewardIds.includes(i.id)).length;
           
           return (
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl text-xs font-black whitespace-nowrap transition-all shrink-0 ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black whitespace-nowrap transition-all shrink-0 cursor-pointer ${
                 isSelected
                   ? 'bg-purple-700 text-white shadow-md scale-102 ring-2 ring-purple-400/50'
                   : 'bg-white hover:bg-purple-50 text-slate-700 hover:text-purple-950 border border-purple-200 shadow-2xs'
@@ -276,74 +281,77 @@ export const CosmeticsCustomizer: React.FC<CosmeticsCustomizerProps> = ({
       {/* ========================================================================= */}
       {/* 3. 🔍 FILTERS & SEARCH BAR                                                */}
       {/* ========================================================================= */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-2.5 bg-white p-3 rounded-2xl border border-purple-100 shadow-xs">
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-purple-100 shadow-xs">
         
         {/* Status Filters */}
-        <div className="flex flex-wrap items-center gap-1.5 w-full md:w-auto">
+        <div className="flex flex-wrap items-center gap-1.5">
           <button
             onClick={() => setFilterStatus('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               filterStatus === 'all'
                 ? 'bg-purple-900 text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
-            Todos ({categoryItems.length})
+            Todas ({categoryItems.length})
           </button>
           <button
             onClick={() => setFilterStatus('unlocked')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1 ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
               filterStatus === 'unlocked'
                 ? 'bg-emerald-600 text-white shadow-xs'
                 : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200'
             }`}
           >
-            <Check className="w-3 h-3" />
-            <span>Desbloqueados</span>
+            <Check className="w-3.5 h-3.5" />
+            <span>Desbloqueadas</span>
           </button>
           <button
             onClick={() => setFilterStatus('locked')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1 ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
               filterStatus === 'locked'
-                ? 'bg-slate-700 text-white shadow-xs'
+                ? 'bg-slate-800 text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
-            <Lock className="w-3 h-3" />
-            <span>Bloqueados</span>
+            <Lock className="w-3.5 h-3.5" />
+            <span>Bloqueadas</span>
           </button>
         </div>
 
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          {/* Rarity Select */}
-          <select
-            value={selectedRarity}
-            onChange={e => setSelectedRarity(e.target.value)}
-            className="px-2.5 py-1.5 rounded-xl bg-slate-50 border border-purple-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-400"
-          >
-            {rarityOptions.map(opt => (
-              <option key={opt.id} value={opt.id}>{opt.label}</option>
-            ))}
-          </select>
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Rarity Select Pills */}
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-none py-0.5">
+            <span className="text-[11px] font-bold text-slate-500 mr-1 hidden sm:inline">Raridade:</span>
+            <select
+              value={selectedRarity}
+              onChange={e => setSelectedRarity(e.target.value)}
+              className="px-3 py-1.5 rounded-xl bg-slate-50 border border-purple-200 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            >
+              {rarityOptions.map(opt => (
+                <option key={opt.id} value={opt.id}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
 
           {/* Search */}
-          <div className="relative flex-1 md:w-44">
+          <div className="relative flex-1 sm:w-52">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input 
               type="text"
-              placeholder="Buscar item..."
+              placeholder="Pesquisar coleção..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-slate-50 border border-purple-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-400"
+              className="w-full pl-8.5 pr-3 py-1.5 rounded-xl bg-slate-50 border border-purple-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-400"
             />
           </div>
         </div>
       </div>
 
       {/* ========================================================================= */}
-      {/* 4. 🎁 GRID DE ITENS COSMÉTICOS                                            */}
+      {/* 4. 🎁 PROFESSIONAL COLLECTION GRID (Cards com Encaixe Perfeito)            */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+      <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
         {filteredItems.map(item => {
           const isUnlocked = cosmeticsProfile.unlockedRewardIds.includes(item.id);
           const isSecretLocked = item.isSecret && !isUnlocked;
@@ -361,38 +369,38 @@ export const CosmeticsCustomizer: React.FC<CosmeticsCustomizerProps> = ({
           return (
             <div
               key={item.id}
-              className={`relative rounded-2xl p-3.5 flex flex-col justify-between transition-all border ${
+              className={`relative rounded-3xl p-4 flex flex-col justify-between transition-all border group ${
                 isEquipped
-                  ? 'bg-purple-50/90 border-purple-600 shadow-md ring-2 ring-purple-400'
+                  ? 'bg-purple-50/95 border-purple-600 shadow-md ring-2 ring-purple-400'
                   : isSecretLocked
                   ? 'bg-gradient-to-b from-slate-900 to-slate-950 border-purple-900/60 text-purple-200 shadow-inner'
                   : isUnlocked
-                  ? 'bg-white hover:bg-purple-50/40 border-purple-200 shadow-xs hover:shadow-md'
-                  : 'bg-slate-50/80 border-slate-200 opacity-80'
+                  ? 'bg-white hover:bg-purple-50/40 border-purple-200 shadow-2xs hover:shadow-md'
+                  : 'bg-slate-50/90 border-slate-200 opacity-85 hover:opacity-100'
               }`}
             >
-              {/* Top Row: Rarity Tag & Inspect Button & Equipped Badge */}
               <div>
+                {/* Card Header: Rarity Badge + Inspect Action + Status */}
                 <div className="flex items-center justify-between gap-1.5 mb-2.5">
-                  <span className={`text-[10px] font-black px-2 py-0.5 rounded-md border ${
+                  <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border shadow-2xs ${
                     isSecretLocked 
                       ? 'bg-purple-950 text-purple-300 border-purple-800' 
                       : `${rarityBadge.bgClass} ${rarityBadge.textClass} ${rarityBadge.borderClass}`
                   }`}>
-                    {isSecretLocked ? '🔒 Item Secreto' : rarityBadge.label}
+                    {isSecretLocked ? '🔒 Secreto' : `✦ ${rarityBadge.label.replace(/^[⚪🟢🔵🟣🟠🔴🌈]\s*/, '').toUpperCase()}`}
                   </span>
 
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => setInspectedItem(item)}
-                      className="p-1 rounded-lg bg-purple-100/80 hover:bg-purple-200 text-purple-700 hover:text-purple-900 transition-colors title='Inspecionar Recompensa'"
-                      title="Ver Detalhes do Colecionável"
+                      className="p-1.5 rounded-xl bg-purple-100/90 hover:bg-purple-200 text-purple-800 hover:text-purple-950 transition-colors cursor-pointer"
+                      title="Inspecionar Recompensa em Detalhes"
                     >
                       <Maximize2 className="w-3.5 h-3.5" />
                     </button>
 
                     {isEquipped ? (
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-purple-700 text-white flex items-center gap-1 shadow-2xs">
+                      <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-purple-700 text-white flex items-center gap-1 shadow-2xs">
                         <Check className="w-3 h-3" />
                         Equipado
                       </span>
@@ -409,30 +417,34 @@ export const CosmeticsCustomizer: React.FC<CosmeticsCustomizerProps> = ({
                   </div>
                 </div>
 
-                {/* Item Center Preview */}
+                {/* Card Center: Dedicated Frame & Avatar Preview Area (Contained & Centered) */}
                 <div 
                   onClick={() => setInspectedItem(item)}
-                  className={`flex flex-col items-center justify-center my-2 p-3 rounded-xl min-h-[96px] border cursor-pointer hover:border-purple-300 transition-all ${
-                  isSecretLocked 
-                    ? 'bg-slate-950/60 border-purple-900/40' 
-                    : 'bg-purple-50/40 border-purple-100'
-                }`}>
+                  className={`relative rounded-2xl min-h-[148px] flex items-center justify-center p-3.5 my-2.5 overflow-hidden transition-all cursor-pointer border ${
+                    isSecretLocked 
+                      ? 'bg-slate-950/70 border-purple-900/40 shadow-inner' 
+                      : 'bg-gradient-to-b from-purple-950/40 via-purple-900/20 to-slate-900/50 border-purple-800/20 shadow-inner group-hover:border-purple-500/40'
+                  }`}
+                >
                   {isSecretLocked ? (
-                    <div className="text-center">
-                      <div className="w-12 h-12 rounded-full bg-purple-950 text-purple-400 border border-purple-700/60 flex items-center justify-center text-2xl animate-pulse mx-auto mb-1">
+                    <div className="text-center py-2">
+                      <div className="w-14 h-14 rounded-full bg-purple-950 text-purple-400 border border-purple-700/60 flex items-center justify-center text-3xl animate-pulse mx-auto mb-1.5 shadow-md">
                         🗝️
                       </div>
-                      <span className="text-[11px] font-mono text-purple-300 tracking-widest">???</span>
+                      <span className="text-xs font-mono font-black text-purple-300 tracking-widest block">ITEM OCULTO</span>
+                      <span className="text-[10px] text-purple-400/80">Clique para ver a pista</span>
                     </div>
                   ) : (
-                    <>
+                    <div className="relative flex items-center justify-center">
                       {item.category === 'frame' && (
                         <AvatarRenderer 
                           frameId={item.id}
                           iconId={cosmeticsProfile.equippedIconId}
+                          effectId={cosmeticsProfile.equippedEffectId}
                           level={currentLevel}
                           levelBadgeEmoji={currentLevelBadgeEmoji}
-                          size="md"
+                          size="lg"
+                          showLevelBadge={true}
                         />
                       )}
 
@@ -440,9 +452,11 @@ export const CosmeticsCustomizer: React.FC<CosmeticsCustomizerProps> = ({
                         <AvatarRenderer 
                           frameId={cosmeticsProfile.equippedFrameId}
                           iconId={item.id}
+                          effectId={cosmeticsProfile.equippedEffectId}
                           level={currentLevel}
                           levelBadgeEmoji={currentLevelBadgeEmoji}
-                          size="md"
+                          size="lg"
+                          showLevelBadge={true}
                         />
                       )}
 
@@ -453,26 +467,27 @@ export const CosmeticsCustomizer: React.FC<CosmeticsCustomizerProps> = ({
                           effectId={item.id}
                           level={currentLevel}
                           levelBadgeEmoji={currentLevelBadgeEmoji}
-                          size="md"
+                          size="lg"
+                          showLevelBadge={true}
                         />
                       )}
 
                       {item.category === 'title' && (
-                        <div className="text-center">
-                          <span className="text-2xl mb-1 block">{item.iconPreview}</span>
-                          <div className="text-xs font-black text-purple-950 px-2.5 py-1 bg-white rounded-lg border border-purple-300 shadow-2xs">
+                        <div className="text-center py-2">
+                          <span className="text-3xl mb-1.5 block">{item.iconPreview}</span>
+                          <div className="text-xs font-black text-amber-300 px-3 py-1.5 bg-purple-950 rounded-xl border border-amber-400/60 shadow-md">
                             « {item.customTitleText || item.name} »
                           </div>
                         </div>
                       )}
 
                       {item.category === 'badge' && (
-                        <div className="text-center">
-                          <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${item.badgeStyle?.badgeGradient || 'from-purple-900 to-indigo-950'} text-amber-300 flex items-center justify-center text-2xl shadow-xs border-2 ${item.badgeStyle?.badgeBorder || 'border-amber-400'} mx-auto mb-1`}>
+                        <div className="text-center py-1">
+                          <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${item.badgeStyle?.badgeGradient || 'from-purple-900 to-indigo-950'} text-amber-300 flex items-center justify-center text-3xl shadow-md border-2 ${item.badgeStyle?.badgeBorder || 'border-amber-400'} mx-auto mb-1.5`}>
                             {item.iconPreview}
                           </div>
                           {item.badgeStyle?.ribbonText && (
-                            <span className="text-[9px] font-black uppercase tracking-wider text-amber-400 bg-amber-950/80 px-1.5 py-0.2 rounded-md border border-amber-500/40">
+                            <span className="text-[9.5px] font-black uppercase tracking-wider text-amber-400 bg-amber-950/90 px-2 py-0.5 rounded-md border border-amber-500/40">
                               {item.badgeStyle.ribbonText}
                             </span>
                           )}
@@ -480,22 +495,23 @@ export const CosmeticsCustomizer: React.FC<CosmeticsCustomizerProps> = ({
                       )}
 
                       {item.category === 'theme' && (
-                        <div className={`w-full p-2.5 rounded-xl bg-gradient-to-r ${item.themeStyle?.cardGradient || 'from-purple-900 to-indigo-950'} text-white text-center shadow-xs border ${item.themeStyle?.borderHighlight || 'border-purple-400'}`}>
-                          <div className="text-xs font-bold">{item.name}</div>
-                          <div className="text-[10px] text-purple-200 mt-0.5">Estilo do Perfil</div>
+                        <div className={`w-36 p-3 rounded-2xl bg-gradient-to-r ${item.themeStyle?.cardGradient || 'from-purple-900 to-indigo-950'} text-white text-center shadow-md border ${item.themeStyle?.borderHighlight || 'border-purple-400'}`}>
+                          <span className="text-xl block mb-0.5">{item.iconPreview}</span>
+                          <div className="text-xs font-black truncate">{item.name}</div>
+                          <div className="text-[9.5px] text-purple-200 mt-0.5">Estilo do Perfil</div>
                         </div>
                       )}
-                    </>
+                    </div>
                   )}
                 </div>
 
-                {/* Name & Description */}
-                <h4 className={`font-black text-xs sm:text-sm mb-0.5 ${
+                {/* Name & Short Description */}
+                <h4 className={`font-black text-sm mb-1 line-clamp-1 ${
                   isSecretLocked ? 'text-purple-200' : 'text-slate-900'
                 }`}>
                   {isSecretLocked ? '??? (Item Oculto)' : item.name}
                 </h4>
-                <p className={`text-[11px] leading-tight mb-2 ${
+                <p className={`text-[11.5px] leading-snug mb-3 line-clamp-2 min-h-[32px] ${
                   isSecretLocked ? 'text-purple-400 italic' : 'text-slate-500'
                 }`}>
                   {isSecretLocked 
@@ -504,14 +520,14 @@ export const CosmeticsCustomizer: React.FC<CosmeticsCustomizerProps> = ({
                 </p>
               </div>
 
-              {/* Action Button & Requirement Hint */}
-              <div className={`pt-2 border-t ${
-                isSecretLocked ? 'border-purple-900/60' : 'border-purple-100/80'
+              {/* Card Footer: Action Button or Clear Unlock Condition */}
+              <div className={`pt-3 border-t ${
+                isSecretLocked ? 'border-purple-900/60' : 'border-purple-100'
               }`}>
                 {isEquipped ? (
                   <button
                     disabled
-                    className="w-full py-1.5 px-3 rounded-xl bg-purple-100 text-purple-900 text-xs font-black cursor-default flex items-center justify-center gap-1.5"
+                    className="w-full py-2 px-3 rounded-xl bg-purple-100 text-purple-900 text-xs font-black cursor-default flex items-center justify-center gap-1.5"
                   >
                     <Check className="w-3.5 h-3.5 text-purple-700" />
                     <span>Em Uso</span>
@@ -519,22 +535,28 @@ export const CosmeticsCustomizer: React.FC<CosmeticsCustomizerProps> = ({
                 ) : isUnlocked ? (
                   <button
                     onClick={() => handleEquip(item)}
-                    className="w-full py-1.5 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 active:scale-95 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5"
+                    className="w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 active:scale-95 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>Equipar</span>
                   </button>
                 ) : (
-                  <div className={`p-1.5 rounded-xl text-[10.5px] font-medium flex items-center gap-1.5 ${
-                    isSecretLocked 
-                      ? 'bg-purple-950/80 text-purple-300 border border-purple-800/50' 
-                      : 'bg-slate-100 text-slate-600'
-                  }`}>
-                    <Lock className="w-3.5 h-3.5 shrink-0 opacity-70" />
-                    <span className="truncate">
-                      {isSecretLocked ? 'Condição Secreta' : item.unlockCondition.description}
-                    </span>
-                  </div>
+                  <button
+                    onClick={() => setInspectedItem(item)}
+                    className={`w-full p-2 rounded-xl text-[11px] font-bold flex items-center justify-between gap-1.5 transition-colors cursor-pointer ${
+                      isSecretLocked 
+                        ? 'bg-purple-950/80 hover:bg-purple-900 text-purple-300 border border-purple-800/50' 
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <Lock className="w-3.5 h-3.5 shrink-0 text-amber-500" />
+                      <span className="truncate">
+                        {isSecretLocked ? 'Condição Secreta' : item.unlockCondition.description}
+                      </span>
+                    </div>
+                    <Eye className="w-3.5 h-3.5 shrink-0 opacity-60" />
+                  </button>
                 )}
               </div>
 
@@ -544,10 +566,12 @@ export const CosmeticsCustomizer: React.FC<CosmeticsCustomizerProps> = ({
       </div>
 
       {filteredItems.length === 0 && (
-        <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-300">
-          <Layers className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-          <h4 className="text-sm font-bold text-slate-700">Nenhum item encontrado</h4>
-          <p className="text-xs text-slate-500 mt-1">Tente ajustar seus filtros de status ou raridade.</p>
+        <div className="p-10 text-center bg-slate-50 rounded-3xl border border-dashed border-slate-300">
+          <Layers className="w-10 h-10 text-slate-400 mx-auto mb-2.5 opacity-60" />
+          <h4 className="text-sm font-black text-slate-700">Nenhum colecionável encontrado</h4>
+          <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+            Tente ajustar os filtros de categoria, raridade ou termo de busca para visualizar os itens da coleção.
+          </p>
         </div>
       )}
 
